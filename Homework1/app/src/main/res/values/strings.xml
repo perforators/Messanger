@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Homework 1</string>
+    <string name="title_first_activity_toolbar">First Activity</string>
+    <string name="title_second_activity_toolbar">Second Activity</string>
+    <string name="no_permission">Ошибка. Нету разрешения на чтение календаря!</string>
+    <string name="get_calendar_events_button">Получить список событий</string>
+    <string name="event_date">Начало события: %s\nОкончание события: %s</string>
+    <string name="default_title">Событие №%s</string>
+</resources>
