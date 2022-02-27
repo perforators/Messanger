@@ -6,13 +6,13 @@ import android.content.Intent
 import android.content.IntentFilter
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import androidx.appcompat.widget.Toolbar
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.krivochkov.homework1.databinding.ActivitySecondBinding
 import com.krivochkov.homework1.model.CalendarEvent
-import com.krivochkov.homework1.util.CUSTOM_CALENDAR_EVENTS_FILTER
-import com.krivochkov.homework1.util.CALENDAR_EVENTS_EXTRA
 
 class SecondActivity : AppCompatActivity() {
+
+    private lateinit var viewBinding: ActivitySecondBinding
 
     private val calendarEventsBroadcastReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent) {
@@ -27,7 +27,8 @@ class SecondActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_second)
+        viewBinding = ActivitySecondBinding.inflate(layoutInflater)
+        setContentView(viewBinding.root)
         initToolbar()
 
         val intentFilter = IntentFilter(CUSTOM_CALENDAR_EVENTS_FILTER)
@@ -36,9 +37,10 @@ class SecondActivity : AppCompatActivity() {
     }
 
     private fun initToolbar() {
-        val toolbar: Toolbar = findViewById(R.id.toolbar)
-        toolbar.title = getString(R.string.title_second_activity_toolbar)
-        setSupportActionBar(toolbar)
+        viewBinding.toolbarLayout.toolbar.apply {
+            title = getString(R.string.title_second_activity_toolbar)
+            setSupportActionBar(this)
+        }
     }
 
     override fun onDestroy() {
@@ -59,6 +61,9 @@ class SecondActivity : AppCompatActivity() {
     }
 
     companion object {
+
+        const val CUSTOM_CALENDAR_EVENTS_FILTER = "calendar_events_filter"
+        const val CALENDAR_EVENTS_EXTRA = "calendar_events_extra"
 
         fun createIntent(context: Context) = Intent(context, SecondActivity::class.java)
     }

@@ -6,7 +6,9 @@
     android:layout_height="match_parent"
     tools:context=".SecondActivity">
 
-    <include layout="@layout/toolbar"/>
+    <include
+        android:id="@+id/toolbar_layout"
+        layout="@layout/toolbar"/>
 
     <ProgressBar
         android:id="@+id/progressBar"

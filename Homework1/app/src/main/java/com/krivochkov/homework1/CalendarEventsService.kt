@@ -6,15 +6,15 @@ import android.content.Intent
 import android.os.IBinder
 import android.provider.CalendarContract.Events
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.krivochkov.homework1.SecondActivity.Companion.CALENDAR_EVENTS_EXTRA
+import com.krivochkov.homework1.SecondActivity.Companion.CUSTOM_CALENDAR_EVENTS_FILTER
 import com.krivochkov.homework1.model.CalendarEvent
-import com.krivochkov.homework1.util.CUSTOM_CALENDAR_EVENTS_FILTER
-import com.krivochkov.homework1.util.CALENDAR_EVENTS_EXTRA
-import com.krivochkov.homework1.util.convertLongToTime
-import com.krivochkov.homework1.util.getDefaultEventTitle
+import com.krivochkov.homework1.util.TimeConverter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlin.collections.ArrayList
 import kotlin.coroutines.CoroutineContext
 
 class CalendarEventsService : Service(), CoroutineScope {
@@ -48,10 +48,14 @@ class CalendarEventsService : Service(), CoroutineScope {
                         val startDate = getLong(2)
                         val endDate = getLong(3)
                         val calendarEvent = CalendarEvent(
-                            id,
-                            if (title.isEmpty()) resources.getDefaultEventTitle(id) else title,
-                            startDate.convertLongToTime(),
-                            endDate.convertLongToTime()
+                            id = id,
+                            title = if (title.isEmpty()) {
+                                String.format(resources.getString(R.string.default_title), id)
+                            } else {
+                                title
+                            },
+                            startDate = TimeConverter.convertLongToTime(startDate),
+                            endDate = TimeConverter.convertLongToTime(endDate)
                         )
                         calendarEvents.add(calendarEvent)
                     }
