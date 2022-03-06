@@ -5,8 +5,9 @@
 
     <ImageView
         android:id="@+id/avatar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:adjustViewBounds="true"
         android:layout_marginRight="@dimen/middle_margin"
         android:layout_marginBottom="@dimen/middle_margin"
         android:src="@mipmap/ic_launcher" />
