@@ -11,9 +11,9 @@
         android:id="@+id/message1"
         android:layout_width="350dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="@dimen/middle_margin"
-        android:layout_marginBottom="@dimen/middle_margin"
+        android:paddingTop="@dimen/middle_padding"
+        android:paddingBottom="@dimen/middle_padding"
+        android:paddingLeft="@dimen/middle_padding"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">

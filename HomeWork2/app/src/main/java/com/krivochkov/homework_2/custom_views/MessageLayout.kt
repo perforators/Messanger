@@ -96,8 +96,9 @@ class MessageLayout @JvmOverloads constructor(
             }
         }
 
-        val width = avatar.measuredWidthWithMarginsOrZero + widthUsed
-        val height = maxOf(heightUsed, avatar.measuredHeightWithMarginsOrZero)
+        val width = avatar.measuredWidthWithMarginsOrZero + widthUsed + paddingLeft + paddingRight
+        val height = maxOf(heightUsed, avatar.measuredHeightWithMarginsOrZero) +
+                paddingTop + paddingBottom
 
         setMeasuredDimension(
             resolveSize(width, widthMeasureSpec),
@@ -108,23 +109,24 @@ class MessageLayout @JvmOverloads constructor(
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
         if (avatar.visibility != View.GONE) {
             avatar.layout(
-                avatar.marginLeft,
-                avatar.marginTop,
-                avatar.marginLeft + avatar.measuredWidth,
-                avatar.paddingTop + avatar.measuredHeight
+                avatar.marginLeft + paddingLeft,
+                avatar.marginTop + paddingTop,
+                avatar.marginLeft + paddingLeft + avatar.measuredWidth,
+                avatar.paddingTop + paddingTop + avatar.measuredHeight
             )
         }
 
-        var currentTop = 0
+        var currentTop = paddingTop
+        val currentLeft = avatar.measuredWidthWithMarginsOrZero + paddingLeft
 
         for (i in 1 until childCount) {
             val child = getChildAt(i)
 
             if (child.visibility != View.GONE) {
                 child.layout(
-                    avatar.measuredWidthWithMarginsOrZero + child.marginLeft,
+                    currentLeft + child.marginLeft,
                     currentTop + child.marginTop,
-                    avatar.measuredWidthWithMarginsOrZero + child.marginLeft + child.measuredWidth,
+                    currentLeft + child.marginLeft + child.measuredWidth,
                     currentTop + child.marginTop + child.measuredHeight
                 )
 
@@ -132,13 +134,13 @@ class MessageLayout @JvmOverloads constructor(
             }
         }
 
-        backgroundBounds.left = avatar.measuredWidthWithMarginsOrZero.toFloat()
-        backgroundBounds.top = 0f
+        backgroundBounds.left = currentLeft.toFloat()
+        backgroundBounds.top = paddingTop.toFloat()
         backgroundBounds.right = maxOf(
-                avatar.measuredWidthWithMarginsOrZero + userName.measuredWidthWithMarginsOrZero,
-                avatar.measuredWidthWithMarginsOrZero + message.measuredWidthWithMarginsOrZero
+                currentLeft + userName.measuredWidthWithMarginsOrZero,
+                currentLeft + message.measuredWidthWithMarginsOrZero
         ).toFloat()
-        backgroundBounds.bottom = userName.measuredHeightWithMarginsOrZero +
+        backgroundBounds.bottom = paddingTop + userName.measuredHeightWithMarginsOrZero +
                     message.measuredHeightWithMarginsOrZero.toFloat()
     }
 

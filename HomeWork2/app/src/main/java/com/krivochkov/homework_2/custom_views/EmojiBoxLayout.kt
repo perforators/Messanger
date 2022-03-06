@@ -59,7 +59,7 @@ class EmojiBoxLayout @JvmOverloads constructor(
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        val maxWidth = MeasureSpec.getSize(widthMeasureSpec)
+        val maxWidth = MeasureSpec.getSize(widthMeasureSpec) - paddingLeft - paddingRight
         var widthCurrentLine = 0
         var maxHeightCurrentLine = 0
         var maxWidthLines = 0
@@ -86,21 +86,24 @@ class EmojiBoxLayout @JvmOverloads constructor(
         maxWidthLines = maxOf(maxWidthLines, widthCurrentLine)
         totalHeight += maxHeightCurrentLine
 
+        val width = maxWidthLines + paddingLeft + paddingRight
+        val height = totalHeight + paddingTop + paddingBottom
+
         setMeasuredDimension(
-            resolveSize(maxWidthLines, widthMeasureSpec),
-            resolveSize(totalHeight, heightMeasureSpec)
+            resolveSize(width, widthMeasureSpec),
+            resolveSize(height, heightMeasureSpec)
         )
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-        var currentLeftPosition = 0
-        var currentTopPosition = 0
+        var currentLeftPosition = paddingLeft
+        var currentTopPosition = paddingTop
         var heightCurrentLine = 0
 
         children.forEach { child ->
             if (child.visibility != View.GONE) {
                 if (currentLeftPosition + child.measuredWidthWithMargins > measuredWidth) {
-                    currentLeftPosition = 0
+                    currentLeftPosition = paddingLeft
                     currentTopPosition += heightCurrentLine
                     heightCurrentLine = child.measuredHeightWithMargins
                 } else {
