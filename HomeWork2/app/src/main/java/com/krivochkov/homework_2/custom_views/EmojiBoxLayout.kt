@@ -108,9 +108,7 @@ class EmojiBoxLayout @JvmOverloads constructor(
             removeView(emojiView)
         }
 
-        removeView(plus)
-        addView(emojiView)
-        addView(plus)
+        addView(emojiView, childCount - 1)
 
         return true
     }
