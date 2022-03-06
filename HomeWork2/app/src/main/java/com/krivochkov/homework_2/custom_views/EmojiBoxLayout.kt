@@ -36,7 +36,26 @@ class EmojiBoxLayout @JvmOverloads constructor(
             val (emoji, reactionsCount, isSelected) = emojiProducer()
             addEmoji(emoji, reactionsCount, isSelected)
         }
-        addView(plus)
+        addView(plus, childCount)
+    }
+
+    fun addEmoji(emoji: String, reactionsCount: Int, isSelected: Boolean): Boolean {
+        if (reactionsCount < 1) {
+            return false
+        }
+
+        val emojiView = createEmojiView(emoji, reactionsCount, isSelected)
+        emojiView.onInvalidReactionsCount = {
+            removeView(emojiView)
+        }
+        addView(emojiView)
+
+        return true
+    }
+
+    fun removeAllEmoji() {
+        removeAllViews()
+        addView(plus, childCount)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -98,24 +117,13 @@ class EmojiBoxLayout @JvmOverloads constructor(
         }
     }
 
-    fun addEmoji(emoji: String, reactionsCount: Int, isSelected: Boolean): Boolean {
-        if (reactionsCount < 1) {
-            return false
+    override fun addView(child: View?, index: Int, params: LayoutParams?) {
+        val newIndex = if (index < 0) {
+            childCount - 1
+        } else {
+            index
         }
-
-        val emojiView = createEmojiView(emoji, reactionsCount, isSelected)
-        emojiView.onInvalidReactionsCount = {
-            removeView(emojiView)
-        }
-
-        addView(emojiView, childCount - 1)
-
-        return true
-    }
-
-    fun removeAllEmoji() {
-        removeAllViews()
-        addView(plus)
+        super.addView(child, newIndex, params)
     }
 
     private fun createEmojiView(
