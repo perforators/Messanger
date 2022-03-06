@@ -57,15 +57,15 @@ class MessageLayout @JvmOverloads constructor(
         message.text = newMessage
     }
 
-    fun setEmojiProducer(producer: () -> Pair<String, Int>) {
+    fun setEmojiProducer(producer: () -> Triple<String, Int, Boolean>) {
         emojiBox.emojiProducer = producer
     }
 
-    fun addEmoji(emoji: String, reactionsCount: Int) {
-        emojiBox.addEmoji(emoji, reactionsCount)
+    fun addEmoji(emoji: String, reactionsCount: Int, isSelected: Boolean = false) {
+        emojiBox.addEmoji(emoji, reactionsCount, isSelected)
     }
 
-    fun clearAllEmoji() {
+    fun removeAllEmoji() {
         emojiBox.removeAllEmoji()
     }
 

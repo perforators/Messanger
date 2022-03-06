@@ -14,8 +14,12 @@ class EmojiBoxLayout @JvmOverloads constructor(
     attrs: AttributeSet? = null,
 ) : ViewGroup(context, attrs) {
 
-    var emojiProducer: () -> Pair<String, Int> = {
-        EmojiView.DEFAULT_EMOJI to EmojiView.DEFAULT_REACTION_COUNT
+    var emojiProducer: () -> Triple<String, Int, Boolean> = {
+        Triple(
+            EmojiView.DEFAULT_EMOJI,
+            EmojiView.DEFAULT_REACTION_COUNT,
+            false
+        )
     }
 
     private val defaultMargin = DEFAULT_MARGIN_IN_DP.dpToPx(context).toInt()
@@ -28,11 +32,11 @@ class EmojiBoxLayout @JvmOverloads constructor(
     }
 
     init {
-        addView(plus)
         plus.setOnClickListener {
-            val (emoji, reactionsCount) = emojiProducer()
-            addEmoji(emoji, reactionsCount)
+            val (emoji, reactionsCount, isSelected) = emojiProducer()
+            addEmoji(emoji, reactionsCount, isSelected)
         }
+        addView(plus)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -94,21 +98,38 @@ class EmojiBoxLayout @JvmOverloads constructor(
         }
     }
 
-    fun addEmoji(emoji: String, reactionsCount: Int) {
-        val emojiView = EmojiView(context).apply {
-            layoutParams = createDefaultLayoutParams()
-            background = AppCompatResources.getDrawable(context, R.drawable.bg_emoji_view)
-            this.emoji = emoji
-            this.reactionsCount = reactionsCount
+    fun addEmoji(emoji: String, reactionsCount: Int, isSelected: Boolean): Boolean {
+        if (reactionsCount < 1) {
+            return false
         }
+
+        val emojiView = createEmojiView(emoji, reactionsCount, isSelected)
+        emojiView.onInvalidReactionsCount = {
+            removeView(emojiView)
+        }
+
         removeView(plus)
         addView(emojiView)
         addView(plus)
+
+        return true
     }
 
     fun removeAllEmoji() {
         removeAllViews()
         addView(plus)
+    }
+
+    private fun createEmojiView(
+        emoji: String,
+        reactionsCount: Int,
+        isSelected: Boolean
+    ): EmojiView = EmojiView(context).apply {
+        layoutParams = createDefaultLayoutParams()
+        background = AppCompatResources.getDrawable(context, R.drawable.bg_emoji_view)
+        this.emoji = emoji
+        this.reactionsCount = reactionsCount
+        this.isSelected = isSelected
     }
 
     override fun generateLayoutParams(attrs: AttributeSet?): LayoutParams {

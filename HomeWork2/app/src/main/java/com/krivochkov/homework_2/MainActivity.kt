@@ -16,9 +16,14 @@ class MainActivity : AppCompatActivity() {
         messageLayout = findViewById(R.id.message1)
         emojiProvider = EmojiProvider()
         messageLayout.setEmojiProducer {
-            val reactionsCount = (1..150).random()
+            val reactionsCount = (1..20).random()
             val emoji = emojiProvider.getRandom()
-            emoji to reactionsCount
+            val isSelected = reactionsCount < 10
+            Triple(
+                emoji,
+                reactionsCount,
+                isSelected
+            )
         }
         messageLayout.setUserName("Егор Кривочков")
         messageLayout.setMessage("Это моё первое сообщение")

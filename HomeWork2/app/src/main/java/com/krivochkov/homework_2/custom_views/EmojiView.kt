@@ -14,6 +14,8 @@ class EmojiView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
 ) : View(context, attrs) {
 
+    var onInvalidReactionsCount: () -> Unit = {  }
+
     private val reactionText: String
         get() = "$emoji  $reactionsCount"
 
@@ -103,6 +105,9 @@ class EmojiView @JvmOverloads constructor(
         super.performClick()
         isSelected = !isSelected
         reactionsCount = if (isSelected) reactionsCount + 1 else reactionsCount - 1
+        if (reactionsCount < 1) {
+            onInvalidReactionsCount()
+        }
         return true
     }
 
@@ -124,7 +129,7 @@ class EmojiView @JvmOverloads constructor(
     companion object {
 
         const val DEFAULT_EMOJI = "\uD83D\uDE00"
-        const val DEFAULT_REACTION_COUNT = 0
+        const val DEFAULT_REACTION_COUNT = 1
         private const val DEFAULT_TEXT_SIZE_IN_SP = 12f
         private const val DEFAULT_TEXT_COLOR = Color.WHITE
         private const val DEFAULT_HORIZONTAL_PADDING_IN_DP = 8
