@@ -22,10 +22,12 @@ class EmojiView @JvmOverloads constructor(
 
     var reactionsCount = DEFAULT_REACTION_COUNT
         set(value) {
-            if (value < 1) {
+            field = if (value < 1) {
                 onInvalidReactionsCount()
+                DEFAULT_REACTION_COUNT
+            } else {
+                value
             }
-            field = value
             requestLayout()
         }
 
