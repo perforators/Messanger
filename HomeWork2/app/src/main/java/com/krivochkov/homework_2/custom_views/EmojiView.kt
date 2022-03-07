@@ -14,20 +14,14 @@ class EmojiView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
 ) : View(context, attrs) {
 
-    var onClick: (Boolean) -> Unit = {  }
-    var onInvalidReactionsCount: () -> Unit = {  }
+    var onClick: (EmojiView) -> Unit = {  }
 
     private val reactionText: String
         get() = "$emoji  $reactionsCount"
 
     var reactionsCount = DEFAULT_REACTION_COUNT
         set(value) {
-            field = if (value < 1) {
-                onInvalidReactionsCount()
-                DEFAULT_REACTION_COUNT
-            } else {
-                value
-            }
+            field = value
             requestLayout()
         }
 
@@ -108,7 +102,7 @@ class EmojiView @JvmOverloads constructor(
     override fun performClick(): Boolean {
         super.performClick()
         isSelected = !isSelected
-        onClick(isSelected)
+        onClick(this)
         return true
     }
 

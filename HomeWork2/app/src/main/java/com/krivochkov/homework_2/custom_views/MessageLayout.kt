@@ -23,8 +23,19 @@ class MessageLayout @JvmOverloads constructor(
     attrs: AttributeSet? = null,
 ) : ViewGroup(context, attrs) {
 
-    var emojiProducer: () -> Triple<String, Int, Boolean> = {
-        Triple(
+    var onEmojiClick: (EmojiView) -> Unit = { emoji ->
+        emoji.apply {
+            when (isSelected) {
+                true -> reactionsCount++
+                false -> reactionsCount--
+            }
+            if (reactionsCount < 1) {
+                flexBox.removeView(this)
+            }
+        }
+    }
+    var onPlusClick: (ImageView) -> Unit = {
+        addEmoji(
             EmojiView.DEFAULT_EMOJI,
             EmojiView.DEFAULT_REACTION_COUNT,
             false
@@ -59,8 +70,7 @@ class MessageLayout @JvmOverloads constructor(
         flexBox = findViewById(R.id.flex_box)
 
         plus.setOnClickListener {
-            val (emoji, reactionsCount, isSelected) = emojiProducer()
-            addEmoji(emoji, reactionsCount, isSelected)
+            onPlusClick(plus)
         }
         flexBox.addView(plus)
     }
@@ -93,15 +103,8 @@ class MessageLayout @JvmOverloads constructor(
             this.reactionsCount = reactionsCount
             this.isSelected = isSelected
         }
-
         emojiView.onClick = {
-            when (it) {
-                true -> emojiView.reactionsCount++
-                false -> emojiView.reactionsCount--
-            }
-        }
-        emojiView.onInvalidReactionsCount = {
-            flexBox.removeView(emojiView)
+            onEmojiClick(it)
         }
         flexBox.addView(emojiView, flexBox.childCount - 1)
 
