@@ -23,7 +23,7 @@ task clean(type: Delete) {
 
 ext {
     // Sdk and tools
-    minSdkVers = 21
+    minSdkVers = 23
     targetSdkVers = 31
     compileSdkVers = 31
 

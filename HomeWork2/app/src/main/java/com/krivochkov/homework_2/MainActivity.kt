@@ -15,7 +15,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         messageLayout = findViewById(R.id.message1)
         emojiProvider = EmojiProvider()
-        messageLayout.setEmojiProducer {
+        messageLayout.emojiProducer = {
             val reactionsCount = (1..20).random()
             val emoji = emojiProvider.getRandom()
             val isSelected = reactionsCount < 10

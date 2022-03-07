@@ -35,8 +35,8 @@
         android:textColor="@color/white"
         android:textSize="@dimen/default_text_size" />
 
-    <com.krivochkov.homework_2.custom_views.EmojiBoxLayout
-        android:id="@+id/emoji_box"
+    <com.krivochkov.homework_2.custom_views.FlexBoxLayout
+        android:id="@+id/flex_box"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/middle_margin"

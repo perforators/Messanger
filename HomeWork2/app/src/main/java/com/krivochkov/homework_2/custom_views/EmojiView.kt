@@ -14,6 +14,7 @@ class EmojiView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
 ) : View(context, attrs) {
 
+    var onClick: (Boolean) -> Unit = {  }
     var onInvalidReactionsCount: () -> Unit = {  }
 
     private val reactionText: String
@@ -21,6 +22,9 @@ class EmojiView @JvmOverloads constructor(
 
     var reactionsCount = DEFAULT_REACTION_COUNT
         set(value) {
+            if (value < 1) {
+                onInvalidReactionsCount()
+            }
             field = value
             requestLayout()
         }
@@ -48,10 +52,10 @@ class EmojiView @JvmOverloads constructor(
         )
         textPaint.textSize = typedArray.getDimension(
             R.styleable.EmojiView_textSize,
-            DEFAULT_TEXT_SIZE_IN_SP.spToPx(context)
+            resources.getDimension(R.dimen.emoji_text_size)
         )
         textPaint.color =
-            typedArray.getColor(R.styleable.EmojiView_textColor, DEFAULT_TEXT_COLOR)
+            typedArray.getColor(R.styleable.EmojiView_textColor, Color.WHITE)
 
         typedArray.recycle()
     }
@@ -62,10 +66,8 @@ class EmojiView @JvmOverloads constructor(
         val textWidth = reactionsTextBounds.width()
         val textHeight = reactionsTextBounds.height()
 
-        val sumWidth = textWidth + paddingLeft.orDefaultPadding(PaddingType.LEFT) +
-                paddingRight.orDefaultPadding(PaddingType.RIGHT)
-        val sumHeight = textHeight + paddingTop.orDefaultPadding(PaddingType.TOP) +
-                paddingBottom.orDefaultPadding(PaddingType.BOTTOM)
+        val sumWidth = textWidth + paddingLeft.orDefaultPadding() + paddingRight.orDefaultPadding()
+        val sumHeight = textHeight + paddingTop.orDefaultPadding() + paddingBottom.orDefaultPadding()
 
         val resultWidth = resolveSize(sumWidth, widthMeasureSpec)
         val resultHeight = resolveSize(sumHeight, heightMeasureSpec)
@@ -104,36 +106,22 @@ class EmojiView @JvmOverloads constructor(
     override fun performClick(): Boolean {
         super.performClick()
         isSelected = !isSelected
-        reactionsCount = if (isSelected) reactionsCount + 1 else reactionsCount - 1
-        if (reactionsCount < 1) {
-            onInvalidReactionsCount()
-        }
+        onClick(isSelected)
         return true
     }
 
-    private fun Int.orDefaultPadding(type: PaddingType): Int {
+    private fun Int.orDefaultPadding(): Int {
         return if (this == 0) {
-            type.defaultValue.dpToPx(context).toInt()
+            resources.getDimension(R.dimen.middle_padding).toInt()
         } else {
             this
         }
-    }
-
-    private enum class PaddingType(val defaultValue: Int) {
-        RIGHT(DEFAULT_HORIZONTAL_PADDING_IN_DP),
-        LEFT(DEFAULT_HORIZONTAL_PADDING_IN_DP),
-        TOP(DEFAULT_VERTICAL_PADDING_IN_DP),
-        BOTTOM(DEFAULT_VERTICAL_PADDING_IN_DP)
     }
 
     companion object {
 
         const val DEFAULT_EMOJI = "\uD83D\uDE00"
         const val DEFAULT_REACTION_COUNT = 1
-        private const val DEFAULT_TEXT_SIZE_IN_SP = 12f
-        private const val DEFAULT_TEXT_COLOR = Color.WHITE
-        private const val DEFAULT_HORIZONTAL_PADDING_IN_DP = 8
-        private const val DEFAULT_VERTICAL_PADDING_IN_DP = 6
         private val SUPPORTED_DRAWABLE_STATE = intArrayOf(android.R.attr.state_selected)
     }
 }

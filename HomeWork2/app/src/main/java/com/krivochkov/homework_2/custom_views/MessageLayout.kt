@@ -2,7 +2,6 @@ package com.krivochkov.homework_2.custom_views
 
 import android.content.Context
 import android.graphics.Canvas
-import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.RectF
 import android.graphics.drawable.Drawable
@@ -12,8 +11,11 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.DrawableRes
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.marginLeft
 import androidx.core.view.marginTop
+import androidx.core.view.setMargins
+import androidx.core.view.setPadding
 import com.krivochkov.homework_2.R
 
 class MessageLayout @JvmOverloads constructor(
@@ -21,16 +23,32 @@ class MessageLayout @JvmOverloads constructor(
     attrs: AttributeSet? = null,
 ) : ViewGroup(context, attrs) {
 
+    var emojiProducer: () -> Triple<String, Int, Boolean> = {
+        Triple(
+            EmojiView.DEFAULT_EMOJI,
+            EmojiView.DEFAULT_REACTION_COUNT,
+            false
+        )
+    }
+
     private val avatar: ImageView
     private val userName: TextView
     private val message: TextView
-    private val emojiBox: EmojiBoxLayout
+    private val flexBox: FlexBoxLayout
 
-    private val radiusRounding = RADIUS_OF_ROUNDING_IN_DP.dpToPx(context)
+    private val defaultMargin = resources.getDimension(R.dimen.small_margin).toInt()
+    private val radiusRounding = resources.getDimension(R.dimen.radius_rounding)
     private val backgroundBounds = RectF()
     private val backgroundPaint = Paint().apply {
         isAntiAlias = true
-        color = Color.parseColor(BACKGROUND_COLOR)
+        color = context.getColor(R.color.black_200)
+    }
+
+    private val plus = ImageView(context).apply {
+        layoutParams = createDefaultLayoutParams()
+        background = AppCompatResources.getDrawable(context, R.drawable.bg_emoji_view_unselected)
+        setImageResource(R.drawable.plus)
+        setPadding(resources.getDimension(R.dimen.small_padding).toInt())
     }
 
     init {
@@ -38,7 +56,13 @@ class MessageLayout @JvmOverloads constructor(
         avatar = findViewById(R.id.avatar)
         userName = findViewById(R.id.username)
         message = findViewById(R.id.message)
-        emojiBox = findViewById(R.id.emoji_box)
+        flexBox = findViewById(R.id.flex_box)
+
+        plus.setOnClickListener {
+            val (emoji, reactionsCount, isSelected) = emojiProducer()
+            addEmoji(emoji, reactionsCount, isSelected)
+        }
+        flexBox.addView(plus)
     }
 
     fun setAvatar(@DrawableRes resId: Int) {
@@ -57,16 +81,36 @@ class MessageLayout @JvmOverloads constructor(
         message.text = newMessage
     }
 
-    fun setEmojiProducer(producer: () -> Triple<String, Int, Boolean>) {
-        emojiBox.emojiProducer = producer
-    }
+    fun addEmoji(emoji: String, reactionsCount: Int, isSelected: Boolean = false): Boolean {
+        if (reactionsCount < 1) {
+            return false
+        }
 
-    fun addEmoji(emoji: String, reactionsCount: Int, isSelected: Boolean = false) {
-        emojiBox.addEmoji(emoji, reactionsCount, isSelected)
+        val emojiView = EmojiView(context).apply {
+            layoutParams = createDefaultLayoutParams()
+            background = AppCompatResources.getDrawable(context, R.drawable.bg_emoji_view)
+            this.emoji = emoji
+            this.reactionsCount = reactionsCount
+            this.isSelected = isSelected
+        }
+
+        emojiView.onClick = {
+            when (it) {
+                true -> emojiView.reactionsCount++
+                false -> emojiView.reactionsCount--
+            }
+        }
+        emojiView.onInvalidReactionsCount = {
+            flexBox.removeView(emojiView)
+        }
+        flexBox.addView(emojiView, flexBox.childCount - 1)
+
+        return true
     }
 
     fun removeAllEmoji() {
-        emojiBox.removeAllEmoji()
+        flexBox.removeAllViews()
+        flexBox.addView(plus)
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -161,6 +205,14 @@ class MessageLayout @JvmOverloads constructor(
         return MarginLayoutParams(p)
     }
 
+    private fun createDefaultLayoutParams(): LayoutParams {
+        return MarginLayoutParams(
+            LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT
+        ).apply {
+            setMargins(defaultMargin)
+        }
+    }
+
     private val View.measuredWidthWithMarginsOrZero: Int
         get() {
             return if (visibility != View.GONE) {
@@ -180,9 +232,4 @@ class MessageLayout @JvmOverloads constructor(
                 0
             }
         }
-
-    companion object {
-        private const val BACKGROUND_COLOR = "#1c1c1c"
-        private const val RADIUS_OF_ROUNDING_IN_DP = 8
-    }
 }
