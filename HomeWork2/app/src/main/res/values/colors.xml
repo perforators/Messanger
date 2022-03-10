@@ -11,4 +11,5 @@
     <color name="black_200">#1c1c1c</color>
     <color name="grey">#3a3a3a</color>
     <color name="white">#FFFFFFFF</color>
+    <color name="emoji_text">#FFFFFFFF</color>
 </resources>

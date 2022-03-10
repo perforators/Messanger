@@ -14,7 +14,7 @@ class EmojiView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
 ) : View(context, attrs) {
 
-    var onClick: (EmojiView) -> Unit = {  }
+    private var onChangedSelect: (EmojiView, Boolean) -> Unit = { _, _ -> }
 
     private val reactionText: String
         get() = "$emoji  $reactionsCount"
@@ -50,10 +50,16 @@ class EmojiView @JvmOverloads constructor(
             R.styleable.EmojiView_textSize,
             resources.getDimension(R.dimen.emoji_text_size)
         )
-        textPaint.color =
-            typedArray.getColor(R.styleable.EmojiView_textColor, Color.WHITE)
+        textPaint.color = typedArray.getColor(
+            R.styleable.EmojiView_textColor,
+            context.getColor(R.color.emoji_text)
+        )
 
         typedArray.recycle()
+    }
+
+    fun setOnChangedSelectListener(onChangedSelect: (EmojiView, Boolean) -> Unit) {
+        this.onChangedSelect = onChangedSelect
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
@@ -102,7 +108,7 @@ class EmojiView @JvmOverloads constructor(
     override fun performClick(): Boolean {
         super.performClick()
         isSelected = !isSelected
-        onClick(this)
+        onChangedSelect(this, isSelected)
         return true
     }
 

@@ -23,24 +23,8 @@ class MessageLayout @JvmOverloads constructor(
     attrs: AttributeSet? = null,
 ) : ViewGroup(context, attrs) {
 
-    var onEmojiClick: (EmojiView) -> Unit = { emoji ->
-        emoji.apply {
-            when (isSelected) {
-                true -> reactionsCount++
-                false -> reactionsCount--
-            }
-            if (reactionsCount < 1) {
-                flexBox.removeView(this)
-            }
-        }
-    }
-    var onPlusClick: (ImageView) -> Unit = {
-        addEmoji(
-            EmojiView.DEFAULT_EMOJI,
-            EmojiView.DEFAULT_REACTION_COUNT,
-            false
-        )
-    }
+    private var onEmojiClick: (EmojiView, Boolean) -> Unit = { _, _ -> }
+    private var onPlusClick: (ImageView) -> Unit = {  }
 
     private val avatar: ImageView
     private val userName: TextView
@@ -75,6 +59,14 @@ class MessageLayout @JvmOverloads constructor(
         flexBox.addView(plus)
     }
 
+    fun setOnEmojiClickListener(onClick: (EmojiView, Boolean) -> Unit) {
+        onEmojiClick = onClick
+    }
+
+    fun setOnPlusClickListener(onClick: (ImageView) -> Unit) {
+        onPlusClick = onClick
+    }
+
     fun setAvatar(@DrawableRes resId: Int) {
         avatar.setImageResource(resId)
     }
@@ -103,12 +95,16 @@ class MessageLayout @JvmOverloads constructor(
             this.reactionsCount = reactionsCount
             this.isSelected = isSelected
         }
-        emojiView.onClick = {
-            onEmojiClick(it)
+        emojiView.setOnChangedSelectListener { selectedEmoji, newSelect ->
+            onEmojiClick(selectedEmoji, newSelect)
         }
         flexBox.addView(emojiView, flexBox.childCount - 1)
 
         return true
+    }
+
+    fun removeEmoji(emoji: EmojiView) {
+        flexBox.removeView(emoji)
     }
 
     fun removeAllEmoji() {
