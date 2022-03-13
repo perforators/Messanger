@@ -41,7 +41,10 @@ class MessagesActivity : AppCompatActivity() {
                         viewBinding.recyclerView.smoothScrollToPosition(adapter.itemCount)
                     }
                 }
-                else -> {
+                is MessagesViewModel.MessageEvent.ReactionUpdated -> {
+                    adapter.submitList(it.messages.toMessageItemsWithDates())
+                }
+                is MessagesViewModel.MessageEvent.MessagesRefreshed -> {
                     adapter.submitList(it.messages.toMessageItemsWithDates())
                 }
             }
