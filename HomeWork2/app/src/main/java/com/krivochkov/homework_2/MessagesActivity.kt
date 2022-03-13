@@ -24,8 +24,6 @@ class MessagesActivity : AppCompatActivity() {
     private lateinit var adapter: MessageAdapter
     private lateinit var viewModel: MessagesViewModel
 
-    private var isLastActionSend: Boolean = false
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         viewBinding = ActivityMessagesBinding.inflate(layoutInflater)
@@ -36,16 +34,18 @@ class MessagesActivity : AppCompatActivity() {
         initRecycler()
         initInputField()
 
-        viewModel.messages.observe(this) {
-            val onCommitted = if (isLastActionSend) {
-                { viewBinding.recyclerView.smoothScrollToPosition(adapter.itemCount) }
-            } else {
-                null
+        viewModel.event.observe(this) {
+            when (it) {
+                is MessagesViewModel.MessageEvent.MessageSent -> {
+                    adapter.submitList(it.messages.toMessageItemsWithDates()) {
+                        viewBinding.recyclerView.smoothScrollToPosition(adapter.itemCount)
+                    }
+                }
+                else -> {
+                    adapter.submitList(it.messages.toMessageItemsWithDates())
+                }
             }
-            adapter.submitList(it.toMessageItemsWithDates(), onCommitted)
         }
-
-        viewModel.loadMessages()
     }
 
     private fun initToolbar() {
@@ -59,8 +59,6 @@ class MessagesActivity : AppCompatActivity() {
         adapter = MessageAdapter().apply {
             val onChangeMyReaction: (Long, String) -> Unit = { messageId, emoji ->
                 viewModel.updateReaction(messageId, emoji)
-                isLastActionSend = false
-                viewModel.loadMessages()
             }
 
             setOnAddMyReactionListener(onChangeMyReaction)
@@ -92,8 +90,6 @@ class MessagesActivity : AppCompatActivity() {
                 if (inputText.isNotEmpty()) {
                     inputField.setText("")
                     viewModel.sendMessage(inputText)
-                    isLastActionSend = true
-                    viewModel.loadMessages()
                 }
             }
 

@@ -74,7 +74,7 @@ class MessageRepositoryImpl : MessageRepository {
         )
     )
 
-    override fun loadAllMessages(): List<Message> {
+    override fun getAllMessages(): List<Message> {
         return messages.map { it.copy(reactions = it.reactions.toMutableList()) }
     }
 

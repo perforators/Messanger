@@ -11,19 +11,31 @@ class MessagesViewModel(
     private val repository: MessageRepository = MessageRepositoryImpl()
 ) : ViewModel() {
 
-    private val _messages: MutableLiveData<List<Message>> = MutableLiveData()
-    val messages: LiveData<List<Message>>
-        get() = _messages
+    private val _event: MutableLiveData<MessageEvent> = MutableLiveData()
+    val event: LiveData<MessageEvent>
+        get() = _event
 
-    fun loadMessages() {
-        _messages.value = repository.loadAllMessages()
+    init {
+        refreshMessages()
+    }
+
+    private fun refreshMessages() {
+        _event.value = MessageEvent.MessagesRefreshed(repository.getAllMessages())
     }
 
     fun updateReaction(messageId: Long, emoji: String) {
         repository.updateReaction(messageId, emoji)
+        _event.value = MessageEvent.ReactionUpdated(repository.getAllMessages())
     }
 
     fun sendMessage(message: String) {
         repository.sendMessage(message)
+        _event.value = MessageEvent.MessageSent(repository.getAllMessages())
+    }
+
+    sealed class MessageEvent(val messages: List<Message>) {
+        class MessagesRefreshed(messages: List<Message>): MessageEvent(messages)
+        class MessageSent(messages: List<Message>): MessageEvent(messages)
+        class ReactionUpdated(messages: List<Message>): MessageEvent(messages)
     }
 }

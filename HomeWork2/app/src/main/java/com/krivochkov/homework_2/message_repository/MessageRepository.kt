@@ -4,7 +4,7 @@ import com.krivochkov.homework_2.models.Message
 
 interface MessageRepository {
 
-    fun loadAllMessages(): List<Message>
+    fun getAllMessages(): List<Message>
 
     fun sendMessage(content: String)
 
