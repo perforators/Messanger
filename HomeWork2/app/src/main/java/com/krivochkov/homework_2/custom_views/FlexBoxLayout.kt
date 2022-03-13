@@ -11,6 +11,12 @@ class FlexBoxLayout @JvmOverloads constructor(
     attrs: AttributeSet? = null,
 ) : ViewGroup(context, attrs) {
 
+    var isReversed: Boolean = false
+        set(value) {
+            field = value
+            requestLayout()
+        }
+
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
         val maxWidth = MeasureSpec.getSize(widthMeasureSpec) - paddingLeft - paddingRight
         var widthCurrentLine = 0
@@ -49,6 +55,13 @@ class FlexBoxLayout @JvmOverloads constructor(
     }
 
     override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
+        when (isReversed) {
+            true -> rightLayout()
+            false -> leftLayout()
+        }
+    }
+
+    private fun leftLayout() {
         var currentLeftPosition = paddingLeft
         var currentTopPosition = paddingTop
         var heightCurrentLine = 0
@@ -73,16 +86,29 @@ class FlexBoxLayout @JvmOverloads constructor(
         }
     }
 
-    override fun generateLayoutParams(attrs: AttributeSet?): LayoutParams {
-        return MarginLayoutParams(context, attrs)
-    }
+    private fun rightLayout() {
+        var currentRightPosition = measuredWidth - paddingRight
+        var currentTopPosition = paddingTop
+        var heightCurrentLine = 0
 
-    override fun checkLayoutParams(p: LayoutParams): Boolean {
-        return p is MarginLayoutParams
-    }
-
-    override fun generateLayoutParams(p: LayoutParams): LayoutParams {
-        return MarginLayoutParams(p)
+        children.forEach { child ->
+            if (child.visibility != View.GONE) {
+                if (currentRightPosition - child.measuredWidthWithMargins < paddingLeft) {
+                    currentRightPosition = measuredWidth - paddingRight
+                    currentTopPosition += heightCurrentLine
+                    heightCurrentLine = child.measuredHeightWithMargins
+                } else {
+                    heightCurrentLine = maxOf(child.measuredHeightWithMargins, heightCurrentLine)
+                }
+                child.layout(
+                    currentRightPosition - child.marginRight - child.measuredWidth,
+                    currentTopPosition + child.marginTop,
+                    currentRightPosition - child.marginRight,
+                    currentTopPosition + child.marginTop + child.measuredHeight
+                )
+                currentRightPosition -= child.measuredWidthWithMargins
+            }
+        }
     }
 
     private val View.measuredWidthWithMargins: Int

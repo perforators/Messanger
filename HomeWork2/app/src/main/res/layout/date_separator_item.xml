@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/big_margin"
+    android:layout_marginBottom="@dimen/big_margin"
+    android:gravity="center|center_horizontal|center_horizontal">
+
+    <TextView
+        android:id="@+id/date_separator"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_date_separator"
+        android:paddingStart="@dimen/middle_padding"
+        android:paddingTop="@dimen/small_padding"
+        android:paddingEnd="@dimen/middle_padding"
+        android:paddingBottom="@dimen/small_padding"
+        android:textColor="@color/grey_200"
+        android:textSize="@dimen/date_separator_text_size" />
+
+</LinearLayout>

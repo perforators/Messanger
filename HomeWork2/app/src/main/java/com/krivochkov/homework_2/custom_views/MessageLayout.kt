@@ -1,19 +1,16 @@
 package com.krivochkov.homework_2.custom_views
 
 import android.content.Context
-import android.graphics.Canvas
-import android.graphics.Paint
-import android.graphics.RectF
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
+import android.view.Gravity
 import android.view.View
-import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.annotation.DrawableRes
-import androidx.appcompat.content.res.AppCompatResources
-import androidx.core.view.marginLeft
-import androidx.core.view.marginTop
+import androidx.appcompat.content.res.AppCompatResources.getDrawable
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.setMargins
 import androidx.core.view.setPadding
 import com.krivochkov.homework_2.R
@@ -21,7 +18,7 @@ import com.krivochkov.homework_2.R
 class MessageLayout @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-) : ViewGroup(context, attrs) {
+) : ConstraintLayout(context, attrs) {
 
     private var onEmojiClick: (EmojiView, Boolean) -> Unit = { _, _ -> }
     private var onPlusClick: (ImageView) -> Unit = {  }
@@ -29,34 +26,58 @@ class MessageLayout @JvmOverloads constructor(
     private val avatar: ImageView
     private val userName: TextView
     private val message: TextView
+    private val messageBox: LinearLayout
+    private val messageBoxContent: LinearLayout
     private val flexBox: FlexBoxLayout
 
     private val defaultMargin = resources.getDimension(R.dimen.small_margin).toInt()
-    private val radiusRounding = resources.getDimension(R.dimen.radius_rounding)
-    private val backgroundBounds = RectF()
-    private val backgroundPaint = Paint().apply {
-        isAntiAlias = true
-        color = context.getColor(R.color.black_200)
-    }
 
     private val plus = ImageView(context).apply {
         layoutParams = createDefaultLayoutParams()
-        background = AppCompatResources.getDrawable(context, R.drawable.bg_emoji_view_unselected)
+        background = getDrawable(context, R.drawable.bg_emoji_view_unselected)
         setImageResource(R.drawable.plus)
         setPadding(resources.getDimension(R.dimen.small_padding).toInt())
     }
+
+    var isMeMessage: Boolean = false
+        set(value) {
+            flexBox.isReversed = value
+            if (value) {
+                messageBoxContent.background = getDrawable(context, R.drawable.bg_message_is_me)
+                messageBox.gravity = Gravity.END
+                avatar.visibility = View.GONE
+                userName.visibility = View.GONE
+            } else {
+                messageBoxContent.background = getDrawable(context, R.drawable.bg_message_not_me)
+                messageBox.gravity = Gravity.START
+                avatar.visibility = View.VISIBLE
+                userName.visibility = View.VISIBLE
+            }
+            field = value
+        }
 
     init {
         inflate(context, R.layout.message_layout, this)
         avatar = findViewById(R.id.avatar)
         userName = findViewById(R.id.username)
         message = findViewById(R.id.message)
+        messageBox = findViewById(R.id.message_box)
+        messageBoxContent = findViewById(R.id.message_content)
         flexBox = findViewById(R.id.flex_box)
 
         plus.setOnClickListener {
             onPlusClick(plus)
         }
         flexBox.addView(plus)
+        hidePlus()
+    }
+
+    fun showPlus() {
+        plus.visibility = View.VISIBLE
+    }
+
+    fun hidePlus() {
+        plus.visibility = View.GONE
     }
 
     fun setOnEmojiClickListener(onClick: (EmojiView, Boolean) -> Unit) {
@@ -90,7 +111,7 @@ class MessageLayout @JvmOverloads constructor(
 
         val emojiView = EmojiView(context).apply {
             layoutParams = createDefaultLayoutParams()
-            background = AppCompatResources.getDrawable(context, R.drawable.bg_emoji_view)
+            background = getDrawable(context, R.drawable.bg_emoji_view)
             this.emoji = emoji
             this.reactionsCount = reactionsCount
             this.isSelected = isSelected
@@ -112,123 +133,11 @@ class MessageLayout @JvmOverloads constructor(
         flexBox.addView(plus)
     }
 
-    override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
-        if (avatar.visibility != View.GONE) {
-            measureChildWithMargins(
-                avatar, widthMeasureSpec, 0, heightMeasureSpec, 0
-            )
-        }
-
-        var heightUsed = 0
-        var widthUsed = 0
-
-        for (i in 1 until childCount) {
-            val child = getChildAt(i)
-
-            if (child.visibility != View.GONE) {
-                measureChildWithMargins(
-                    child,
-                    widthMeasureSpec,
-                    avatar.measuredWidthWithMarginsOrZero,
-                    heightMeasureSpec,
-                    heightUsed
-                )
-
-                widthUsed = maxOf(widthUsed, child.measuredWidthWithMarginsOrZero)
-                heightUsed += child.measuredHeightWithMarginsOrZero
-            }
-        }
-
-        val width = avatar.measuredWidthWithMarginsOrZero + widthUsed + paddingLeft + paddingRight
-        val height = maxOf(heightUsed, avatar.measuredHeightWithMarginsOrZero) +
-                paddingTop + paddingBottom
-
-        setMeasuredDimension(
-            resolveSize(width, widthMeasureSpec),
-            resolveSize(height, heightMeasureSpec)
-        )
-    }
-
-    override fun onLayout(changed: Boolean, l: Int, t: Int, r: Int, b: Int) {
-        if (avatar.visibility != View.GONE) {
-            avatar.layout(
-                avatar.marginLeft + paddingLeft,
-                avatar.marginTop + paddingTop,
-                avatar.marginLeft + paddingLeft + avatar.measuredWidth,
-                avatar.paddingTop + paddingTop + avatar.measuredHeight
-            )
-        }
-
-        var currentTop = paddingTop
-        val currentLeft = avatar.measuredWidthWithMarginsOrZero + paddingLeft
-
-        for (i in 1 until childCount) {
-            val child = getChildAt(i)
-
-            if (child.visibility != View.GONE) {
-                child.layout(
-                    currentLeft + child.marginLeft,
-                    currentTop + child.marginTop,
-                    currentLeft + child.marginLeft + child.measuredWidth,
-                    currentTop + child.marginTop + child.measuredHeight
-                )
-
-                currentTop += child.measuredHeightWithMarginsOrZero
-            }
-        }
-
-        backgroundBounds.left = currentLeft.toFloat()
-        backgroundBounds.top = paddingTop.toFloat()
-        backgroundBounds.right = maxOf(
-                currentLeft + userName.measuredWidthWithMarginsOrZero,
-                currentLeft + message.measuredWidthWithMarginsOrZero
-        ).toFloat()
-        backgroundBounds.bottom = paddingTop + userName.measuredHeightWithMarginsOrZero +
-                    message.measuredHeightWithMarginsOrZero.toFloat()
-    }
-
-    override fun dispatchDraw(canvas: Canvas) {
-        canvas.drawRoundRect(backgroundBounds, radiusRounding, radiusRounding, backgroundPaint)
-        super.dispatchDraw(canvas)
-    }
-
-    override fun generateLayoutParams(attrs: AttributeSet?): LayoutParams {
-        return MarginLayoutParams(context, attrs)
-    }
-
-    override fun checkLayoutParams(p: LayoutParams): Boolean {
-        return p is MarginLayoutParams
-    }
-
-    override fun generateLayoutParams(p: LayoutParams): LayoutParams {
-        return MarginLayoutParams(p)
-    }
-
-    private fun createDefaultLayoutParams(): LayoutParams {
+    private fun createDefaultLayoutParams(): MarginLayoutParams {
         return MarginLayoutParams(
             LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT
         ).apply {
             setMargins(defaultMargin)
         }
     }
-
-    private val View.measuredWidthWithMarginsOrZero: Int
-        get() {
-            return if (visibility != View.GONE) {
-                val params = layoutParams as MarginLayoutParams
-                measuredWidth + params.rightMargin + params.leftMargin
-            } else {
-                0
-            }
-        }
-
-    private val View.measuredHeightWithMarginsOrZero: Int
-        get() {
-            return if (visibility != View.GONE) {
-                val params = layoutParams as MarginLayoutParams
-                measuredHeight + params.topMargin + params.bottomMargin
-            } else {
-                0
-            }
-        }
 }

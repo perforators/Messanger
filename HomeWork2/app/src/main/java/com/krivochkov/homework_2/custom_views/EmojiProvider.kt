@@ -23,5 +23,5 @@ class EmojiProvider {
 
     fun getRandom() = getAll().random()
 
-    fun getAll() = listEmoji.values
+    fun getAll(): List<String> = listEmoji.values.toList()
 }
