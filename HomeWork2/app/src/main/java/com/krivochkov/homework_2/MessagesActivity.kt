@@ -34,20 +34,13 @@ class MessagesActivity : AppCompatActivity() {
         initRecycler()
         initInputField()
 
-        viewModel.event.observe(this) {
-            when (it) {
-                is MessagesViewModel.MessageEvent.MessageSent -> {
-                    adapter.submitList(it.messages.toMessageItemsWithDates()) {
-                        viewBinding.recyclerView.smoothScrollToPosition(adapter.itemCount)
-                    }
-                }
-                is MessagesViewModel.MessageEvent.ReactionUpdated -> {
-                    adapter.submitList(it.messages.toMessageItemsWithDates())
-                }
-                is MessagesViewModel.MessageEvent.MessagesRefreshed -> {
-                    adapter.submitList(it.messages.toMessageItemsWithDates())
-                }
+        viewModel.messages.observe(this) {
+            val onCommitted = if (it.isLastActionSending) {
+                { viewBinding.recyclerView.smoothScrollToPosition(adapter.itemCount) }
+            } else {
+                null
             }
+            adapter.submitList(it.messages.toMessageItemsWithDates(), onCommitted)
         }
     }
 
@@ -62,6 +55,7 @@ class MessagesActivity : AppCompatActivity() {
         adapter = MessageAdapter().apply {
             val onChangeMyReaction: (Long, String) -> Unit = { messageId, emoji ->
                 viewModel.updateReaction(messageId, emoji)
+                viewModel.refreshMessages()
             }
 
             setOnAddMyReactionListener(onChangeMyReaction)
@@ -93,6 +87,7 @@ class MessagesActivity : AppCompatActivity() {
                 if (inputText.isNotEmpty()) {
                     inputField.setText("")
                     viewModel.sendMessage(inputText)
+                    viewModel.refreshMessages()
                 }
             }
 
