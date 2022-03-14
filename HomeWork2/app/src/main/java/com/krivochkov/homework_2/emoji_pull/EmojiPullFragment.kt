@@ -16,7 +16,7 @@ class EmojiPullFragment(
     private val onEmojiClick: (String) -> Unit
 ) : BottomSheetDialogFragment() {
 
-    lateinit var binding: EmojiPullLayoutBinding
+    private lateinit var binding: EmojiPullLayoutBinding
     private lateinit var adapter: EmojiPullAdapter
 
     override fun getTheme() = R.style.AppBottomSheetDialogTheme
