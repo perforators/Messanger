@@ -6,6 +6,7 @@ import android.view.View
 import androidx.core.widget.doOnTextChanged
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.krivochkov.homework_2.custom_views.EmojiProvider
 import com.krivochkov.homework_2.databinding.ActivityMessagesBinding
 import com.krivochkov.homework_2.emoji_pull.EmojiPullFragment
@@ -35,12 +36,7 @@ class MessagesActivity : AppCompatActivity() {
         initInputField()
 
         viewModel.messages.observe(this) {
-            val onCommitted = if (it.isLastActionSending) {
-                { viewBinding.recyclerView.smoothScrollToPosition(adapter.itemCount) }
-            } else {
-                null
-            }
-            adapter.submitList(it.messages.toMessageItemsWithDates(), onCommitted)
+            adapter.submitList(it.toMessageItemsWithDates())
         }
     }
 
@@ -66,6 +62,11 @@ class MessagesActivity : AppCompatActivity() {
                 }
             }
         }
+        adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                viewBinding.recyclerView.smoothScrollToPosition(adapter.itemCount)
+            }
+        })
         viewBinding.recyclerView.adapter = adapter
 
         val layoutManager = LinearLayoutManager(this)

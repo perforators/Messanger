@@ -11,10 +11,8 @@ class MessagesViewModel(
     private val repository: MessageRepository = MessageRepositoryImpl()
 ) : ViewModel() {
 
-    private var isLastActionSending = false
-
-    private val _messages: MutableLiveData<MessageResult> = MutableLiveData()
-    val messages: LiveData<MessageResult>
+    private val _messages: MutableLiveData<List<Message>> = MutableLiveData()
+    val messages: LiveData<List<Message>>
         get() = _messages
 
     init {
@@ -22,18 +20,14 @@ class MessagesViewModel(
     }
 
     fun refreshMessages() {
-        _messages.value = MessageResult(repository.getAllMessages(), isLastActionSending)
+        _messages.value = repository.getAllMessages()
     }
 
     fun updateReaction(messageId: Long, emoji: String) {
         repository.updateReaction(messageId, emoji)
-        isLastActionSending = false
     }
 
     fun sendMessage(message: String) {
         repository.sendMessage(message)
-        isLastActionSending = true
     }
-
-    data class MessageResult(val messages: List<Message>, val isLastActionSending: Boolean)
 }

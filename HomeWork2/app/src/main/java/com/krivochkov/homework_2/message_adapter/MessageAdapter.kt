@@ -46,10 +46,9 @@ class MessageAdapter : RecyclerView.Adapter<MessageAdapter.BaseViewHolder>() {
                 setUserName(message.userName)
                 isMeMessage = message.isMeMessage
                 setOnEmojiClickListener { emojiView, isSelected ->
-                    if (isSelected) {
-                        onAddMyReaction(message.id, emojiView.emoji)
-                    } else {
-                        onRemoveMyReaction(message.id, emojiView.emoji)
+                    when (isSelected) {
+                        true -> onAddMyReaction(message.id, emojiView.emoji)
+                        false -> onRemoveMyReaction(message.id, emojiView.emoji)
                     }
                 }
                 setOnPlusClickListener {
