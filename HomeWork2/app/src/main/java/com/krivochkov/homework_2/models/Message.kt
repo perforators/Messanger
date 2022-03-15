@@ -1,5 +1,7 @@
 package com.krivochkov.homework_2.models
 
+import com.krivochkov.homework_2.message_repository.MessageRepositoryImpl
+
 data class Message(
     val id: Long,
     val userId: Int,
@@ -10,6 +12,17 @@ data class Message(
     val date: Long,
     val reactions: MutableList<Reaction>,
 ) {
-    val groupedReactions: Map<String, List<Reaction>>
-        get() = reactions.groupBy { it.emoji }
+    val groupedReactions: List<GroupedReaction> by lazy { groupReaction() }
+
+    private fun groupReaction(): List<GroupedReaction> {
+        val groupedReactions = mutableListOf<GroupedReaction>()
+        val groupedReactionsByEmoji = reactions.groupBy { it.emoji }
+        for (reactionGroup in groupedReactionsByEmoji) {
+            val emoji = reactionGroup.key
+            val reactionsCount = reactionGroup.value.size
+            val isSelected = reactionGroup.value.any { it.userId == MessageRepositoryImpl.MY_USER_ID }
+            groupedReactions.add(GroupedReaction(emoji, reactionsCount, isSelected))
+        }
+        return groupedReactions
+    }
 }

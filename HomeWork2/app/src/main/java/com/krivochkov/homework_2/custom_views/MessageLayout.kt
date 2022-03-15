@@ -14,6 +14,7 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.setMargins
 import androidx.core.view.setPadding
 import com.krivochkov.homework_2.R
+import com.krivochkov.homework_2.models.GroupedReaction
 
 class MessageLayout @JvmOverloads constructor(
     context: Context,
@@ -39,7 +40,7 @@ class MessageLayout @JvmOverloads constructor(
         setPadding(resources.getDimension(R.dimen.small_padding).toInt())
     }
 
-    var isMeMessage: Boolean = false
+    var isMyMessage: Boolean = false
         set(value) {
             flexBox.isReversed = value
             if (value) {
@@ -104,7 +105,14 @@ class MessageLayout @JvmOverloads constructor(
         message.text = newMessage
     }
 
-    fun addEmoji(emoji: String, reactionsCount: Int, isSelected: Boolean = false): Boolean {
+    fun addReactions(reactions: List<GroupedReaction>) {
+        for (reaction in reactions) {
+            val (emoji, reactionsCount, isSelected) = reaction
+            addReaction(emoji, reactionsCount, isSelected)
+        }
+    }
+
+    fun addReaction(emoji: String, reactionsCount: Int, isSelected: Boolean = false): Boolean {
         if (reactionsCount < 1) {
             return false
         }

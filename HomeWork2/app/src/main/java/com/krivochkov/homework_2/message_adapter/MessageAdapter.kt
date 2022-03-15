@@ -12,8 +12,6 @@ import com.krivochkov.homework_2.databinding.DateSeparatorItemBinding
 import com.krivochkov.homework_2.databinding.MessageItemBinding
 import com.krivochkov.homework_2.message_adapter.items.DateSeparatorItem
 import com.krivochkov.homework_2.message_adapter.items.Item
-import com.krivochkov.homework_2.message_adapter.items.Item.Companion.TYPE_DATE_SEPARATOR
-import com.krivochkov.homework_2.message_adapter.items.Item.Companion.TYPE_MESSAGE
 import com.krivochkov.homework_2.message_adapter.items.MessageItem
 import java.lang.IllegalStateException
 
@@ -44,7 +42,7 @@ class MessageAdapter : RecyclerView.Adapter<MessageAdapter.BaseViewHolder>() {
                 setAvatar(R.mipmap.ic_launcher_round) // пока что захардкожено
                 setMessage(message.text)
                 setUserName(message.userName)
-                isMeMessage = message.isMeMessage
+                isMyMessage = message.isMeMessage
                 setOnEmojiClickListener { emojiView, isSelected ->
                     when (isSelected) {
                         true -> onAddMyReaction(message.id, emojiView.emoji)
@@ -65,12 +63,7 @@ class MessageAdapter : RecyclerView.Adapter<MessageAdapter.BaseViewHolder>() {
                     hidePlus()
                 }
 
-                for (reactionGroup in message.groupedReactions) {
-                    val emoji = reactionGroup.key
-                    val reactionsCount = reactionGroup.value.size
-                    val isSelected = reactionGroup.value.any { it.userId == MY_USER_ID }
-                    addEmoji(emoji, reactionsCount, isSelected)
-                }
+                addReactions(message.groupedReactions)
             }
         }
     }
@@ -130,4 +123,8 @@ class MessageAdapter : RecyclerView.Adapter<MessageAdapter.BaseViewHolder>() {
 
     override fun getItemCount() = differ.currentList.size
 
+    companion object {
+        const val TYPE_MESSAGE = 0
+        const val TYPE_DATE_SEPARATOR = 1
+    }
 }

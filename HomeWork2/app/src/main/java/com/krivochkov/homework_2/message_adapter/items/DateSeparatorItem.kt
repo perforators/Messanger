@@ -1,12 +1,15 @@
 package com.krivochkov.homework_2.message_adapter.items
 
-class DateSeparatorItem(override val id: Long, val date: String) : Item() {
+import com.krivochkov.homework_2.message_adapter.MessageAdapter.Companion.TYPE_MESSAGE
 
-    override fun getType() = TYPE_DATE_SEPARATOR
+class DateSeparatorItem(val date: String) : Item {
 
-    override fun compareTo(otherItem: Item) = if (otherItem is DateSeparatorItem) {
-        date == otherItem.date
-    } else {
-        false
-    }
+    override fun areItemsTheSame(otherItem: Item) =
+        areContentsTheSame(otherItem)
+
+    override fun areContentsTheSame(otherItem: Item) =
+        otherItem is DateSeparatorItem && date == otherItem.date
+
+    override fun getType() = TYPE_MESSAGE
+
 }

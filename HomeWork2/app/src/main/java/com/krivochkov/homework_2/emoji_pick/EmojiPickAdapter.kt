@@ -1,14 +1,14 @@
-package com.krivochkov.homework_2.emoji_pull
+package com.krivochkov.homework_2.emoji_pick
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.krivochkov.homework_2.databinding.EmojiItemBinding
 
-class EmojiPullAdapter(
+class EmojiPickAdapter(
     private val listEmoji: List<String>,
-    private val onEmojiClick: (String) -> Unit
-) : RecyclerView.Adapter<EmojiPullAdapter.EmojiViewHolder>() {
+    private val onEmojiPick: (String) -> Unit
+) : RecyclerView.Adapter<EmojiPickAdapter.EmojiViewHolder>() {
 
     inner class EmojiViewHolder(private val binding: EmojiItemBinding)
         : RecyclerView.ViewHolder(binding.root) {
@@ -17,7 +17,7 @@ class EmojiPullAdapter(
             binding.emoji.apply {
                 text = emoji
                 setOnClickListener {
-                    onEmojiClick(emoji)
+                    onEmojiPick(emoji)
                 }
             }
         }
