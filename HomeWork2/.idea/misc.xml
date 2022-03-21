@@ -11,8 +11,26 @@
         <entry key="..\:/Users/sfsdf/AndroidStudioProjects/HomeWork2/app/src/main/res/layout-v31/message_layout.xml" value="0.4466666666666667" />
         <entry key="..\:/Users/sfsdf/AndroidStudioProjects/HomeWork2/app/src/main/res/layout/activity_main.xml" value="0.16666666666666666" />
         <entry key="..\:/Users/sfsdf/AndroidStudioProjects/HomeWork2/app/src/main/res/layout/message_layout.xml" value="0.3333333333333333" />
-        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/activity_main.xml" value="0.12" />
-        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/message_layout.xml" value="0.3333333333333333" />
+        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/drawable/bg_date_separator.xml" value="0.1685185185185185" />
+        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/drawable/bg_emoji_pull.xml" value="0.19583333333333333" />
+        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/drawable/bg_emoji_view_selected.xml" value="0.103125" />
+        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/drawable/bg_emoji_view_unselected.xml" value="0.1685185185185185" />
+        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/drawable/bg_input_field.xml" value="0.19583333333333333" />
+        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/drawable/bg_input_message.xml" value="0.103125" />
+        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/drawable/bg_message_is_me.xml" value="0.1638888888888889" />
+        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/drawable/bg_message_not_me.xml" value="0.1638888888888889" />
+        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/drawable/bg_send_button.xml" value="0.18981481481481483" />
+        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/drawable/plus.xml" value="0.19583333333333333" />
+        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/drawable/send_picture.xml" value="0.19583333333333333" />
+        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/activity_main.xml" value="0.22" />
+        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/activity_messages.xml" value="0.16666666666666666" />
+        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/date_separator_item.xml" value="0.16666666666666666" />
+        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/emoji_item.xml" value="0.16666666666666666" />
+        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/emoji_pull_layout.xml" value="0.14175724637681159" />
+        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/message_item.xml" value="0.3333333333333333" />
+        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/message_layout.xml" value="0.16666666666666666" />
+        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/toolbar.xml" value="0.1" />
+        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.1685185185185185" />
       </map>
     </option>
   </component>
