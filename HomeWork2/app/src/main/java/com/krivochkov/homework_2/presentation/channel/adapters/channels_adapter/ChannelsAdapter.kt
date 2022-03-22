@@ -12,9 +12,11 @@ import com.krivochkov.homework_2.presentation.Item
 import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.items.ChannelItem
 import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.items.TopicItem
 import com.krivochkov.homework_2.databinding.ChannelItemBinding
+import com.krivochkov.homework_2.databinding.LoadingItemBinding
 import com.krivochkov.homework_2.databinding.TopicItemBinding
 import com.krivochkov.homework_2.domain.models.Channel
 import com.krivochkov.homework_2.domain.models.Topic
+import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.items.LoadingItem
 import java.lang.IllegalStateException
 
 class ChannelsAdapter : RecyclerView.Adapter<ChannelsAdapter.BaseViewHolder>() {
@@ -83,6 +85,8 @@ class ChannelsAdapter : RecyclerView.Adapter<ChannelsAdapter.BaseViewHolder>() {
         }
     }
 
+    class LoadingViewHolder(binding: LoadingItemBinding) : BaseViewHolder(binding.root)
+
     fun submitChannels(channels: List<Channel>) {
         val items = channels.map { ChannelItem(it) }
         submitItems(items)
@@ -93,23 +97,23 @@ class ChannelsAdapter : RecyclerView.Adapter<ChannelsAdapter.BaseViewHolder>() {
         val channelItem = findChannelItemById(channelId) ?: return
         if (channelItem.isExpanded) {
             collapseChannelItem(channelItem) {
-                channelItem.topicItems = topicItems
+                channelItem.childItems = topicItems
                 expandChannelItem(channelItem)
             }
         } else {
-            channelItem.topicItems = topicItems
+            channelItem.childItems = topicItems
         }
     }
 
     private fun expandChannelItem(channelItem: ChannelItem) {
         val items = differ.currentList.toMutableList()
-        items.addAll(items.indexOf(channelItem) + 1, channelItem.topicItems)
+        items.addAll(items.indexOf(channelItem) + 1, channelItem.childItems)
         submitItems(items)
     }
 
     private fun collapseChannelItem(channelItem: ChannelItem, onCommitted: (() -> Unit)? = null) {
         val items = differ.currentList.toMutableList()
-        items.removeAll(channelItem.topicItems)
+        items.removeAll(channelItem.childItems)
         submitItems(items, onCommitted)
     }
 
@@ -139,7 +143,11 @@ class ChannelsAdapter : RecyclerView.Adapter<ChannelsAdapter.BaseViewHolder>() {
                     parent,
                     false
                 ),
-                onExpanded = { onExpandedChannel(it.channel.id) },
+                onExpanded = {
+                    it.childItems = listOf(LoadingItem())
+                    expandChannelItem(it)
+                    onExpandedChannel(it.channel.id)
+                },
                 onCollapsed = { collapseChannelItem(it) },
             )
             TYPE_TOPIC -> TopicViewHolder(
@@ -152,6 +160,13 @@ class ChannelsAdapter : RecyclerView.Adapter<ChannelsAdapter.BaseViewHolder>() {
                     val channelItem = findChannelItemById(it.associatedChannelId)!!
                     onTopicClick(channelItem.channel, it.topic)
                 }
+            )
+            TYPE_LOADING -> LoadingViewHolder(
+                LoadingItemBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                )
             )
             else -> throw IllegalStateException("Unknown viewType")
         }
@@ -171,5 +186,6 @@ class ChannelsAdapter : RecyclerView.Adapter<ChannelsAdapter.BaseViewHolder>() {
     companion object {
         const val TYPE_CHANNEL = 0
         const val TYPE_TOPIC = 1
+        const val TYPE_LOADING = 2
     }
 }

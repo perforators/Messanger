@@ -4,7 +4,7 @@ import com.krivochkov.homework_2.presentation.Item
 import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.ChannelsAdapter.Companion.TYPE_TOPIC
 import com.krivochkov.homework_2.domain.models.Topic
 
-class TopicItem(val topic: Topic, val associatedChannelId: Long) : Item {
+class TopicItem(val topic: Topic, val associatedChannelId: Long) : ChildItem() {
 
     override fun areItemsTheSame(otherItem: Item) =
         otherItem is TopicItem && topic.id == otherItem.topic.id

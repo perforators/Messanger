@@ -4,10 +4,10 @@ import com.krivochkov.homework_2.presentation.Item
 import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.ChannelsAdapter.Companion.TYPE_CHANNEL
 import com.krivochkov.homework_2.domain.models.Channel
 
-class ChannelItem(val channel: Channel, ) : Item {
+class ChannelItem(val channel: Channel) : Item {
 
     var isExpanded: Boolean = false
-    var topicItems: List<TopicItem> = emptyList()
+    var childItems: List<ChildItem> = emptyList()
 
     override fun areItemsTheSame(otherItem: Item) =
         otherItem is ChannelItem && channel.id == otherItem.channel.id
