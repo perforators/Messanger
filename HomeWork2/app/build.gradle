@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'kotlin-parcelize'
+    id 'androidx.navigation.safeargs.kotlin'
 }
 
 android {
@@ -42,5 +43,8 @@ dependencies {
     implementation "androidx.constraintlayout:constraintlayout:$androidXConstraintLayoutVersion"
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$androidXLifecycleVersion"
     implementation "androidx.lifecycle:lifecycle-livedata-ktx:$androidXLifecycleVersion"
-    implementation 'androidx.activity:activity-ktx:1.4.0'
+    implementation "androidx.navigation:navigation-fragment-ktx:$navVersion"
+    implementation "androidx.navigation:navigation-ui-ktx:$navVersion"
+    implementation "androidx.activity:activity-ktx:$activityKtxVersion"
+    implementation "androidx.fragment:fragment-ktx:$fragmentKtxVersion"
 }

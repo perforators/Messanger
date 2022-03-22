@@ -1,6 +1,19 @@
 <resources>
     <string name="app_name">HomeWork-2</string>
-    <string name="title_message_screen">Messages</string>
+    <string name="title_message">Messages</string>
+    <string name="title_channels">Channels</string>
+    <string name="title_people">People</string>
+    <string name="title_profile">Profile</string>
+    <string name="tab_all">All channels</string>
+    <string name="tab_subscribed">Subscribed</string>
     <string name="avatar">Avatar</string>
     <string name="hint_text_field">Написать…</string>
+    <string name="hint_search_view_channels">Search…</string>
+    <string name="hint_search_view_users">Users…</string>
+    <string name="count_messages">%s mes</string>
+    <string name="status">in a meeting</string>
+    <string name="online_status">online</string>
+    <string name="offline_status">offline</string>
+    <string name="log_out">Log out</string>
+    <string name="topic_text">Topic: %s</string>
 </resources>

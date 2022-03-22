@@ -57,7 +57,7 @@
         </LinearLayout>
     </LinearLayout>
 
-    <com.krivochkov.homework_2.custom_views.FlexBoxLayout
+    <com.krivochkov.homework_2.presentation.custom_views.FlexBoxLayout
         android:id="@+id/flex_box"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
