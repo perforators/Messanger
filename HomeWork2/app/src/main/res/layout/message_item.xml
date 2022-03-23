@@ -6,7 +6,7 @@
     android:layout_marginTop="@dimen/big_margin"
     android:layout_marginBottom="@dimen/big_margin">
 
-    <com.krivochkov.homework_2.custom_views.MessageLayout
+    <com.krivochkov.homework_2.presentation.custom_views.MessageLayout
         android:id="@+id/message_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />

@@ -10,7 +10,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.HomeWork2">
         <activity
-            android:name=".MessagesActivity"
+            android:name=".presentation.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

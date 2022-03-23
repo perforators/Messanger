@@ -2,6 +2,7 @@
 buildscript {
     ext.kotlinVersion = '1.6.0'
     ext.gradleVersion = '7.0.4'
+    ext.navVersion = '2.4.1'
 
     repositories {
         google()
@@ -11,6 +12,7 @@ buildscript {
     dependencies {
         classpath "com.android.tools.build:gradle:$gradleVersion"
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+        classpath "androidx.navigation:navigation-safe-args-gradle-plugin:$navVersion"
 
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -29,6 +31,8 @@ ext {
 
     // App dependencies
     androidXCoreVersion = '1.7.0'
+    activityKtxVersion = '1.4.0'
+    fragmentKtxVersion = '1.4.1'
     androidXAppCompatVersion = '1.4.1'
     materialVersion = '1.5.0'
     androidXConstraintLayoutVersion = '2.1.3'

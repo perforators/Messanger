@@ -4,9 +4,10 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-private val dateFormat = SimpleDateFormat("dd MMM", Locale("ru"))
+private val defaultDateFormat = SimpleDateFormat("dd MMM", Locale("ru"))
 
-fun Long.convertToDate(): String {
+fun Long.convertToDate(customDateFormat: SimpleDateFormat? = null): String {
+    val dateFormat = customDateFormat ?: defaultDateFormat
     val date = Date(TimeUnit.SECONDS.toMillis(this))
     return dateFormat.format(date)
 }
