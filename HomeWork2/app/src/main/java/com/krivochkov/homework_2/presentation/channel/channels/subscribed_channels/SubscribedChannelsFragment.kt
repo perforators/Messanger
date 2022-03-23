@@ -34,7 +34,6 @@ class SubscribedChannelsFragment : BaseChannelsFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initRecycler(binding.streamsRecyclerView)
-        setObservers()
     }
 
     companion object {

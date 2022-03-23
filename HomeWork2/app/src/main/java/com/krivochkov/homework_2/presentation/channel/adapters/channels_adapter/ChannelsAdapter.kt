@@ -1,12 +1,9 @@
 package com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.content.res.AppCompatResources
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.RecyclerView
-import com.krivochkov.homework_2.R
 import com.krivochkov.homework_2.presentation.DiffCallback
 import com.krivochkov.homework_2.presentation.Item
 import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.items.ChannelItem
@@ -16,76 +13,22 @@ import com.krivochkov.homework_2.databinding.LoadingItemBinding
 import com.krivochkov.homework_2.databinding.TopicItemBinding
 import com.krivochkov.homework_2.domain.models.Channel
 import com.krivochkov.homework_2.domain.models.Topic
+import com.krivochkov.homework_2.presentation.BaseViewHolder
 import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.items.LoadingItem
+import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.view_holders.ChannelViewHolder
+import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.view_holders.ChannelViewHolder.Companion.TYPE_CHANNEL
+import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.view_holders.LoadingViewHolder
+import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.view_holders.LoadingViewHolder.Companion.TYPE_LOADING
+import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.view_holders.TopicViewHolder
+import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.view_holders.TopicViewHolder.Companion.TYPE_TOPIC
 import java.lang.IllegalStateException
 
-class ChannelsAdapter : RecyclerView.Adapter<ChannelsAdapter.BaseViewHolder>() {
+class ChannelsAdapter : RecyclerView.Adapter<BaseViewHolder>() {
 
     private val differ: AsyncListDiffer<Item> = AsyncListDiffer(this, DiffCallback())
 
     private var onExpandedChannel: (channelId: Long) -> Unit = {  }
     private var onTopicClick: (channel: Channel, topic: Topic) -> Unit = { _, _ -> }
-
-    abstract class BaseViewHolder(view: View) : RecyclerView.ViewHolder(view)
-
-    class ChannelViewHolder(
-        private val binding: ChannelItemBinding,
-        private val onExpanded: (channelItem: ChannelItem) -> Unit,
-        private val onCollapsed: (channelItem: ChannelItem) -> Unit,
-    ) : BaseViewHolder(binding.root) {
-
-        private val context = binding.root.context
-
-        fun bind(channelItem: ChannelItem) {
-            binding.channelName.text = channelItem.channel.name
-            if (channelItem.isExpanded) showUpArrow() else showDownArrow()
-
-            binding.channelItem.setOnClickListener {
-                channelItem.isExpanded = !channelItem.isExpanded
-                when (channelItem.isExpanded) {
-                    true -> {
-                        onExpanded(channelItem)
-                        showUpArrow()
-                    }
-                    false -> {
-                        onCollapsed(channelItem)
-                        showDownArrow()
-                    }
-                }
-            }
-        }
-
-        private fun showUpArrow() {
-            binding.arrow.background =
-                AppCompatResources.getDrawable(context, R.drawable.arrow_up_picture)
-        }
-
-        private fun showDownArrow() {
-            binding.arrow.background =
-                AppCompatResources.getDrawable(context, R.drawable.arrow_down_picture)
-        }
-    }
-
-    class TopicViewHolder(
-        private val binding: TopicItemBinding,
-        private val onTopicClick: (topicItem: TopicItem) -> Unit
-    ) : BaseViewHolder(binding.root) {
-
-        private val context = binding.root.context
-
-        fun bind(topicItem: TopicItem) {
-            binding.topicName.text = topicItem.topic.name
-            binding.countMessages.text = String.format(
-                context.getString(R.string.count_messages),
-                topicItem.topic.countMessages.toString()
-            )
-            binding.topicItem.setOnClickListener {
-                onTopicClick(topicItem)
-            }
-        }
-    }
-
-    class LoadingViewHolder(binding: LoadingItemBinding) : BaseViewHolder(binding.root)
 
     fun submitChannels(channels: List<Channel>) {
         val items = channels.map { ChannelItem(it) }
@@ -182,10 +125,4 @@ class ChannelsAdapter : RecyclerView.Adapter<ChannelsAdapter.BaseViewHolder>() {
     override fun getItemViewType(position: Int) = differ.currentList[position].getType()
 
     override fun getItemCount() = differ.currentList.size
-
-    companion object {
-        const val TYPE_CHANNEL = 0
-        const val TYPE_TOPIC = 1
-        const val TYPE_LOADING = 2
-    }
 }

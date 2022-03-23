@@ -8,6 +8,6 @@ class GetAllMessagesUseCase(
 ) {
 
     operator fun invoke(): List<Message> {
-        return repository.getAllMessages().onEach { it.groupedReactions }
+        return repository.getAllMessages()
     }
 }

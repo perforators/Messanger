@@ -12,7 +12,7 @@ data class Message(
     val date: Long,
     val reactions: MutableList<Reaction>,
 ) {
-    val groupedReactions: List<GroupedReaction> by lazy { groupReaction() }
+    val groupedReactions: List<GroupedReaction> = groupReaction()
 
     private fun groupReaction(): List<GroupedReaction> {
         val groupedReactions = mutableListOf<GroupedReaction>()

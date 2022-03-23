@@ -1,5 +1,7 @@
 package com.krivochkov.homework_2.presentation.channel.channels
 
+import android.os.Bundle
+import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -13,6 +15,11 @@ abstract class BaseChannelsFragment : Fragment() {
     private val sharedViewModel: SharedViewModel by activityViewModels()
     private lateinit var adapter: ChannelsAdapter
     protected abstract val channelsViewModel: BaseChannelsViewModel
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        setObservers()
+    }
 
     protected fun initRecycler(recyclerView: RecyclerView) {
         adapter = ChannelsAdapter().apply {
@@ -34,7 +41,7 @@ abstract class BaseChannelsFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
     }
 
-    protected fun setObservers() {
+    private fun setObservers() {
         channelsViewModel.channels.observe(this) { channels ->
             adapter.submitChannels(channels)
         }

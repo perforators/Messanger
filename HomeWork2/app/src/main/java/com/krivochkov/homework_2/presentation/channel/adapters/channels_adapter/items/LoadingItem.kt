@@ -1,9 +1,9 @@
 package com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.items
 
 import com.krivochkov.homework_2.presentation.Item
-import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.ChannelsAdapter.Companion.TYPE_LOADING
+import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.view_holders.LoadingViewHolder.Companion.TYPE_LOADING
 
-class LoadingItem : ChildItem() {
+class LoadingItem : Item {
 
     override fun areItemsTheSame(otherItem: Item) = otherItem is LoadingItem
 

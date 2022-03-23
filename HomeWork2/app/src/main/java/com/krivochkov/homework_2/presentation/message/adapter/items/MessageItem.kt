@@ -1,8 +1,8 @@
 package com.krivochkov.homework_2.presentation.message.adapter.items
 
 import com.krivochkov.homework_2.presentation.Item
-import com.krivochkov.homework_2.presentation.message.adapter.MessageAdapter.Companion.TYPE_MESSAGE
 import com.krivochkov.homework_2.domain.models.Message
+import com.krivochkov.homework_2.presentation.message.adapter.view_holders.MessageViewHolder.Companion.TYPE_MESSAGE
 
 class MessageItem(val message: Message) : Item {
 
