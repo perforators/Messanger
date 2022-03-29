@@ -104,6 +104,7 @@ class MessageFragment : Fragment(), EmojiPickFragment.OnEmojiPickListener {
     private fun showError() {
         hideContent()
         hideLoading()
+        changeVisibilityInputField(false)
         binding.error.isVisible = true
     }
 
