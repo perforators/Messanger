@@ -70,12 +70,25 @@ class MessageFragment : Fragment(), EmojiPickFragment.OnEmojiPickListener {
     private fun render(state: ScreenState) {
         when (state) {
             is ScreenState.MessagesLoaded -> {
+                changeErrorVisibility(false)
+                changeLoadingVisibility(false)
+                changeInputFieldVisibility(true)
                 adapter.submitList(state.messagesWithDates) {
-                    showContent()
+                    changeContentVisibility(true)
                 }
             }
-            is ScreenState.Loading -> showLoading()
-            is ScreenState.Error -> showError()
+            is ScreenState.Loading -> {
+                changeErrorVisibility(false)
+                changeContentVisibility(false)
+                changeInputFieldVisibility(false)
+                changeLoadingVisibility(true)
+            }
+            is ScreenState.Error -> {
+                changeContentVisibility(false)
+                changeInputFieldVisibility(false)
+                changeLoadingVisibility(false)
+                changeErrorVisibility(true)
+            }
         }
     }
 
@@ -88,42 +101,22 @@ class MessageFragment : Fragment(), EmojiPickFragment.OnEmojiPickListener {
         }
     }
 
-    private fun showLoading() {
-        hideError()
-        hideContent()
-        changeVisibilityInputField(false)
-        binding.loading.loadingLayout.startShimmer()
-        binding.loading.loadingLayout.isVisible = true
+    private fun changeLoadingVisibility(visibility: Boolean) {
+        binding.loading.loadingLayout.apply {
+            isVisible = visibility
+            if (visibility) startShimmer() else stopShimmer()
+        }
     }
 
-    private fun hideLoading() {
-        binding.loading.loadingLayout.stopShimmer()
-        binding.loading.loadingLayout.isVisible = false
+    private fun changeErrorVisibility(visibility: Boolean) {
+        binding.error.isVisible = visibility
     }
 
-    private fun showError() {
-        hideContent()
-        hideLoading()
-        changeVisibilityInputField(false)
-        binding.error.isVisible = true
+    private fun changeContentVisibility(visibility: Boolean) {
+        binding.recyclerView.isVisible = visibility
     }
 
-    private fun hideError() {
-        binding.error.isVisible = false
-    }
-
-    private fun showContent() {
-        hideLoading()
-        hideError()
-        changeVisibilityInputField(true)
-        binding.recyclerView.isVisible = true
-    }
-
-    private fun hideContent() {
-        binding.recyclerView.isVisible = false
-    }
-
-    private fun changeVisibilityInputField(visibility: Boolean) {
+    private fun changeInputFieldVisibility(visibility: Boolean) {
         binding.inputField.isVisible = visibility
         binding.buttonBox.isVisible = visibility
     }

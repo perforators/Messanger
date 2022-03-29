@@ -83,12 +83,22 @@ abstract class BaseChannelsFragment : Fragment() {
     private fun render(state: ScreenState) {
         when (state) {
             is ScreenState.ChannelsLoaded -> {
+                changeLoadingVisibility(false)
+                changeErrorVisibility(false)
                 submitChannels(state.channels) {
-                    showContent()
+                    changeContentVisibility(true)
                 }
             }
-            is ScreenState.Loading -> { showLoading() }
-            is ScreenState.Error -> { showError() }
+            is ScreenState.Loading -> {
+                changeContentVisibility(false)
+                changeErrorVisibility(false)
+                changeLoadingVisibility(true)
+            }
+            is ScreenState.Error -> {
+                changeContentVisibility(false)
+                changeLoadingVisibility(false)
+                changeErrorVisibility(true)
+            }
         }
     }
 
@@ -100,17 +110,11 @@ abstract class BaseChannelsFragment : Fragment() {
         }
     }
 
-    protected abstract fun showLoading()
+    protected abstract fun changeLoadingVisibility(visibility: Boolean)
 
-    protected abstract fun showContent()
+    protected abstract fun changeErrorVisibility(visibility: Boolean)
 
-    protected abstract fun showError()
-
-    protected abstract fun hideLoading()
-
-    protected abstract fun hideContent()
-
-    protected abstract fun hideError()
+    protected abstract fun changeContentVisibility(visibility: Boolean)
 
     private fun submitChannels(channels: List<ChannelItem>, onCommitted: (() -> Unit)? = null) {
         adapter.submitChannels(channels, onCommitted)

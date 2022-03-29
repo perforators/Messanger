@@ -50,15 +50,26 @@ class ProfileFragment : Fragment() {
 
     private fun render(state: ScreenState) {
         when (state) {
-            is ScreenState.ProfileLoaded -> showContent(state.user)
-            is ScreenState.Loading -> showLoading()
-            is ScreenState.Error -> showError()
+            is ScreenState.ProfileLoaded -> {
+                changeLoadingVisibility(false)
+                changeErrorVisibility(false)
+                changeContentVisibility(true)
+                showProfile(state.user)
+            }
+            is ScreenState.Loading -> {
+                changeContentVisibility(false)
+                changeErrorVisibility(false)
+                changeLoadingVisibility(true)
+            }
+            is ScreenState.Error -> {
+                changeLoadingVisibility(false)
+                changeContentVisibility(false)
+                changeErrorVisibility(true)
+            }
         }
     }
 
-    private fun showContent(user: User) {
-        hideError()
-        hideLoading()
+    private fun showProfile(user: User) {
         binding.profile.apply {
             avatar.setImageResource(R.mipmap.ic_launcher_round)
             fullName.text = user.fullName
@@ -68,29 +79,18 @@ class ProfileFragment : Fragment() {
         }
     }
 
-    private fun showLoading() {
-        hideContent()
-        hideError()
-        binding.loading.loadingLayout.isVisible = true
-        binding.loading.loadingLayout.startShimmer()
+    private fun changeLoadingVisibility(visibility: Boolean) {
+        binding.loading.loadingLayout.apply {
+            isVisible = visibility
+            if (visibility) startShimmer() else stopShimmer()
+        }
     }
 
-    private fun showError() {
-        hideContent()
-        hideLoading()
-        binding.error.isVisible = true
+    private fun changeErrorVisibility(visibility: Boolean) {
+        binding.error.isVisible = visibility
     }
 
-    private fun hideContent() {
-        binding.profile.profileLayout.isVisible = false
-    }
-
-    private fun hideLoading() {
-        binding.loading.loadingLayout.isVisible = false
-        binding.loading.loadingLayout.stopShimmer()
-    }
-
-    private fun hideError() {
-        binding.error.isVisible = false
+    private fun changeContentVisibility(visibility: Boolean) {
+        binding.profile.profileLayout.isVisible = visibility
     }
 }

@@ -74,44 +74,37 @@ class PeopleFragment : Fragment() {
     private fun render(state: ScreenState) {
         when (state) {
             is ScreenState.PeopleLoaded -> {
+                changeLoadingVisibility(false)
+                changeErrorVisibility(false)
                 adapter.submitUsers(state.users) {
-                    showContent()
+                    changeContentVisibility(true)
                 }
             }
-            is ScreenState.Loading -> { showLoading() }
-            is ScreenState.Error -> { showError() }
+            is ScreenState.Loading -> {
+                changeErrorVisibility(false)
+                changeContentVisibility(false)
+                changeLoadingVisibility(true)
+            }
+            is ScreenState.Error -> {
+                changeContentVisibility(false)
+                changeLoadingVisibility(false)
+                changeErrorVisibility(true)
+            }
         }
     }
 
-    private fun showLoading() {
-        hideContent()
-        hideError()
-        binding.loading.loadingLayout.isVisible = true
-        binding.loading.loadingLayout.startShimmer()
+    private fun changeLoadingVisibility(visibility: Boolean) {
+        binding.loading.loadingLayout.apply {
+            isVisible = visibility
+            if (visibility) startShimmer() else stopShimmer()
+        }
     }
 
-    private fun showContent() {
-        hideError()
-        hideLoading()
-        binding.peopleRecycler.isVisible = true
+    private fun changeErrorVisibility(visibility: Boolean) {
+        binding.error.isVisible = visibility
     }
 
-    private fun showError() {
-        hideContent()
-        hideLoading()
-        binding.error.isVisible = true
-    }
-
-    private fun hideLoading() {
-        binding.loading.loadingLayout.stopShimmer()
-        binding.loading.loadingLayout.isVisible = false
-    }
-
-    private fun hideContent() {
-        binding.peopleRecycler.isVisible = false
-    }
-
-    private fun hideError() {
-        binding.error.isVisible = false
+    private fun changeContentVisibility(visibility: Boolean) {
+        binding.peopleRecycler.isVisible = visibility
     }
 }

@@ -38,36 +38,19 @@ class SubscribedChannelsFragment : BaseChannelsFragment() {
         initErrorView(binding.channels.error)
     }
 
-    override fun showLoading() {
-        hideContent()
-        hideError()
-        binding.channels.loading.loadingLayout.isVisible = true
-        binding.channels.loading.loadingLayout.startShimmer()
+    override fun changeLoadingVisibility(visibility: Boolean) {
+        binding.channels.loading.loadingLayout.apply {
+            isVisible = visibility
+            if (visibility) startShimmer() else stopShimmer()
+        }
     }
 
-    override fun showContent() {
-        hideError()
-        hideLoading()
-        binding.channels.channelsRecyclerView.isVisible = true
+    override fun changeErrorVisibility(visibility: Boolean) {
+        binding.channels.error.isVisible = visibility
     }
 
-    override fun showError() {
-        hideContent()
-        hideLoading()
-        binding.channels.error.isVisible = true
-    }
-
-    override fun hideLoading() {
-        binding.channels.loading.loadingLayout.stopShimmer()
-        binding.channels.loading.loadingLayout.isVisible = false
-    }
-
-    override fun hideContent() {
-        binding.channels.channelsRecyclerView.isVisible = false
-    }
-
-    override fun hideError() {
-        binding.channels.error.isVisible = false
+    override fun changeContentVisibility(visibility: Boolean) {
+        binding.channels.channelsRecyclerView.isVisible = visibility
     }
 
     companion object {
