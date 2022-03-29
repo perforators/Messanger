@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <include layout="@layout/message_item_placeholder" />
+        <include layout="@layout/date_separator_item_placeholder" />
 
         <include layout="@layout/message_item_placeholder" />
 
@@ -18,7 +18,11 @@
 
         <include layout="@layout/message_item_placeholder" />
 
+        <include layout="@layout/date_separator_item_placeholder" />
+
         <include layout="@layout/message_item_placeholder" />
+
+        <include layout="@layout/date_separator_item_placeholder" />
 
         <include layout="@layout/message_item_placeholder" />
 
