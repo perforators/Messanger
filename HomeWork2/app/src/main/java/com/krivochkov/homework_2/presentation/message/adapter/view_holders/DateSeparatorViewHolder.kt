@@ -10,8 +10,4 @@ class DateSeparatorViewHolder(private val binding: DateSeparatorItemBinding)
     fun bind(dateSeparatorItem: DateSeparatorItem) {
         binding.dateSeparator.text = dateSeparatorItem.date
     }
-
-    companion object {
-        const val TYPE_DATE_SEPARATOR = 4
-    }
 }

@@ -22,13 +22,30 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/people_recycler"
+    <FrameLayout
         android:layout_width="0dp"
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/app_bar_layout" />
+        app:layout_constraintTop_toBottomOf="@+id/app_bar_layout">
+
+        <include
+            android:id="@+id/loading"
+            layout="@layout/people_skeleton_layout" />
+
+        <com.krivochkov.homework_2.presentation.custom_views.ErrorView
+            android:id="@+id/error"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/people_recycler"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
+
+    </FrameLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -47,4 +47,11 @@ dependencies {
     implementation "androidx.navigation:navigation-ui-ktx:$navVersion"
     implementation "androidx.activity:activity-ktx:$activityKtxVersion"
     implementation "androidx.fragment:fragment-ktx:$fragmentKtxVersion"
+
+    //Rx
+    implementation "io.reactivex.rxjava2:rxandroid:$rxJavaVersion"
+    implementation "io.reactivex.rxjava2:rxkotlin:$rxKotlinVersion"
+
+    //Shimmer animation
+    implementation "com.facebook.shimmer:shimmer:$shimmerVersion"
 }

@@ -16,11 +16,8 @@ import com.krivochkov.homework_2.domain.models.Topic
 import com.krivochkov.homework_2.presentation.BaseViewHolder
 import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.items.LoadingItem
 import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.view_holders.ChannelViewHolder
-import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.view_holders.ChannelViewHolder.Companion.TYPE_CHANNEL
 import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.view_holders.LoadingViewHolder
-import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.view_holders.LoadingViewHolder.Companion.TYPE_LOADING
 import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.view_holders.TopicViewHolder
-import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.view_holders.TopicViewHolder.Companion.TYPE_TOPIC
 import java.lang.IllegalStateException
 
 class ChannelsAdapter : RecyclerView.Adapter<BaseViewHolder>() {
@@ -30,33 +27,45 @@ class ChannelsAdapter : RecyclerView.Adapter<BaseViewHolder>() {
     private var onExpandedChannel: (channelId: Long) -> Unit = {  }
     private var onTopicClick: (channel: Channel, topic: Topic) -> Unit = { _, _ -> }
 
-    fun submitChannels(channels: List<Channel>) {
-        val items = channels.map { ChannelItem(it) }
-        submitItems(items)
+    fun submitChannels(channels: List<ChannelItem>, onCommitted: (() -> Unit)? = null) {
+        submitItems(channels, onCommitted)
     }
 
-    fun submitTopicsInChannel(channelId: Long, topics: List<Topic>) {
-        val topicItems = topics.map { TopicItem(it, channelId) }
+    fun submitTopicsInChannel(channelId: Long, topics: List<TopicItem>) {
         val channelItem = findChannelItemById(channelId) ?: return
         if (channelItem.isExpanded) {
             collapseChannelItem(channelItem) {
-                channelItem.childItems = topicItems
-                expandChannelItem(channelItem)
+                val changedChannelItem = channelItem.copy(childItems = topics)
+                changeChannelItem(
+                    channelId = channelId,
+                    changedChannelItem = changedChannelItem,
+                    onCommitted = { expandChannelItem(changedChannelItem) }
+                )
             }
         } else {
-            channelItem.childItems = topicItems
+            changeChannelItem(
+                channelId = channelId,
+                changedChannelItem = channelItem.copy(childItems = topics)
+            )
         }
     }
 
-    private fun expandChannelItem(channelItem: ChannelItem) {
+    private fun expandChannelItem(channelItem: ChannelItem, onCommitted: (() -> Unit)? = null) {
         val items = differ.currentList.toMutableList()
         items.addAll(items.indexOf(channelItem) + 1, channelItem.childItems)
-        submitItems(items)
+        submitItems(items, onCommitted)
     }
 
     private fun collapseChannelItem(channelItem: ChannelItem, onCommitted: (() -> Unit)? = null) {
         val items = differ.currentList.toMutableList()
-        items.removeAll(channelItem.childItems)
+        val nextPosition = items.indexOf(channelItem) + 1
+        while (true) {
+            if (nextPosition == items.size
+                || items[nextPosition].getType() == ChannelItem.TYPE) {
+                break
+            }
+            items.removeAt(nextPosition)
+        }
         submitItems(items, onCommitted)
     }
 
@@ -70,6 +79,17 @@ class ChannelsAdapter : RecyclerView.Adapter<BaseViewHolder>() {
         } as? ChannelItem
     }
 
+    private fun changeChannelItem(
+        channelId: Long,
+        changedChannelItem: ChannelItem,
+        onCommitted: (() -> Unit)? = null
+    ) {
+        val oldChannelItem = findChannelItemById(channelId) ?: return
+        val items = differ.currentList.toMutableList()
+        items[items.indexOf(oldChannelItem)] = changedChannelItem
+        submitItems(items, onCommitted)
+    }
+
     fun setOnExpandedChannelListener(listener: (channelId: Long) -> Unit) {
          onExpandedChannel = listener
     }
@@ -80,20 +100,37 @@ class ChannelsAdapter : RecyclerView.Adapter<BaseViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         return when (viewType) {
-            TYPE_CHANNEL -> ChannelViewHolder(
+            ChannelItem.TYPE -> ChannelViewHolder(
                 ChannelItemBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false
                 ),
                 onExpanded = {
-                    it.childItems = listOf(LoadingItem())
-                    expandChannelItem(it)
-                    onExpandedChannel(it.channel.id)
+                    val changedChannelItem = it.copy(
+                        isExpanded = true,
+                        childItems = listOf(LoadingItem)
+                    )
+                    changeChannelItem(
+                        channelId = it.channel.id,
+                        changedChannelItem = changedChannelItem,
+                        onCommitted = {
+                            expandChannelItem(changedChannelItem) {
+                                onExpandedChannel(changedChannelItem.channel.id)
+                            }
+                        }
+                    )
                 },
-                onCollapsed = { collapseChannelItem(it) },
+                onCollapsed = {
+                    val changedChannelItem = it.copy(isExpanded = false)
+                    changeChannelItem(
+                        channelId = it.channel.id,
+                        changedChannelItem = changedChannelItem,
+                        onCommitted = { collapseChannelItem(changedChannelItem)  }
+                    )
+                }
             )
-            TYPE_TOPIC -> TopicViewHolder(
+            TopicItem.TYPE -> TopicViewHolder(
                 TopicItemBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
@@ -104,7 +141,7 @@ class ChannelsAdapter : RecyclerView.Adapter<BaseViewHolder>() {
                     onTopicClick(channelItem.channel, it.topic)
                 }
             )
-            TYPE_LOADING -> LoadingViewHolder(
+            LoadingItem.TYPE -> LoadingViewHolder(
                 LoadingItemBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,

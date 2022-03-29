@@ -51,8 +51,4 @@ class MessageViewHolder(
             addReactions(message.groupedReactions)
         }
     }
-
-    companion object {
-        const val TYPE_MESSAGE = 3
-    }
 }

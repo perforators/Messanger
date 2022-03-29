@@ -2,13 +2,18 @@ package com.krivochkov.homework_2.presentation.channel.channels
 
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.krivochkov.homework_2.R
 import com.krivochkov.homework_2.presentation.channel.SharedViewModel
 import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.ChannelsAdapter
+import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.items.ChannelItem
+import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.items.TopicItem
+import com.krivochkov.homework_2.presentation.custom_views.ErrorView
 
 abstract class BaseChannelsFragment : Fragment() {
 
@@ -19,6 +24,20 @@ abstract class BaseChannelsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setObservers()
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        sharedViewModel.searchQuery.observe(viewLifecycleOwner) {
+            channelsViewModel.loadChannels(it)
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        sharedViewModel.searchQuery.removeObservers(viewLifecycleOwner)
     }
 
     protected fun initRecycler(recyclerView: RecyclerView) {
@@ -41,19 +60,67 @@ abstract class BaseChannelsFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
     }
 
-    private fun setObservers() {
-        channelsViewModel.channels.observe(this) { channels ->
-            adapter.submitChannels(channels)
+    protected fun initErrorView(errorView: ErrorView) {
+        errorView.setOnErrorButtonClickListener {
+            channelsViewModel.loadChannelsByLastQuery()
         }
 
-        channelsViewModel.topicsInChannel.observe(this) {
-            it.getContentIfNotHandled()?.let { result ->
-                val (channelId, topics) = result
-                adapter.submitTopicsInChannel(
-                    channelId,
-                    topics
-                )
+        errorView.text = requireContext().getString(R.string.error_text)
+    }
+
+    private fun setObservers() {
+        channelsViewModel.state.observe(viewLifecycleOwner) { state ->
+            render(state)
+        }
+
+        channelsViewModel.event.observe(viewLifecycleOwner) { singleEvent ->
+            singleEvent.getContentIfNotHandled()?.let { event ->
+                handleEvent(event)
             }
         }
+    }
+
+    private fun render(state: ScreenState) {
+        when (state) {
+            is ScreenState.ChannelsLoaded -> {
+                submitChannels(state.channels) {
+                    showContent()
+                }
+            }
+            is ScreenState.Loading -> { showLoading() }
+            is ScreenState.Error -> { showError() }
+        }
+    }
+
+    private fun handleEvent(event: UIEvent) {
+        when (event) {
+            is UIEvent.SubmitTopicsInChannel -> submitTopicsInChannel(event.channelId, event.topics)
+            is UIEvent.FailedLoadTopics -> showToast(requireContext()
+                .getString(R.string.failed_load_topics))
+        }
+    }
+
+    protected abstract fun showLoading()
+
+    protected abstract fun showContent()
+
+    protected abstract fun showError()
+
+    protected abstract fun hideLoading()
+
+    protected abstract fun hideContent()
+
+    protected abstract fun hideError()
+
+    private fun submitChannels(channels: List<ChannelItem>, onCommitted: (() -> Unit)? = null) {
+        adapter.submitChannels(channels, onCommitted)
+    }
+
+    private fun submitTopicsInChannel(channelId: Long, topics: List<TopicItem>) {
+        adapter.submitTopicsInChannel(channelId, topics)
+    }
+
+    private fun showToast(text: String) {
+        Toast.makeText(requireContext(), text, Toast.LENGTH_LONG).show()
     }
 }

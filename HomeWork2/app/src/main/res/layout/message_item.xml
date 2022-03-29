@@ -4,7 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginTop="@dimen/big_margin"
-    android:layout_marginBottom="@dimen/big_margin">
+    android:layout_marginBottom="@dimen/big_margin"
+    android:layout_marginStart="@dimen/middle_margin"
+    android:layout_marginEnd="@dimen/middle_margin" >
 
     <com.krivochkov.homework_2.presentation.custom_views.MessageLayout
         android:id="@+id/message_layout"

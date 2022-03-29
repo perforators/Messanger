@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.viewModels
@@ -14,14 +15,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.krivochkov.homework_2.R
 import com.krivochkov.homework_2.databinding.FragmentMessageBinding
-import com.krivochkov.homework_2.presentation.Item
 import com.krivochkov.homework_2.presentation.custom_views.EmojiProvider
 import com.krivochkov.homework_2.presentation.message.adapter.MessageAdapter
 import com.krivochkov.homework_2.presentation.message.emoji_pick.EmojiPickFragment
-import com.krivochkov.homework_2.domain.models.Message
-import com.krivochkov.homework_2.presentation.message.adapter.items.DateSeparatorItem
-import com.krivochkov.homework_2.presentation.message.adapter.items.MessageItem
-import com.krivochkov.homework_2.utils.convertToDate
 
 class MessageFragment : Fragment(), EmojiPickFragment.OnEmojiPickListener {
 
@@ -36,7 +32,6 @@ class MessageFragment : Fragment(), EmojiPickFragment.OnEmojiPickListener {
 
     private val onChangeMyReaction: (Long, String) -> Unit = { messageId, emoji ->
         viewModel.updateReaction(messageId, emoji)
-        viewModel.loadMessages()
     }
 
     override fun onCreateView(
@@ -59,10 +54,77 @@ class MessageFragment : Fragment(), EmojiPickFragment.OnEmojiPickListener {
         initToolbar()
         initRecycler()
         initInputField()
+        initErrorView()
 
-        viewModel.messages.observe(this) {
-            adapter.submitList(it.toMessageItemsWithDates())
+        viewModel.state.observe(viewLifecycleOwner) { state ->
+            render(state)
         }
+
+        viewModel.event.observe(viewLifecycleOwner) { singleEvent ->
+            singleEvent.getContentIfNotHandled()?.let { event ->
+                handleEvent(event)
+            }
+        }
+    }
+
+    private fun render(state: ScreenState) {
+        when (state) {
+            is ScreenState.MessagesLoaded -> {
+                adapter.submitList(state.messagesWithDates) {
+                    showContent()
+                }
+            }
+            is ScreenState.Loading -> showLoading()
+            is ScreenState.Error -> showError()
+        }
+    }
+
+    private fun handleEvent(event: UIEvent) {
+        when (event) {
+            is UIEvent.FailedSendMessage -> showToast(requireContext()
+                .getString(R.string.failed_send_message))
+            is UIEvent.FailedUpdateReaction -> showToast(requireContext()
+                .getString(R.string.failed_update_reaction))
+        }
+    }
+
+    private fun showLoading() {
+        hideError()
+        hideContent()
+        changeVisibilityInputField(false)
+        binding.loading.loadingLayout.startShimmer()
+        binding.loading.loadingLayout.isVisible = true
+    }
+
+    private fun hideLoading() {
+        binding.loading.loadingLayout.stopShimmer()
+        binding.loading.loadingLayout.isVisible = false
+    }
+
+    private fun showError() {
+        hideContent()
+        hideLoading()
+        binding.error.isVisible = true
+    }
+
+    private fun hideError() {
+        binding.error.isVisible = false
+    }
+
+    private fun showContent() {
+        hideLoading()
+        hideError()
+        changeVisibilityInputField(true)
+        binding.recyclerView.isVisible = true
+    }
+
+    private fun hideContent() {
+        binding.recyclerView.isVisible = false
+    }
+
+    private fun changeVisibilityInputField(visibility: Boolean) {
+        binding.inputField.isVisible = visibility
+        binding.buttonBox.isVisible = visibility
     }
 
     private fun initToolbar() {
@@ -78,6 +140,14 @@ class MessageFragment : Fragment(), EmojiPickFragment.OnEmojiPickListener {
         binding.toolbarLayout.backButton.setOnClickListener {
             findNavController().navigateUp()
         }
+    }
+
+    private fun initErrorView() {
+        binding.error.setOnErrorButtonClickListener {
+            viewModel.refreshMessages(true, 3)
+        }
+
+        binding.error.text = requireContext().getString(R.string.error_text)
     }
 
     private fun initRecycler() {
@@ -100,11 +170,6 @@ class MessageFragment : Fragment(), EmojiPickFragment.OnEmojiPickListener {
         binding.recyclerView.layoutManager = layoutManager
     }
 
-    private fun showEmojiPick(messageId: Long) {
-        EmojiPickFragment.newInstance(EmojiProvider().getAll(), messageId)
-            .show(childFragmentManager, EMOJI_PICK_FRAGMENT_TAG)
-    }
-
     private fun initInputField() {
         binding.apply {
             sendButton.setOnClickListener {
@@ -113,7 +178,6 @@ class MessageFragment : Fragment(), EmojiPickFragment.OnEmojiPickListener {
                 if (inputText.isNotEmpty()) {
                     inputField.setText("")
                     viewModel.sendMessage(inputText)
-                    viewModel.loadMessages()
                 }
             }
 
@@ -124,26 +188,20 @@ class MessageFragment : Fragment(), EmojiPickFragment.OnEmojiPickListener {
         }
     }
 
+    private fun showEmojiPick(messageId: Long) {
+        EmojiPickFragment.newInstance(EmojiProvider().getAll(), messageId)
+            .show(childFragmentManager, EMOJI_PICK_FRAGMENT_TAG)
+    }
+
+    private fun showToast(text: String) {
+        Toast.makeText(requireContext(), text, Toast.LENGTH_LONG).show()
+    }
+
     override fun onEmojiPick(messageId: Long, emoji: String) {
         onChangeMyReaction(messageId, emoji)
     }
 
-    private fun List<Message>.toMessageItemsWithDates(): List<Item> {
-        val listItems = mutableListOf<Item>()
-        val groupedMessages = groupBy { (it.date / SECONDS_IN_DAY) * SECONDS_IN_DAY }
-
-        for (groups in groupedMessages) {
-            val date = groups.key.convertToDate()
-            val messageItems = groups.value.map { MessageItem(it) }
-            listItems += DateSeparatorItem(date)
-            listItems += messageItems
-        }
-
-        return listItems
-    }
-
     companion object {
         private const val EMOJI_PICK_FRAGMENT_TAG = "TAG_EMOJI_PICK"
-        private const val SECONDS_IN_DAY = 86400
     }
 }

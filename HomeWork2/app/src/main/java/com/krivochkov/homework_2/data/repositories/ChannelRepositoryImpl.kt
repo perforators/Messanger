@@ -3,6 +3,8 @@ package com.krivochkov.homework_2.data.repositories
 import com.krivochkov.homework_2.domain.models.Channel
 import com.krivochkov.homework_2.domain.models.Topic
 import com.krivochkov.homework_2.domain.repositories.ChannelRepository
+import io.reactivex.Single
+import java.lang.IllegalStateException
 
 class ChannelRepositoryImpl : ChannelRepository {
 
@@ -37,16 +39,29 @@ class ChannelRepositoryImpl : ChannelRepository {
         )
     )
 
-    override fun loadAllChannels(): List<Channel> {
-        return channels.map { it.copy() }
+    override fun loadAllChannels(): Single<List<Channel>> {
+        return Single.fromCallable {
+            randomException()
+            channels.map { it.copy() }
+        }
     }
 
-    override fun loadSubscribedChannels(): List<Channel> {
-        return channels.subList(0, 2).map { it.copy() }
+    override fun loadSubscribedChannels(): Single<List<Channel>> {
+        return Single.fromCallable {
+            randomException()
+            channels.subList(0, 2).map { it.copy() }
+        }
     }
 
-    override fun loadTopicsInChannel(channelId: Long): List<Topic> {
-        val topics = topics[channelId] ?: listOf()
-        return topics.map { it.copy() }
+    override fun loadTopicsInChannel(channelId: Long): Single<List<Topic>> {
+        return Single.fromCallable {
+            randomException()
+            val topics = topics[channelId] ?: listOf()
+            topics.map { it.copy() }
+        }
+    }
+
+    private fun randomException() {
+        if ((1..10).random() < 4) throw IllegalStateException("Random error")
     }
 }

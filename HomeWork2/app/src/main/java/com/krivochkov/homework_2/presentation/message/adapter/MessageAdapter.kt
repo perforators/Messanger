@@ -12,9 +12,7 @@ import com.krivochkov.homework_2.presentation.BaseViewHolder
 import com.krivochkov.homework_2.presentation.message.adapter.items.DateSeparatorItem
 import com.krivochkov.homework_2.presentation.message.adapter.items.MessageItem
 import com.krivochkov.homework_2.presentation.message.adapter.view_holders.DateSeparatorViewHolder
-import com.krivochkov.homework_2.presentation.message.adapter.view_holders.DateSeparatorViewHolder.Companion.TYPE_DATE_SEPARATOR
 import com.krivochkov.homework_2.presentation.message.adapter.view_holders.MessageViewHolder
-import com.krivochkov.homework_2.presentation.message.adapter.view_holders.MessageViewHolder.Companion.TYPE_MESSAGE
 import java.lang.IllegalStateException
 
 class MessageAdapter : RecyclerView.Adapter<BaseViewHolder>() {
@@ -43,7 +41,7 @@ class MessageAdapter : RecyclerView.Adapter<BaseViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         return when (viewType) {
-            TYPE_MESSAGE -> MessageViewHolder(
+            MessageItem.TYPE -> MessageViewHolder(
                 MessageItemBinding.inflate(
                         LayoutInflater.from(parent.context),
                         parent,
@@ -53,7 +51,7 @@ class MessageAdapter : RecyclerView.Adapter<BaseViewHolder>() {
                 onRemoveMyReaction,
                 onChoosingReaction
             )
-            TYPE_DATE_SEPARATOR -> DateSeparatorViewHolder(
+            DateSeparatorItem.TYPE -> DateSeparatorViewHolder(
                 DateSeparatorItemBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,

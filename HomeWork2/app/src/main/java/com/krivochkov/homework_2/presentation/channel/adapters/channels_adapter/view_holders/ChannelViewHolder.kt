@@ -19,15 +19,12 @@ class ChannelViewHolder(
         if (channelItem.isExpanded) showUpArrow() else showDownArrow()
 
         binding.channelItem.setOnClickListener {
-            channelItem.isExpanded = !channelItem.isExpanded
-            when (channelItem.isExpanded) {
+            when (!channelItem.isExpanded) {
                 true -> {
                     onExpanded(channelItem)
-                    showUpArrow()
                 }
                 false -> {
                     onCollapsed(channelItem)
-                    showDownArrow()
                 }
             }
         }
@@ -41,9 +38,5 @@ class ChannelViewHolder(
     private fun showDownArrow() {
         binding.arrow.background =
             AppCompatResources.getDrawable(context, R.drawable.arrow_down_picture)
-    }
-
-    companion object {
-        const val TYPE_CHANNEL = 0
     }
 }
