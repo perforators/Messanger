@@ -19,6 +19,10 @@ class MessageAdapter : RecyclerView.Adapter<BaseViewHolder>() {
 
     private val differ: AsyncListDiffer<Item> = AsyncListDiffer(this, DiffCallback())
 
+    var items: List<Item>
+        get() = differ.currentList
+        set(value) = submitList(value)
+
     private var onAddMyReaction: (messageId: Long, emoji: String) -> Unit = { _, _ -> }
     private var onRemoveMyReaction: (messageId: Long, emoji: String) -> Unit = { _, _ -> }
     private var onChoosingReaction: (messageId: Long) -> Unit = {  }
