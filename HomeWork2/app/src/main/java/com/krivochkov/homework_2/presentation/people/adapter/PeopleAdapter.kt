@@ -13,10 +13,6 @@ class PeopleAdapter : RecyclerView.Adapter<PeopleAdapter.UserViewHolder>() {
 
     private val differ: AsyncListDiffer<User> = AsyncListDiffer(this, DiffCallback())
 
-    var users: List<User>
-        get() = differ.currentList
-        set(value) = differ.submitList(value)
-
     private class DiffCallback : DiffUtil.ItemCallback<User>() {
 
         override fun areItemsTheSame(oldItem: User, newItem: User) = oldItem.id == newItem.id
@@ -40,6 +36,10 @@ class PeopleAdapter : RecyclerView.Adapter<PeopleAdapter.UserViewHolder>() {
         }
     }
 
+    fun submitUsers(users: List<User>, onCommitted: (() -> Unit)? = null) {
+        differ.submitList(users, onCommitted)
+    }
+
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
@@ -54,8 +54,8 @@ class PeopleAdapter : RecyclerView.Adapter<PeopleAdapter.UserViewHolder>() {
     }
 
     override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
-        holder.bind(users[position])
+        holder.bind(differ.currentList[position])
     }
 
-    override fun getItemCount() = users.size
+    override fun getItemCount() = differ.currentList.size
 }

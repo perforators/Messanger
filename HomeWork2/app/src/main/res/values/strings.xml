@@ -16,4 +16,9 @@
     <string name="offline_status">offline</string>
     <string name="log_out">Log out</string>
     <string name="topic_text">Topic: %s</string>
+    <string name="error_button_text">ПОВТОРИТЬ</string>
+    <string name="failed_load_topics">Не удалось загрузить топики</string>
+    <string name="failed_send_message">Не удалось отправить сообщение</string>
+    <string name="failed_update_reaction">Не удалось обновить реакцию</string>
+    <string name="error_text">Произошла ошибка при загрузке данных. Проверьте подключение к сети.</string>
 </resources>

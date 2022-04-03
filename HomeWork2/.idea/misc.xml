@@ -25,8 +25,10 @@
         <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/drawable/bg_message_is_me.xml" value="0.1638888888888889" />
         <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/drawable/bg_message_not_me.xml" value="0.1638888888888889" />
         <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/drawable/bg_online_status.xml" value="0.1" />
+        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/drawable/bg_placeholder.xml" value="0.18333333333333332" />
         <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/drawable/bg_send_button.xml" value="0.18981481481481483" />
         <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/drawable/channels_picture.xml" value="0.1" />
+        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/drawable/error_picture.xml" value="0.18333333333333332" />
         <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/drawable/is_offline_picture.xml" value="0.1" />
         <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/drawable/is_online_picture.xml" value="0.1" />
         <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/drawable/people_picture.xml" value="0.1" />
@@ -37,23 +39,38 @@
         <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/activity_main.xml" value="0.13333333333333333" />
         <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/activity_messages.xml" value="0.16666666666666666" />
         <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/channel_item.xml" value="0.1" />
+        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/channel_item_placeholder.xml" value="0.10778985507246377" />
+        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/channel_placeholder.xml" value="0.22" />
+        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/channel_skeleton_layout.xml" value="0.1" />
+        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/channels_content_layout.xml" value="0.1" />
+        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/channels_layout.xml" value="0.1" />
+        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/channels_skeleton_layout.xml" value="0.1" />
         <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/date_separator_item.xml" value="0.16666666666666666" />
+        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/date_separator_item_placeholder.xml" value="0.16666666666666666" />
         <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/emoji_item.xml" value="0.16666666666666666" />
         <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/emoji_pull_layout.xml" value="0.14175724637681159" />
-        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/fragment_all_channels.xml" value="0.1" />
-        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/fragment_channel.xml" value="0.1" />
+        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/error_layout.xml" value="0.16666666666666666" />
+        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/fragment_all_channels.xml" value="0.10666666666666667" />
+        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/fragment_channel.xml" value="0.13333333333333333" />
         <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/fragment_emoji_pick.xml" value="0.1" />
-        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/fragment_message.xml" value="0.14666666666666667" />
+        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/fragment_message.xml" value="0.16666666666666666" />
         <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/fragment_people.xml" value="0.14666666666666667" />
         <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/fragment_profile.xml" value="0.16666666666666666" />
         <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/fragment_subscribed_channels.xml" value="0.1" />
+        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/loading_channels_layout.xml" value="0.1" />
         <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/loading_item.xml" value="0.14673913043478262" />
         <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/message_item.xml" value="0.3333333333333333" />
+        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/message_item_placeholder.xml" value="0.10778985507246377" />
         <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/message_layout.xml" value="0.16666666666666666" />
+        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/message_skeleton_layout.xml" value="0.10778985507246377" />
+        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/people_skeleton_layout.xml" value="0.1" />
+        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/profile_layout.xml" value="0.11956521739130435" />
+        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/profile_skeleton_layout.xml" value="0.11956521739130435" />
         <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/search_layout.xml" value="0.1" />
         <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/toolbar.xml" value="0.16666666666666666" />
         <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/topic_item.xml" value="0.16666666666666666" />
         <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/user_item.xml" value="0.6666666666666666" />
+        <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/user_item_placeholder.xml" value="0.22" />
         <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/layout/user_profile_layout.xml" value="0.1" />
         <entry key="..\:/Users/sfsdf/tfs-android-spring-2022/HomeWork2/app/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.1685185185185185" />
       </map>

@@ -22,8 +22,4 @@ class TopicViewHolder(
             onTopicClick(topicItem)
         }
     }
-
-    companion object {
-        const val TYPE_TOPIC = 1
-    }
 }

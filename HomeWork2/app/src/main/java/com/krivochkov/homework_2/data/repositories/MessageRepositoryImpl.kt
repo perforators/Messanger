@@ -3,6 +3,9 @@ package com.krivochkov.homework_2.data.repositories
 import com.krivochkov.homework_2.domain.repositories.MessageRepository
 import com.krivochkov.homework_2.domain.models.Message
 import com.krivochkov.homework_2.domain.models.Reaction
+import io.reactivex.Completable
+import io.reactivex.Single
+import java.lang.IllegalStateException
 
 class MessageRepositoryImpl : MessageRepository {
 
@@ -75,33 +78,47 @@ class MessageRepositoryImpl : MessageRepository {
         )
     )
 
-    override fun getAllMessages(): List<Message> {
-        return messages.map { it.copy(reactions = it.reactions.toMutableList()) }
-    }
-
-    override fun sendMessage(content: String) {
-        val message = Message(
-            id = messages.last().id + 1,
-            userId = MY_USER_ID,
-            userName = "Egor Krivochkov",
-            avatarUrl = "",
-            isMeMessage = true,
-            text = content,
-            date = System.currentTimeMillis() / 1000,
-            reactions = mutableListOf()
-        )
-        messages += message
-    }
-
-    override fun updateReaction(messageId: Long, emoji: String) {
-        val message = messages.find { it.id == messageId } ?: return
-        val oldReaction = message.reactions.find { it.emoji == emoji && it.userId == MY_USER_ID }
-
-        if (oldReaction != null) {
-            message.reactions.remove(oldReaction)
-        } else {
-            message.reactions.add(Reaction(MY_USER_ID, emoji))
+    override fun getAllMessages(): Single<List<Message>> {
+        return Single.fromCallable {
+            messages.map { it.copy(reactions = it.reactions.toMutableList()) }
         }
+    }
+
+    override fun sendMessage(content: String): Completable {
+        return Completable.fromCallable {
+            randomException()
+            val message = Message(
+                id = messages.last().id + 1,
+                userId = MY_USER_ID,
+                userName = "Egor Krivochkov",
+                avatarUrl = "",
+                isMeMessage = true,
+                text = content,
+                date = System.currentTimeMillis() / 1000,
+                reactions = mutableListOf()
+            )
+
+            messages.add(message)
+        }
+    }
+
+    override fun updateReaction(messageId: Long, emoji: String): Completable {
+        return Completable.fromCallable {
+            randomException()
+            val message = messages.find { it.id == messageId }
+                ?: throw IllegalStateException("Message not found")
+            val oldReaction = message.reactions.find { it.emoji == emoji && it.userId == MY_USER_ID }
+
+            if (oldReaction != null) {
+                message.reactions.remove(oldReaction)
+            } else {
+                message.reactions.add(Reaction(MY_USER_ID, emoji))
+            }
+        }
+    }
+
+    private fun randomException() {
+        if ((1..10).random() < 3) throw IllegalStateException("Random error")
     }
 
     companion object {

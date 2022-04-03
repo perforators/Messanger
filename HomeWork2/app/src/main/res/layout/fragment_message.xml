@@ -28,15 +28,33 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar_layout" />
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerView"
+    <FrameLayout
+        android:id="@+id/content_layout"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginBottom="@dimen/middle_margin"
         app:layout_constraintBottom_toTopOf="@+id/input_field"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/topic_text" />
+        app:layout_constraintTop_toBottomOf="@+id/topic_text">
+
+        <include
+            android:id="@+id/loading"
+            layout="@layout/message_skeleton_layout" />
+
+        <com.krivochkov.homework_2.presentation.custom_views.ErrorView
+            android:id="@+id/error"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="gone" />
+
+    </FrameLayout>
 
     <EditText
         android:id="@+id/input_field"
@@ -59,11 +77,11 @@
         android:textColorHint="@color/white_200"
         android:textSize="@dimen/input_field_text_size"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/linear_layout"
+        app:layout_constraintEnd_toStartOf="@+id/button_box"
         app:layout_constraintStart_toStartOf="parent" />
 
     <LinearLayout
-        android:id="@+id/linear_layout"
+        android:id="@+id/button_box"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="@dimen/big_margin"

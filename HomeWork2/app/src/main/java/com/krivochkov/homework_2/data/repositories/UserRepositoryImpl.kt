@@ -2,6 +2,8 @@ package com.krivochkov.homework_2.data.repositories
 
 import com.krivochkov.homework_2.domain.models.User
 import com.krivochkov.homework_2.domain.repositories.UserRepository
+import io.reactivex.Single
+import java.lang.IllegalStateException
 
 class UserRepositoryImpl : UserRepository {
 
@@ -36,11 +38,21 @@ class UserRepositoryImpl : UserRepository {
         )
     )
 
-    override fun loadUsers(): List<User> {
-        return users.map { it.copy() }
+    override fun loadUsers(): Single<List<User>> {
+        return Single.fromCallable {
+            randomException()
+            users.map { it.copy() }
+        }
     }
 
-    override fun loadMyUser(): User {
-        return users[0].copy()
+    override fun loadMyUser(): Single<User> {
+        return Single.fromCallable {
+            randomException()
+            users[0].copy()
+        }
+    }
+
+    private fun randomException() {
+        if ((1..10).random() < 4) throw IllegalStateException("Random error")
     }
 }
