@@ -15,8 +15,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.krivochkov.homework_2.R
 import com.krivochkov.homework_2.databinding.FragmentMessageBinding
-import com.krivochkov.homework_2.presentation.custom_views.EmojiProvider
+import com.krivochkov.homework_2.domain.models.Emoji
 import com.krivochkov.homework_2.presentation.message.adapter.MessageAdapter
+import com.krivochkov.homework_2.presentation.message.adapter.items.MessageItem
 import com.krivochkov.homework_2.presentation.message.emoji_pick.EmojiPickFragment
 
 class MessageFragment : Fragment(), EmojiPickFragment.OnEmojiPickListener {
@@ -28,10 +29,8 @@ class MessageFragment : Fragment(), EmojiPickFragment.OnEmojiPickListener {
 
     private lateinit var adapter: MessageAdapter
 
-    private val viewModel: MessageViewModel by viewModels()
-
-    private val onChangeMyReaction: (Long, String) -> Unit = { messageId, emoji ->
-        viewModel.updateReaction(messageId, emoji)
+    private val viewModel: MessageViewModel by viewModels {
+        MessageViewModelFactory(args.channel.name, args.topic.name)
     }
 
     override fun onCreateView(
@@ -94,10 +93,9 @@ class MessageFragment : Fragment(), EmojiPickFragment.OnEmojiPickListener {
 
     private fun handleEvent(event: UIEvent) {
         when (event) {
-            is UIEvent.FailedSendMessage -> showToast(requireContext()
-                .getString(R.string.failed_send_message))
-            is UIEvent.FailedUpdateReaction -> showToast(requireContext()
-                .getString(R.string.failed_update_reaction))
+            is UIEvent.FailedSendMessage -> showToast(R.string.failed_send_message)
+            is UIEvent.FailedAddReaction -> showToast(R.string.failed_add_reaction)
+            is UIEvent.FailedRemoveReaction -> showToast(R.string.failed_remove_reaction)
         }
     }
 
@@ -138,30 +136,41 @@ class MessageFragment : Fragment(), EmojiPickFragment.OnEmojiPickListener {
 
     private fun initErrorView() {
         binding.error.setOnErrorButtonClickListener {
-            viewModel.refreshMessages(true, 3)
+            viewModel.refreshMessages()
         }
 
         binding.error.text = requireContext().getString(R.string.error_text)
     }
 
     private fun initRecycler() {
-        adapter = MessageAdapter().apply {
-            setOnAddMyReactionListener(onChangeMyReaction)
-            setOnRemoveMyReactionListener(onChangeMyReaction)
-            setOnChoosingReactionListener { messageId ->
-                showEmojiPick(messageId)
-            }
-        }
-        adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
-            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                binding.recyclerView.smoothScrollToPosition(adapter.itemCount)
-            }
-        })
+        initAdapter()
         binding.recyclerView.adapter = adapter
 
         val layoutManager = LinearLayoutManager(requireContext())
         layoutManager.stackFromEnd = true
         binding.recyclerView.layoutManager = layoutManager
+    }
+
+    private fun initAdapter() {
+        adapter = MessageAdapter().apply {
+            setOnAddMyReactionListener { messageId, emoji ->
+                viewModel.addReaction(messageId, emoji)
+            }
+            setOnRemoveMyReactionListener { messageId, emoji ->
+                viewModel.removeReaction(messageId, emoji)
+            }
+            setOnChoosingReactionListener { messageId ->
+                showEmojiPick(messageId)
+            }
+        }
+
+        adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+            override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
+                if (positionStart == adapter.itemCount - 1) {
+                    binding.recyclerView.smoothScrollToPosition(adapter.itemCount)
+                }
+            }
+        })
     }
 
     private fun initInputField() {
@@ -183,19 +192,33 @@ class MessageFragment : Fragment(), EmojiPickFragment.OnEmojiPickListener {
     }
 
     private fun showEmojiPick(messageId: Long) {
-        EmojiPickFragment.newInstance(EmojiProvider().getAll(), messageId)
+        EmojiPickFragment.newInstance(messageId)
             .show(childFragmentManager, EMOJI_PICK_FRAGMENT_TAG)
     }
 
-    private fun showToast(text: String) {
+    private fun showToast(stringResId: Int) {
+        val text = requireContext().getString(stringResId)
         Toast.makeText(requireContext(), text, Toast.LENGTH_LONG).show()
     }
 
-    override fun onEmojiPick(messageId: Long, emoji: String) {
-        onChangeMyReaction(messageId, emoji)
+    override fun onEmojiPick(messageId: Long, emoji: Emoji) {
+        val messageItem = adapter.items.find { item ->
+            item is MessageItem && item.message.id == messageId
+        } as? MessageItem ?: return
+
+        val groupedReaction = messageItem.message.groupedReactions.find {
+            it.emoji.name == emoji.name
+        }
+
+        if (groupedReaction == null || !groupedReaction.isSelected) {
+            viewModel.addReaction(messageId, emoji)
+        } else {
+            viewModel.removeReaction(messageId, emoji)
+        }
     }
 
     companion object {
+
         private const val EMOJI_PICK_FRAGMENT_TAG = "TAG_EMOJI_PICK"
     }
 }

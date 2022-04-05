@@ -4,6 +4,6 @@ data class User(
     val id: Long,
     val fullName: String,
     val email: String,
-    val avatarUrl: String,
-    val isOnline: Boolean
+    val avatarUrl: String?,
+    val status: String
 )

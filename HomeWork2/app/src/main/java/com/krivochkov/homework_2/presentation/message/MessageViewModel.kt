@@ -3,11 +3,12 @@ package com.krivochkov.homework_2.presentation.message
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.krivochkov.homework_2.data.repositories.MessageRepositoryImpl
+import com.krivochkov.homework_2.domain.models.Emoji
 import com.krivochkov.homework_2.domain.models.Message
-import com.krivochkov.homework_2.domain.use_cases.message.GetAllMessagesUseCase
+import com.krivochkov.homework_2.domain.use_cases.message.GetMessagesUseCase
 import com.krivochkov.homework_2.domain.use_cases.message.SendMessageUseCase
-import com.krivochkov.homework_2.domain.use_cases.reaction.UpdateReactionUseCase
+import com.krivochkov.homework_2.domain.use_cases.reaction.AddReactionUseCase
+import com.krivochkov.homework_2.domain.use_cases.reaction.RemoveReactionUseCase
 import com.krivochkov.homework_2.presentation.Item
 import com.krivochkov.homework_2.presentation.SingleEvent
 import com.krivochkov.homework_2.presentation.message.adapter.items.DateSeparatorItem
@@ -18,15 +19,17 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
-import java.util.concurrent.TimeUnit
 
-class MessageViewModel : ViewModel() {
+class MessageViewModel(
+    private val channelName: String,
+    private val topicName: String,
+    private val getMessagesUseCase: GetMessagesUseCase = GetMessagesUseCase(),
+    private val addReactionUseCase: AddReactionUseCase = AddReactionUseCase(),
+    private val removeReactionUseCase: RemoveReactionUseCase = RemoveReactionUseCase(),
+    private val sendMessageUseCase: SendMessageUseCase = SendMessageUseCase()
+) : ViewModel() {
 
     private val compositeDisposable = CompositeDisposable()
-
-    private val getAllMessagesUseCase: GetAllMessagesUseCase
-    private val updateReactionUseCase: UpdateReactionUseCase
-    private val sendMessageUseCase: SendMessageUseCase
 
     private val _state: MutableLiveData<ScreenState> = MutableLiveData()
     val state: LiveData<ScreenState>
@@ -37,21 +40,15 @@ class MessageViewModel : ViewModel() {
         get() = _event
 
     init {
-        val repository = MessageRepositoryImpl()
-        getAllMessagesUseCase = GetAllMessagesUseCase(repository)
-        updateReactionUseCase = UpdateReactionUseCase(repository)
-        sendMessageUseCase = SendMessageUseCase(repository)
-
-        refreshMessages(true, 3)
+        refreshMessages()
     }
 
-    fun refreshMessages(withLoadingAnim: Boolean, delay: Long = 0) {
-        getAllMessagesUseCase()
+    fun refreshMessages(withLoadingAnim: Boolean = true) {
+        getMessagesUseCase(channelName, topicName)
             .map { it.toMessageItemsWithDates() }
-            .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
-            .delaySubscription(delay, TimeUnit.SECONDS)
             .doOnSubscribe { if (withLoadingAnim) _state.value = ScreenState.Loading }
+            .observeOn(AndroidSchedulers.mainThread())
             .subscribeBy(
                 onSuccess = {
                     _state.value = ScreenState.MessagesLoaded(it)
@@ -63,8 +60,8 @@ class MessageViewModel : ViewModel() {
             .addTo(compositeDisposable)
     }
 
-    fun updateReaction(messageId: Long, emoji: String) {
-        updateReactionUseCase(messageId, emoji)
+    fun addReaction(messageId: Long, emoji: Emoji) {
+        addReactionUseCase(messageId, emoji.name)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribeBy(
@@ -72,13 +69,27 @@ class MessageViewModel : ViewModel() {
                     refreshMessages(false)
                 },
                 onError = {
-                    _event.value = SingleEvent(UIEvent.FailedUpdateReaction)
+                    _event.value = SingleEvent(UIEvent.FailedAddReaction)
+                }
+            )
+    }
+
+    fun removeReaction(messageId: Long, emoji: Emoji) {
+        removeReactionUseCase(messageId, emoji.name)
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .subscribeBy(
+                onComplete = {
+                    refreshMessages(false)
+                },
+                onError = {
+                    _event.value = SingleEvent(UIEvent.FailedRemoveReaction)
                 }
             )
     }
 
     fun sendMessage(message: String) {
-        sendMessageUseCase(message)
+        sendMessageUseCase(channelName, topicName, message)
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
             .subscribeBy(
@@ -89,11 +100,6 @@ class MessageViewModel : ViewModel() {
                     _event.value = SingleEvent(UIEvent.FailedSendMessage)
                 }
             )
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        compositeDisposable.dispose()
     }
 
     private fun List<Message>.toMessageItemsWithDates(): List<Item> {
@@ -110,7 +116,13 @@ class MessageViewModel : ViewModel() {
         return listItems
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        compositeDisposable.dispose()
+    }
+
     companion object {
+
         private const val SECONDS_IN_DAY = 86400
     }
 }

@@ -1,7 +1,6 @@
 package com.krivochkov.homework_2.presentation.custom_views
 
 import android.content.Context
-import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.Gravity
 import android.view.View
@@ -15,6 +14,7 @@ import androidx.core.view.setMargins
 import androidx.core.view.setPadding
 import com.krivochkov.homework_2.R
 import com.krivochkov.homework_2.domain.models.GroupedReaction
+import com.krivochkov.homework_2.utils.loadImage
 
 class MessageLayout @JvmOverloads constructor(
     context: Context,
@@ -93,8 +93,8 @@ class MessageLayout @JvmOverloads constructor(
         avatar.setImageResource(resId)
     }
 
-    fun setAvatar(drawable: Drawable) {
-        avatar.setImageDrawable(drawable)
+    fun setAvatar(url: String) {
+        avatar.loadImage(url)
     }
 
     fun setUserName(newUserName: String) {
@@ -108,7 +108,7 @@ class MessageLayout @JvmOverloads constructor(
     fun addReactions(reactions: List<GroupedReaction>) {
         for (reaction in reactions) {
             val (emoji, reactionsCount, isSelected) = reaction
-            addReaction(emoji, reactionsCount, isSelected)
+            addReaction(emoji.code, reactionsCount, isSelected)
         }
     }
 
@@ -130,10 +130,6 @@ class MessageLayout @JvmOverloads constructor(
         flexBox.addView(emojiView, flexBox.childCount - 1)
 
         return true
-    }
-
-    fun removeEmoji(emoji: EmojiView) {
-        flexBox.removeView(emoji)
     }
 
     fun removeAllEmoji() {

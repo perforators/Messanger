@@ -9,7 +9,6 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
-import java.util.concurrent.TimeUnit
 
 class ProfileViewModel(
     private val loadMyUserProfileUseCase: LoadMyUserProfileUseCase = LoadMyUserProfileUseCase()
@@ -29,7 +28,6 @@ class ProfileViewModel(
         loadMyUserProfileUseCase()
             .observeOn(AndroidSchedulers.mainThread())
             .subscribeOn(Schedulers.io())
-            .delaySubscription(3, TimeUnit.SECONDS)
             .doOnSubscribe { _state.value = ScreenState.Loading }
             .subscribeBy(
                 onSuccess = {

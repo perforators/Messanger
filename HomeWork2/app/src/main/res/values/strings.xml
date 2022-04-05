@@ -19,6 +19,7 @@
     <string name="error_button_text">ПОВТОРИТЬ</string>
     <string name="failed_load_topics">Не удалось загрузить топики</string>
     <string name="failed_send_message">Не удалось отправить сообщение</string>
-    <string name="failed_update_reaction">Не удалось обновить реакцию</string>
+    <string name="failed_add_reaction">Не удалось добавить реакцию</string>
+    <string name="failed_remove_reaction">Не удалось удалить реакцию</string>
     <string name="error_text">Произошла ошибка при загрузке данных. Проверьте подключение к сети.</string>
 </resources>

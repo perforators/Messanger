@@ -8,6 +8,7 @@ import com.krivochkov.homework_2.presentation.DiffCallback
 import com.krivochkov.homework_2.presentation.Item
 import com.krivochkov.homework_2.databinding.DateSeparatorItemBinding
 import com.krivochkov.homework_2.databinding.MessageItemBinding
+import com.krivochkov.homework_2.domain.models.Emoji
 import com.krivochkov.homework_2.presentation.BaseViewHolder
 import com.krivochkov.homework_2.presentation.message.adapter.items.DateSeparatorItem
 import com.krivochkov.homework_2.presentation.message.adapter.items.MessageItem
@@ -23,19 +24,19 @@ class MessageAdapter : RecyclerView.Adapter<BaseViewHolder>() {
         get() = differ.currentList
         set(value) = submitList(value)
 
-    private var onAddMyReaction: (messageId: Long, emoji: String) -> Unit = { _, _ -> }
-    private var onRemoveMyReaction: (messageId: Long, emoji: String) -> Unit = { _, _ -> }
+    private var onAddMyReaction: (messageId: Long, emoji: Emoji) -> Unit = { _, _ -> }
+    private var onRemoveMyReaction: (messageId: Long, emoji: Emoji) -> Unit = { _, _ -> }
     private var onChoosingReaction: (messageId: Long) -> Unit = {  }
 
     fun submitList(items: List<Item>, onCommitted: (() -> Unit)? = null) {
         differ.submitList(items, onCommitted)
     }
 
-    fun setOnRemoveMyReactionListener(listener: (messageId: Long, emoji: String) -> Unit) {
+    fun setOnRemoveMyReactionListener(listener: (messageId: Long, emoji: Emoji) -> Unit) {
         onRemoveMyReaction = listener
     }
 
-    fun setOnAddMyReactionListener(listener: (messageId: Long, emoji: String) -> Unit) {
+    fun setOnAddMyReactionListener(listener: (messageId: Long, emoji: Emoji) -> Unit) {
         onAddMyReaction = listener
     }
 
@@ -47,9 +48,9 @@ class MessageAdapter : RecyclerView.Adapter<BaseViewHolder>() {
         return when (viewType) {
             MessageItem.TYPE -> MessageViewHolder(
                 MessageItemBinding.inflate(
-                        LayoutInflater.from(parent.context),
-                        parent,
-                        false
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
                 ),
                 onAddMyReaction,
                 onRemoveMyReaction,

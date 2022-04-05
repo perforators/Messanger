@@ -8,6 +8,7 @@ import androidx.fragment.app.viewModels
 import com.krivochkov.homework_2.R
 import com.krivochkov.homework_2.databinding.FragmentProfileBinding
 import com.krivochkov.homework_2.domain.models.User
+import com.krivochkov.homework_2.utils.loadImage
 
 class ProfileFragment : Fragment() {
 
@@ -71,10 +72,13 @@ class ProfileFragment : Fragment() {
 
     private fun showProfile(user: User) {
         binding.profile.apply {
-            avatar.setImageResource(R.mipmap.ic_launcher_round)
+            if (user.avatarUrl == null)
+                avatar.setImageResource(R.mipmap.ic_launcher)
+            else
+                avatar.loadImage(user.avatarUrl)
             fullName.text = user.fullName
-            onlineStatus.text = getString(R.string.online_status)
-            onlineStatus.setTextColor(requireContext().getColor(R.color.online_status))
+            onlineStatus.text = user.status
+            onlineStatus.setTextColor(getColorByStatus(user.status))
             profileLayout.isVisible = true
         }
     }
@@ -92,5 +96,20 @@ class ProfileFragment : Fragment() {
 
     private fun changeContentVisibility(visibility: Boolean) {
         binding.profile.profileLayout.isVisible = visibility
+    }
+
+    private fun getColorByStatus(status: String): Int {
+        return when (status) {
+            ACTIVE_STATUS -> requireContext().getColor(R.color.online_status)
+            IDLE_STATUS -> requireContext().getColor(R.color.idle_status)
+            OFFLINE_STATUS -> requireContext().getColor(R.color.offline_status)
+            else -> requireContext().getColor(R.color.offline_status)
+        }
+    }
+
+    companion object {
+        const val OFFLINE_STATUS = "offline"
+        const val ACTIVE_STATUS = "active"
+        const val IDLE_STATUS = "idle"
     }
 }
