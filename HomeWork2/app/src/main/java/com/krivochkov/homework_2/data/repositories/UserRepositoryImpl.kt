@@ -1,58 +1,43 @@
 package com.krivochkov.homework_2.data.repositories
 
+import com.krivochkov.homework_2.data.sources.remote.data_sources.UserRemoteDataSourceImpl
+import com.krivochkov.homework_2.data.sources.remote.data_sources.UserRemoteDataSource
 import com.krivochkov.homework_2.domain.models.User
 import com.krivochkov.homework_2.domain.repositories.UserRepository
+import io.reactivex.Observable
 import io.reactivex.Single
-import java.lang.IllegalStateException
+import io.reactivex.schedulers.Schedulers
 
-class UserRepositoryImpl : UserRepository {
-
-    private val users = listOf(
-        User(
-            0,
-            "Egor Krivochkov",
-            "krivochkov@mail.ru",
-            "",
-            true
-        ),
-        User(
-            1,
-            "Vlad Krivochkov",
-            "vlad234@mail.ru",
-            "",
-            false
-        ),
-        User(
-            2,
-            "Kirill Zuev",
-            "zuev@mail.ru",
-            "",
-            true
-        ),
-        User(
-            3,
-            "Egor Kireev",
-            "kir894@mail.ru",
-            "",
-            true
-        )
-    )
+class UserRepositoryImpl(
+    private val userRemoteDataSource: UserRemoteDataSource = UserRemoteDataSourceImpl()
+) : UserRepository {
 
     override fun loadUsers(): Single<List<User>> {
-        return Single.fromCallable {
-            randomException()
-            users.map { it.copy() }
-        }
+        return userRemoteDataSource.getAllUsers()
+            .flatMapObservable { Observable.fromIterable(it) }
+            .filter { !it.isBot }
+            .flatMapSingle { userDto ->
+                getUserStatus(userDto.email)
+                    .map { userDto.toUser(it) }
+                    .subscribeOn(Schedulers.io())
+                    .retry(COUNT_RETRY) // пока не смог придумать,
+                // как ограничить запросы на получение статуса,
+                // т.к. сервер выдаёт ошибку, если много флудишь запросами.
+                // Без параллельности общий запрос на пользователей идёт значительно дольше
+            }
+            .toList()
     }
 
     override fun loadMyUser(): Single<User> {
-        return Single.fromCallable {
-            randomException()
-            users[0].copy()
-        }
+        return userRemoteDataSource.getOwnUser()
+            .flatMap { userDto -> getUserStatus(userDto.email).map { userDto.toUser(it) } }
     }
 
-    private fun randomException() {
-        if ((1..10).random() < 4) throw IllegalStateException("Random error")
+    private fun getUserStatus(userEmail: String): Single<String> {
+        return userRemoteDataSource.getUserPresence(userEmail).map { it.status }
+    }
+
+    companion object {
+        private const val COUNT_RETRY = 5L
     }
 }

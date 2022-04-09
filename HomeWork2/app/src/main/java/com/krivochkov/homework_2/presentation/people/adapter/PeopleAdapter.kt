@@ -8,6 +8,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.krivochkov.homework_2.R
 import com.krivochkov.homework_2.databinding.UserItemBinding
 import com.krivochkov.homework_2.domain.models.User
+import com.krivochkov.homework_2.presentation.profile.ProfileFragment
+import com.krivochkov.homework_2.utils.loadImage
 
 class PeopleAdapter : RecyclerView.Adapter<PeopleAdapter.UserViewHolder>() {
 
@@ -25,12 +27,20 @@ class PeopleAdapter : RecyclerView.Adapter<PeopleAdapter.UserViewHolder>() {
 
         fun bind(user: User) {
             binding.apply {
-                avatar.setImageResource(R.mipmap.ic_launcher_round)
+                if (user.avatarUrl == null)
+                    avatar.setImageResource(R.mipmap.ic_launcher)
+                else
+                    avatar.loadImage(user.avatarUrl)
                 fullName.text = user.fullName
                 email.text = user.email
-                when (user.isOnline) {
-                    true -> onlineStatus.setImageResource(R.drawable.is_online_picture)
-                    false -> onlineStatus.setImageResource(R.drawable.is_offline_picture)
+                when (user.status) {
+                    ProfileFragment.ACTIVE_STATUS ->
+                        onlineStatus.setImageResource(R.drawable.is_online_picture)
+                    ProfileFragment.IDLE_STATUS ->
+                        onlineStatus.setImageResource(R.drawable.is_idle_picture)
+                    ProfileFragment.OFFLINE_STATUS ->
+                        onlineStatus.setImageResource(R.drawable.is_offline_picture)
+                    else -> onlineStatus.setImageResource(R.drawable.is_offline_picture)
                 }
             }
         }

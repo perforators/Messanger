@@ -22,6 +22,7 @@
     <color name="user_full_name">#FAFAFA</color>
     <color name="user_email">#A2A2A2</color>
     <color name="online_status">#4AB54D</color>
-    <color name="offline_status">@color/grey</color>
+    <color name="idle_status">#FFC107</color>
+    <color name="offline_status">#D61111</color>
     <color name="error_text">#A2A2A2</color>
 </resources>

@@ -4,20 +4,21 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.krivochkov.homework_2.databinding.EmojiItemBinding
+import com.krivochkov.homework_2.domain.models.Emoji
 
 class EmojiPickAdapter(
-    private val listEmoji: List<String>,
-    private val onEmojiPick: (String) -> Unit
+    private val listEmoji: List<Emoji>,
+    private val onEmojiPick: (Emoji) -> Unit
 ) : RecyclerView.Adapter<EmojiPickAdapter.EmojiViewHolder>() {
 
     class EmojiViewHolder(
         private val binding: EmojiItemBinding,
-        private val onEmojiPick: (String) -> Unit
+        private val onEmojiPick: (Emoji) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(emoji: String) {
+        fun bind(emoji: Emoji) {
             binding.emoji.apply {
-                text = emoji
+                text = emoji.code
                 setOnClickListener {
                     onEmojiPick(emoji)
                 }

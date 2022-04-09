@@ -1,128 +1,76 @@
 package com.krivochkov.homework_2.data.repositories
 
-import com.krivochkov.homework_2.domain.repositories.MessageRepository
+import com.krivochkov.homework_2.data.sources.remote.dto.NarrowDto
+import com.krivochkov.homework_2.data.sources.remote.data_sources.MessageRemoteDataSourceImpl
+import com.krivochkov.homework_2.data.sources.remote.data_sources.MessageRemoteDataSource
+import com.krivochkov.homework_2.data.sources.remote.request.*
 import com.krivochkov.homework_2.domain.models.Message
-import com.krivochkov.homework_2.domain.models.Reaction
+import com.krivochkov.homework_2.domain.repositories.MessageRepository
+import com.krivochkov.homework_2.domain.repositories.UserRepository
 import io.reactivex.Completable
 import io.reactivex.Single
-import java.lang.IllegalStateException
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
-class MessageRepositoryImpl : MessageRepository {
+class MessageRepositoryImpl(
+    private val messageRemoteDataSource: MessageRemoteDataSource = MessageRemoteDataSourceImpl(),
+    private val userRepository: UserRepository = UserRepositoryImpl()
+) : MessageRepository {
 
-    private val messages = mutableListOf(
-        Message(
-            id = 1,
-            userId = 435,
-            userName = "Egor Krivochkov",
-            avatarUrl = "",
-            isMeMessage = true,
-            text = "Привет!",
-            date = 1644679406,
-            reactions = mutableListOf()
-        ),
-        Message(
-            id = 2,
-            userId = 54,
-            userName = "Anton Evushko",
-            avatarUrl = "",
-            isMeMessage = false,
-            text = "Привет)",
-            date = 1646954606,
-            reactions = mutableListOf(
-                Reaction(5435, "\uD83D\uDE00"),
-                Reaction(5436, "\uD83D\uDE00"),
-                Reaction(435, "\uD83D\uDE00"),
-                Reaction(54332, "\uD83D\uDE00"),
-                Reaction(54, "\uD83D\uDE01")
-            )
-        ),
-        Message(
-            id = 3,
-            userId = 435,
-            userName = "Egor Krivochkov",
-            avatarUrl = "",
-            isMeMessage = true,
-            text = "Как дела?",
-            date = 1646983406,
-            reactions = mutableListOf()
-        ),
-        Message(
-            id = 4,
-            userId = 54,
-            userName = "Anton Evushko",
-            avatarUrl = "",
-            isMeMessage = false,
-            text = "Нормально",
-            date = 1647069806,
-            reactions = mutableListOf()
-        ),
-        Message(
-            id = 5,
-            userId = 56,
-            userName = "Vlad Krivochkov",
-            avatarUrl = "",
-            isMeMessage = false,
-            text = "Всем привет!",
-            date = 1647077006,
-            reactions = mutableListOf()
-        ),
-        Message(
-            id = 6,
-            userId = 435,
-            userName = "Egor Krivochkov",
-            avatarUrl = "",
-            isMeMessage = true,
-            text = "Привет!",
-            date = 1647098606,
-            reactions = mutableListOf()
+    override fun getMessages(
+        channelName: String,
+        topicName: String,
+        lastMessageId: Long,
+        numBefore: Int
+    ): Single<List<Message>> {
+        val narrows = mutableListOf(
+            NarrowDto(NarrowDto.OPERATOR_CHANNEL, channelName),
+            NarrowDto(NarrowDto.OPERATOR_TOPIC, topicName)
         )
-    )
 
-    override fun getAllMessages(): Single<List<Message>> {
-        return Single.fromCallable {
-            messages.map { it.copy(reactions = it.reactions.toMutableList()) }
-        }
-    }
+        val anchor = if (lastMessageId <= 0) DEFAULT_ANCHOR else lastMessageId
 
-    override fun sendMessage(content: String): Completable {
-        return Completable.fromCallable {
-            randomException()
-            val message = Message(
-                id = messages.last().id + 1,
-                userId = MY_USER_ID,
-                userName = "Egor Krivochkov",
-                avatarUrl = "",
-                isMeMessage = true,
-                text = content,
-                date = System.currentTimeMillis() / 1000,
-                reactions = mutableListOf()
-            )
+        val request = Request.Builder()
+            .addQuery(ANCHOR_KEY, anchor.toString())
+            .addQuery(NUM_BEFORE_KEY, numBefore.toString())
+            .addQuery(NUM_AFTER_KEY, DEFAULT_NUM_AFTER)
+            .addQuery(NARROW_KEY, Json.encodeToString(narrows))
+            .build()
 
-            messages.add(message)
-        }
-    }
-
-    override fun updateReaction(messageId: Long, emoji: String): Completable {
-        return Completable.fromCallable {
-            randomException()
-            val message = messages.find { it.id == messageId }
-                ?: throw IllegalStateException("Message not found")
-            val oldReaction = message.reactions.find { it.emoji == emoji && it.userId == MY_USER_ID }
-
-            if (oldReaction != null) {
-                message.reactions.remove(oldReaction)
-            } else {
-                message.reactions.add(Reaction(MY_USER_ID, emoji))
+        return messageRemoteDataSource.getMessages(request)
+            .flatMap { messagesDto ->
+                userRepository.loadMyUser()
+                    .map { myUser ->
+                        messagesDto.map { messageDto ->
+                            messageDto.toMessage(myUser.id)
+                        }
+                    }
             }
-        }
     }
 
-    private fun randomException() {
-        if ((1..10).random() < 3) throw IllegalStateException("Random error")
+    override fun sendMessage(channelName: String, topicName: String, content: String): Completable {
+        val request = Request.Builder()
+            .addQuery(TYPE_KEY, DEFAULT_TYPE)
+            .addQuery(TO_KEY, channelName)
+            .addQuery(TOPIC_KEY, topicName)
+            .addQuery(CONTENT_KEY, content)
+            .build()
+
+        return messageRemoteDataSource.sendMessage(request)
+    }
+
+    override fun removeReaction(messageId: Long, emojiName: String): Completable {
+        return messageRemoteDataSource.removeReaction(messageId, emojiName)
+    }
+
+    override fun addReaction(messageId: Long, emojiName: String): Completable {
+        return messageRemoteDataSource.addReaction(messageId, emojiName)
     }
 
     companion object {
 
-        const val MY_USER_ID = 435
+        private const val DEFAULT_TYPE = "stream"
+        private const val DEFAULT_ANCHOR = "newest"
+        private const val DEFAULT_NUM_AFTER = "0"
     }
 }

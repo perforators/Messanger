@@ -4,28 +4,34 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.krivochkov.homework_2.domain.models.Channel
+import com.krivochkov.homework_2.domain.use_cases.SearchableUseCase
 import com.krivochkov.homework_2.domain.use_cases.topic.LoadTopicsUseCase
 import com.krivochkov.homework_2.presentation.SingleEvent
 import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.items.ChannelItem
 import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.items.TopicItem
-import com.krivochkov.homework_2.utils.hasNotWhitespaces
+import com.krivochkov.homework_2.presentation.search_component.SearchComponent
+import com.krivochkov.homework_2.presentation.search_component.SearchComponentImpl
+import com.krivochkov.homework_2.presentation.search_component.SearchStatus
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.Observable
+import io.reactivex.Single
 import io.reactivex.rxkotlin.addTo
 import io.reactivex.rxkotlin.subscribeBy
-import io.reactivex.subjects.PublishSubject
-import java.util.concurrent.TimeUnit
 
 abstract class BaseChannelsViewModel(
-    private val loadTopicsUseCase: LoadTopicsUseCase = LoadTopicsUseCase()
+    private val searchableUseCase: SearchableUseCase<Channel>,
+    private val loadTopicsUseCase: LoadTopicsUseCase
 ) : ViewModel() {
 
     private val compositeDisposable = CompositeDisposable()
 
-    private val searchingEvents: PublishSubject<String> = PublishSubject.create()
-    private var lastQuery = ""
+    private val searchComponent: SearchComponent<Channel> by lazy {
+        SearchComponentImpl(searchableUseCase) { channel, query ->
+            channel.name.contains(query)
+        }
+    }
 
     private val _state: MutableLiveData<ScreenState> = MutableLiveData()
     val state: LiveData<ScreenState>
@@ -36,17 +42,32 @@ abstract class BaseChannelsViewModel(
         get() = _event
 
     init {
-        initSearchingEventsProcessing()
+        searchComponent.searchStatus.observeForever { searchStatus ->
+            when (searchStatus) {
+                is SearchStatus.Success -> {
+                    Single.fromCallable { searchStatus.data }
+                        .map { it.map { channel -> ChannelItem(channel) } }
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(AndroidSchedulers.mainThread())
+                        .subscribeBy(
+                            onSuccess = { _state.value = ScreenState.ChannelsLoaded(it) },
+                            onError = { _state.value = ScreenState.Error }
+                        )
+                }
+                is SearchStatus.Error -> _state.value = ScreenState.Error
+                is SearchStatus.Searching -> _state.value = ScreenState.Loading
+            }
+        }
+
+        loadChannels()
     }
 
-    protected abstract fun searchChannels(query: String): Observable<Channel>
-
     fun loadChannels(query: String = "") {
-        searchingEvents.onNext(query)
+        searchComponent.search(query)
     }
 
     fun loadChannelsByLastQuery() {
-        loadChannels(lastQuery)
+        searchComponent.searchByLastQuery()
     }
 
     fun loadTopicsInChannel(channelId: Long) {
@@ -67,41 +88,9 @@ abstract class BaseChannelsViewModel(
             .addTo(compositeDisposable)
     }
 
-    private fun initSearchingEventsProcessing() {
-        searchingEvents
-            .filter { it.isEmpty() || it.hasNotWhitespaces() } // при пустом запросе загружаются все каналы
-            .map { it.trim() }
-            .distinctUntilChanged { query, otherQuery ->
-                // чтобы после ошибки обработать такой же запрос
-                query == otherQuery && state.value !is ScreenState.Error
-            }
-            .debounce(500, TimeUnit.MILLISECONDS)
-            .observeOn(Schedulers.io())
-            .switchMapSingle { query ->
-               searchChannels(query)
-                   .map { ChannelItem(it) }
-                   .toList()
-                   .observeOn(AndroidSchedulers.mainThread())
-                   .map {
-                       lastQuery = query
-                       ScreenState.ChannelsLoaded(it) as ScreenState
-                   }
-                   .onErrorReturn {
-                       lastQuery = query
-                       ScreenState.Error
-                   }
-                   .subscribeOn(Schedulers.io())
-                   .delaySubscription(3, TimeUnit.SECONDS)
-                   .doOnSubscribe { _state.value = ScreenState.Loading }
-                   .subscribeOn(AndroidSchedulers.mainThread())
-            }
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(onNext = { _state.value = it } )
-            .addTo(compositeDisposable)
-    }
-
     override fun onCleared() {
         super.onCleared()
         compositeDisposable.dispose()
+        searchComponent.clearSearch()
     }
 }

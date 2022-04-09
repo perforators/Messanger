@@ -6,9 +6,16 @@ import io.reactivex.Single
 
 interface MessageRepository {
 
-    fun getAllMessages(): Single<List<Message>>
+    fun getMessages(
+        channelName: String,
+        topicName: String,
+        lastMessageId: Long,
+        numBefore: Int
+    ): Single<List<Message>>
 
-    fun sendMessage(content: String): Completable
+    fun sendMessage(channelName: String, topicName: String, content: String): Completable
 
-    fun updateReaction(messageId: Long, emoji: String): Completable
+    fun removeReaction(messageId: Long, emojiName: String): Completable
+
+    fun addReaction(messageId: Long, emojiName: String): Completable
 }

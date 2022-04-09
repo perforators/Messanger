@@ -10,6 +10,7 @@ import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.krivochkov.homework_2.R
 import com.krivochkov.homework_2.databinding.FragmentEmojiPickBinding
+import com.krivochkov.homework_2.domain.models.Emoji
 import com.krivochkov.homework_2.utils.dpToPx
 
 class EmojiPickFragment : BottomSheetDialogFragment() {
@@ -19,12 +20,12 @@ class EmojiPickFragment : BottomSheetDialogFragment() {
 
     private lateinit var adapter: EmojiPickAdapter
 
-    private var listEmoji: List<String> = listOf()
+    private var listEmoji: List<Emoji> = EmojiProvider.getAll()
     private var messageId: Long = -1
     private var onEmojiPickListener: OnEmojiPickListener? = null
 
     interface OnEmojiPickListener {
-        fun onEmojiPick(messageId: Long, emoji: String)
+        fun onEmojiPick(messageId: Long, emoji: Emoji)
     }
 
     override fun getTheme() = R.style.AppBottomSheetDialogTheme
@@ -33,7 +34,6 @@ class EmojiPickFragment : BottomSheetDialogFragment() {
         super.onCreate(savedInstanceState)
         onEmojiPickListener = parentFragment as? OnEmojiPickListener
         requireArguments().apply {
-            listEmoji = getStringArrayList(ARG_LIST_EMOJI)?.toList() ?: listOf()
             messageId = getLong(ARG_MESSAGE_ID)
         }
     }
@@ -85,14 +85,12 @@ class EmojiPickFragment : BottomSheetDialogFragment() {
     companion object {
         private const val COLLAPSED_HEIGHT = 228
         private const val SPAN_COUNT = 7
-        private const val ARG_LIST_EMOJI = "ARG_LIST_EMOJI"
         private const val ARG_MESSAGE_ID = "ARG_MESSAGE_ID"
 
         @JvmStatic
-        fun newInstance(listEmoji: List<String>, messageId: Long): EmojiPickFragment {
+        fun newInstance(messageId: Long): EmojiPickFragment {
             return EmojiPickFragment().apply {
                 arguments = Bundle().apply {
-                    putStringArrayList(ARG_LIST_EMOJI, ArrayList(listEmoji))
                     putLong(ARG_MESSAGE_ID, messageId)
                 }
             }
