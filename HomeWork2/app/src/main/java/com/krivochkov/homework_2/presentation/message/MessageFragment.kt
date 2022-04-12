@@ -201,7 +201,7 @@ class MessageFragment : Fragment(), EmojiPickFragment.OnEmojiPickListener {
 
         messageAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                if (positionStart >= messageAdapter.itemCount - MessageViewModel.MESSAGES_PAGE_SIZE) {
+                if (positionStart >= messageAdapter.itemCount - 1) {
                     binding.recyclerView.smoothScrollToPosition(messageAdapter.itemCount)
                 }
             }

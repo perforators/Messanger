@@ -106,26 +106,18 @@ class MessageRepositoryImpl(
         if (newMessages.isEmpty()) return cachedMessages
         if (cachedMessages.isEmpty()) return newMessages
 
-        val result = mutableListOf<MessageEntity>()
-        val updatedDateRange = LongRange(newMessages[0].date, newMessages[newMessages.lastIndex].date)
-        var indexOfFirstNonOccurrence = -1
-
-        cachedMessages.forEachIndexed { index, message ->
-            if (message.date !in updatedDateRange) {
-                result.add(message)
-                if (indexOfFirstNonOccurrence == -1) indexOfFirstNonOccurrence = index
+        val resultMessages = mutableListOf<MessageEntity>().apply {
+            addAll(newMessages)
+            cachedMessages.forEach { message ->
+                if (find { message.id == it.id } == null) add(message)
             }
+            sortBy { it.date }
         }
 
-        return if (indexOfFirstNonOccurrence == -1) {
-            cachedMessages
-        } else {
-            result.addAll(indexOfFirstNonOccurrence, newMessages)
-            if (result.size > MAX_COUNT_CACHED_MESSAGES)
-                result.subList(result.size - MAX_COUNT_CACHED_MESSAGES, result.size)
-            else
-                result
-        }
+        return if (resultMessages.size > MAX_COUNT_CACHED_MESSAGES)
+            resultMessages.subList(resultMessages.size - MAX_COUNT_CACHED_MESSAGES, resultMessages.size)
+        else
+            resultMessages
     }
 
     companion object {
