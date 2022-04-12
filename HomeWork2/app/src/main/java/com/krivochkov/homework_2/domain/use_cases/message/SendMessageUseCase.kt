@@ -22,14 +22,13 @@ class SendMessageUseCase(
             .flatMap { file ->
                 uploadAttachedFileUseCase(file)
                     .filter { it.remotePath != null }
-                    .map { attachedFile ->
-                        "[${attachedFile.name}](${attachedFile.remotePath})"
-                    }
+                    .map { attachedFile -> "[${attachedFile.name}](${attachedFile.remotePath})" }
                     .toObservable()
             }
             .toList()
             .flatMapCompletable {
-                repository.sendMessage(channelName, topicName, "$message\n$it")
+                val resultMessage = if (it.isEmpty()) message else "$message\n$it"
+                repository.sendMessage(channelName, topicName, resultMessage)
             }
     }
 }
