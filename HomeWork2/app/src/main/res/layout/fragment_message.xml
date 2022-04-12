@@ -33,7 +33,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginBottom="@dimen/middle_margin"
-        app:layout_constraintBottom_toTopOf="@+id/input_field"
+        app:layout_constraintBottom_toTopOf="@+id/recycler_input_files"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/topic_text">
@@ -78,6 +78,17 @@
         android:textSize="@dimen/input_field_text_size"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/button_box"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recycler_input_files"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/middle_margin"
+        android:layout_marginEnd="@dimen/middle_margin"
+        android:layout_marginBottom="@dimen/middle_margin"
+        app:layout_constraintBottom_toTopOf="@+id/input_field"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
     <LinearLayout

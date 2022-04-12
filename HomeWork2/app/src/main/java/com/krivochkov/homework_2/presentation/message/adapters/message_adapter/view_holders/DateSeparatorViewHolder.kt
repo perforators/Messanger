@@ -1,8 +1,8 @@
-package com.krivochkov.homework_2.presentation.message.adapter.view_holders
+package com.krivochkov.homework_2.presentation.message.adapters.message_adapter.view_holders
 
 import com.krivochkov.homework_2.databinding.DateSeparatorItemBinding
 import com.krivochkov.homework_2.presentation.BaseViewHolder
-import com.krivochkov.homework_2.presentation.message.adapter.items.DateSeparatorItem
+import com.krivochkov.homework_2.presentation.message.adapters.message_adapter.items.DateSeparatorItem
 
 class DateSeparatorViewHolder(private val binding: DateSeparatorItemBinding)
     : BaseViewHolder(binding.root) {

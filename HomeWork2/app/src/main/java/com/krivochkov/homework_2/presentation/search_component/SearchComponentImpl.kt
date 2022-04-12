@@ -2,7 +2,7 @@ package com.krivochkov.homework_2.presentation.search_component
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.krivochkov.homework_2.domain.use_cases.SearchableUseCase
+import io.reactivex.Single
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
@@ -12,14 +12,14 @@ import io.reactivex.subjects.PublishSubject
 import java.util.concurrent.TimeUnit
 
 class SearchComponentImpl<T>(
-    private val searchableUseCase: SearchableUseCase<T>,
+    private val source: () -> Single<List<T>>,
     private val filter: (data: T, query: String) -> Boolean
 ) : SearchComponent<T> {
 
     private val compositeDisposable = CompositeDisposable()
 
-    private val searchingEvents: PublishSubject<String> = PublishSubject.create()
-    private var lastQuery = ""
+    private val searchingEvents: PublishSubject<SearchQuery> = PublishSubject.create()
+    private var lastQuery = SearchQuery()
 
     private val _searchStatus: MutableLiveData<SearchStatus<T>> = MutableLiveData()
     override val searchStatus: LiveData<SearchStatus<T>>
@@ -29,8 +29,8 @@ class SearchComponentImpl<T>(
         initSearchingEventsProcessing()
     }
 
-    override fun search(query: String) {
-        searchingEvents.onNext(query)
+    override fun search(searchQuery: SearchQuery) {
+        searchingEvents.onNext(searchQuery)
     }
 
     override fun searchByLastQuery() {
@@ -39,20 +39,22 @@ class SearchComponentImpl<T>(
 
     private fun initSearchingEventsProcessing() {
         searchingEvents
-            .map { it.trim() }
+            .map { it.apply { query.trim() } }
             .distinctUntilChanged { query, otherQuery ->
-                query == otherQuery && _searchStatus.value !is SearchStatus.Error
+                query.query == otherQuery.query && _searchStatus.value !is SearchStatus.Error
             }
             .debounce(SEARCH_DELAY, TimeUnit.MILLISECONDS)
             .observeOn(Schedulers.io())
-            .switchMapSingle { query ->
-                searchableUseCase { filter(it, query) }
+            .switchMapSingle { searchQuery ->
+                source()
+                    .map { it.filter { element -> filter(element, searchQuery.query) } }
                     .map { SearchStatus.Success(it) as SearchStatus<T> }
                     .onErrorReturn { SearchStatus.Error }
                     .subscribeOn(Schedulers.io())
                     .doOnSubscribe {
-                        lastQuery = query
-                        _searchStatus.value = SearchStatus.Searching
+                        lastQuery = searchQuery
+                        if (!searchQuery.ignoreSearchingStatus)
+                            _searchStatus.value = SearchStatus.Searching
                     }
                     .subscribeOn(AndroidSchedulers.mainThread())
             }

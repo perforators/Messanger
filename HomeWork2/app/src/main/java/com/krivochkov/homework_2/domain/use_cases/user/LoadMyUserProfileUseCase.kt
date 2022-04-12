@@ -7,5 +7,5 @@ class LoadMyUserProfileUseCase(
     private val repository: UserRepository = UserRepositoryImpl()
 ) {
 
-    operator fun invoke() = repository.loadMyUser()
+    operator fun invoke() = repository.getMyUser()
 }

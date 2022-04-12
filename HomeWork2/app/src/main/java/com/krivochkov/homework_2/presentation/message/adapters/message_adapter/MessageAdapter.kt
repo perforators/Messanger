@@ -1,4 +1,4 @@
-package com.krivochkov.homework_2.presentation.message.adapter
+package com.krivochkov.homework_2.presentation.message.adapters.message_adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -7,13 +7,16 @@ import androidx.recyclerview.widget.RecyclerView
 import com.krivochkov.homework_2.presentation.DiffCallback
 import com.krivochkov.homework_2.presentation.Item
 import com.krivochkov.homework_2.databinding.DateSeparatorItemBinding
+import com.krivochkov.homework_2.databinding.LoadingItemBinding
 import com.krivochkov.homework_2.databinding.MessageItemBinding
 import com.krivochkov.homework_2.domain.models.Emoji
 import com.krivochkov.homework_2.presentation.BaseViewHolder
-import com.krivochkov.homework_2.presentation.message.adapter.items.DateSeparatorItem
-import com.krivochkov.homework_2.presentation.message.adapter.items.MessageItem
-import com.krivochkov.homework_2.presentation.message.adapter.view_holders.DateSeparatorViewHolder
-import com.krivochkov.homework_2.presentation.message.adapter.view_holders.MessageViewHolder
+import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.items.LoadingItem
+import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.view_holders.LoadingViewHolder
+import com.krivochkov.homework_2.presentation.message.adapters.message_adapter.items.DateSeparatorItem
+import com.krivochkov.homework_2.presentation.message.adapters.message_adapter.items.MessageItem
+import com.krivochkov.homework_2.presentation.message.adapters.message_adapter.view_holders.DateSeparatorViewHolder
+import com.krivochkov.homework_2.presentation.message.adapters.message_adapter.view_holders.MessageViewHolder
 import java.lang.IllegalStateException
 
 class MessageAdapter : RecyclerView.Adapter<BaseViewHolder>() {
@@ -23,6 +26,13 @@ class MessageAdapter : RecyclerView.Adapter<BaseViewHolder>() {
     var items: List<Item>
         get() = differ.currentList
         set(value) = submitList(value)
+
+    var isLoading: Boolean = false
+        set(value) {
+            if (field == value) return
+            field = value
+            if (field) showLoadingItem() else hideLoadingItem()
+        }
 
     private var onAddMyReaction: (messageId: Long, emoji: Emoji) -> Unit = { _, _ -> }
     private var onRemoveMyReaction: (messageId: Long, emoji: Emoji) -> Unit = { _, _ -> }
@@ -44,6 +54,16 @@ class MessageAdapter : RecyclerView.Adapter<BaseViewHolder>() {
         onChoosingReaction = listener
     }
 
+    private fun showLoadingItem() {
+        val items = items.toMutableList().apply { add(0, LoadingItem) }
+        submitList(items)
+    }
+
+    private fun hideLoadingItem() {
+        val items = items.toMutableList().apply { remove(LoadingItem) }
+        submitList(items)
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         return when (viewType) {
             MessageItem.TYPE -> MessageViewHolder(
@@ -58,6 +78,13 @@ class MessageAdapter : RecyclerView.Adapter<BaseViewHolder>() {
             )
             DateSeparatorItem.TYPE -> DateSeparatorViewHolder(
                 DateSeparatorItemBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                )
+            )
+            LoadingItem.TYPE -> LoadingViewHolder(
+                LoadingItemBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false
