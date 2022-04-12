@@ -84,7 +84,7 @@ class MessageRepositoryImpl(
 
     private fun cacheMessages(channelName: String, topicName: String, messages: List<Message>) {
         messageLocalDataSource.getMessages(channelName, topicName)
-            .doOnSuccess { cachedMessages ->
+            .map { cachedMessages ->
                 val newMessages = messages.map { it.mapToMessageEntity(channelName, topicName) }
                 messageLocalDataSource.refreshMessages(
                     channelName,
