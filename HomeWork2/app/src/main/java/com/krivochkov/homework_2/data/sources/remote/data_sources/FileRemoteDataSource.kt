@@ -4,5 +4,5 @@ import io.reactivex.Single
 
 interface FileRemoteDataSource {
 
-    fun uploadFile(path: String, type: String): Single<Pair<String, String>>
+    fun uploadFile(path: String, type: String): Single<String>
 }

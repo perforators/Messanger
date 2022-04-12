@@ -10,7 +10,8 @@ class AttachedFileRepositoryImpl(
     private val fileRemoteDataSource: FileRemoteDataSource = FileRemoteDataSourceImpl()
 ) : AttachedFileRepository {
 
-    override fun uploadFile(attachedFile: AttachedFile): Single<Pair<String, String>> {
+    override fun uploadFile(attachedFile: AttachedFile): Single<AttachedFile> {
         return fileRemoteDataSource.uploadFile(attachedFile.localPath, attachedFile.type)
+            .map { attachedFile.copy(remotePath = it) }
     }
 }

@@ -5,5 +5,5 @@ import io.reactivex.Single
 
 interface AttachedFileRepository {
 
-    fun uploadFile(attachedFile: AttachedFile): Single<Pair<String, String>>
+    fun uploadFile(attachedFile: AttachedFile): Single<AttachedFile>
 }

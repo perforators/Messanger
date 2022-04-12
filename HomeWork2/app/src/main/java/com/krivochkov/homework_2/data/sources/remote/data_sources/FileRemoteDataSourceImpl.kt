@@ -12,11 +12,11 @@ class FileRemoteDataSourceImpl(
     private val api: ZulipApi = ZulipApiProvider.zulipApi
 ) : FileRemoteDataSource {
 
-    override fun uploadFile(path: String, type: String): Single<Pair<String, String>> {
+    override fun uploadFile(path: String, type: String): Single<String> {
         val file = File(path)
         val requestFile = file.asRequestBody(type.toMediaTypeOrNull())
         val body = MultipartBody.Part.createFormData(DEFAULT_NAME, file.name, requestFile)
-        return api.uploadFile(body).map { file.name to it.uri }
+        return api.uploadFile(body).map { it.uri }
     }
 
     companion object {
