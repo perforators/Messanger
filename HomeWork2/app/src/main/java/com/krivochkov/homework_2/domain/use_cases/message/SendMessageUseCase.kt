@@ -21,6 +21,7 @@ class SendMessageUseCase(
         return Observable.fromIterable(attachedFiles)
             .flatMap { file ->
                 uploadAttachedFileUseCase(file)
+                    .map { file.copy(remotePath = it) }
                     .filter { it.remotePath != null }
                     .map { attachedFile -> "[${attachedFile.name}](${attachedFile.remotePath})" }
                     .toObservable()

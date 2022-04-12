@@ -9,6 +9,6 @@ class UploadAttachedFileUseCase(
     private val repositoryAttached: AttachedFileRepository = AttachedFileRepositoryImpl()
 ) {
 
-    operator fun invoke(attachedFile: AttachedFile): Single<AttachedFile> =
+    operator fun invoke(attachedFile: AttachedFile): Single<String> =
         repositoryAttached.uploadFile(attachedFile)
 }
