@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.krivochkov.homework_2.presentation.SingleEvent
 
-class MessageSharedViewModel : ViewModel() {
+class FilePickerSharedViewModel : ViewModel() {
 
     private val _pickFileEvent: MutableLiveData<SingleEvent<Any>> = MutableLiveData()
     val pickFileEvent: LiveData<SingleEvent<Any>>

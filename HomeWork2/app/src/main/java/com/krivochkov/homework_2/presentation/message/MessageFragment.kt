@@ -36,7 +36,7 @@ class MessageFragment : Fragment(), EmojiPickFragment.OnEmojiPickListener {
     private val viewModel: MessageViewModel by viewModels {
         MessageViewModelFactory(args.channel.name, args.topic.name)
     }
-    private val sharedViewModel: MessageSharedViewModel by activityViewModels()
+    private val sharedViewModel: FilePickerSharedViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

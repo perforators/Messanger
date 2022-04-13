@@ -8,15 +8,15 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.krivochkov.homework_2.R
 import com.krivochkov.homework_2.databinding.ActivityMainBinding
-import com.krivochkov.homework_2.presentation.message.MessageSharedViewModel
+import com.krivochkov.homework_2.presentation.message.FilePickerSharedViewModel
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-    private val messageSharedViewModel: MessageSharedViewModel by viewModels()
+    private val filePickerSharedViewModel: FilePickerSharedViewModel by viewModels()
 
     private val filePicker = FilePicker(activityResultRegistry, this) {
-        messageSharedViewModel.sendFileUri(it)
+        filePickerSharedViewModel.sendFileUri(it)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,7 +41,7 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        messageSharedViewModel.pickFileEvent.observe(this) {
+        filePickerSharedViewModel.pickFileEvent.observe(this) {
             it.getContentIfNotHandled()?.let {
                 filePicker.pickFile()
             }
