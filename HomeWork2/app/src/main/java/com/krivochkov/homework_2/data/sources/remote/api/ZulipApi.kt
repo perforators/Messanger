@@ -4,6 +4,7 @@ import com.krivochkov.homework_2.data.sources.remote.dto.UserDto
 import com.krivochkov.homework_2.data.sources.remote.responses.*
 import io.reactivex.Completable
 import io.reactivex.Single
+import okhttp3.MultipartBody
 import retrofit2.http.*
 
 interface ZulipApi {
@@ -43,4 +44,10 @@ interface ZulipApi {
         @Path("message_id") messageId: Long,
         @Query("emoji_name") emojiName: String
     ): Completable
+
+    @Multipart
+    @POST("user_uploads")
+    fun uploadFile(
+        @Part file: MultipartBody.Part,
+    ): Single<FileResponse>
 }

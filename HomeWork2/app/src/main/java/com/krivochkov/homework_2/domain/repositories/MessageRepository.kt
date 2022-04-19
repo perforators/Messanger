@@ -13,6 +13,8 @@ interface MessageRepository {
         numBefore: Int
     ): Single<List<Message>>
 
+    fun getCachedMessages(channelName: String, topicName: String): Single<List<Message>>
+
     fun sendMessage(channelName: String, topicName: String, content: String): Completable
 
     fun removeReaction(messageId: Long, emojiName: String): Completable

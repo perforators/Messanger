@@ -1,8 +1,5 @@
 package com.krivochkov.homework_2.data.sources.remote.dto
 
-import com.krivochkov.homework_2.domain.models.Emoji
-import com.krivochkov.homework_2.domain.models.Reaction
-import com.krivochkov.homework_2.utils.convertEmojiToUtf
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -14,8 +11,7 @@ data class ReactionDto(
     @SerialName("user_id") val userId: Long
 ) {
 
-    fun toReaction() = Reaction(
-        userId = userId,
-        emoji = Emoji(emojiName, emojiCode.convertEmojiToUtf())
-    )
+    companion object {
+        const val UNICODE_REACTION_TYPE = "unicode_emoji"
+    }
 }

@@ -56,7 +56,7 @@ class PeopleFragment : Fragment() {
 
     private fun initErrorView() {
         binding.error.setOnErrorButtonClickListener {
-            viewModel.loadUsersByLastQuery()
+            viewModel.searchUsersByLastQuery()
         }
 
         binding.error.text = requireContext().getString(R.string.error_text)
@@ -67,7 +67,7 @@ class PeopleFragment : Fragment() {
             requireContext().getString(R.string.hint_search_view_users)
 
         binding.search.searchView.addTextChangedListener { text ->
-            viewModel.loadUsers(text?.toString().orEmpty())
+            viewModel.searchUsers(text?.toString().orEmpty())
         }
     }
 

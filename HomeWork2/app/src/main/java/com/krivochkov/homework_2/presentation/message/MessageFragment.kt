@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -15,10 +16,12 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.krivochkov.homework_2.R
 import com.krivochkov.homework_2.databinding.FragmentMessageBinding
+import com.krivochkov.homework_2.domain.models.AttachedFile
 import com.krivochkov.homework_2.domain.models.Emoji
-import com.krivochkov.homework_2.presentation.message.adapter.MessageAdapter
-import com.krivochkov.homework_2.presentation.message.adapter.items.MessageItem
+import com.krivochkov.homework_2.presentation.message.adapters.attached_file_adapter.AttachedFileAdapter
+import com.krivochkov.homework_2.presentation.message.adapters.message_adapter.MessageAdapter
 import com.krivochkov.homework_2.presentation.message.emoji_pick.EmojiPickFragment
+import com.krivochkov.homework_2.utils.createFileAndGetPathWithFileNameFromCache
 
 class MessageFragment : Fragment(), EmojiPickFragment.OnEmojiPickListener {
 
@@ -27,11 +30,13 @@ class MessageFragment : Fragment(), EmojiPickFragment.OnEmojiPickListener {
     private var _binding: FragmentMessageBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var adapter: MessageAdapter
+    private lateinit var messageAdapter: MessageAdapter
+    private lateinit var attachedFileAdapter: AttachedFileAdapter
 
     private val viewModel: MessageViewModel by viewModels {
         MessageViewModelFactory(args.channel.name, args.topic.name)
     }
+    private val sharedViewModel: FilePickerSharedViewModel by activityViewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -47,11 +52,29 @@ class MessageFragment : Fragment(), EmojiPickFragment.OnEmojiPickListener {
         _binding = null
     }
 
+    override fun onResume() {
+        super.onResume()
+        sharedViewModel.fileUri.observe(viewLifecycleOwner) { event ->
+            event.getContentIfNotHandled()?.let { uri ->
+                val (path, fileName) =
+                    createFileAndGetPathWithFileNameFromCache(requireContext(), uri)
+                val type = requireContext().contentResolver.getType(uri) ?: return@let
+                attachedFileAdapter.addFile(AttachedFile(fileName, type, path))
+            }
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+        sharedViewModel.fileUri.removeObservers(viewLifecycleOwner)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         initToolbar()
-        initRecycler()
+        initMessageRecycler()
+        initInputFileRecycler()
         initInputField()
         initErrorView()
 
@@ -72,7 +95,7 @@ class MessageFragment : Fragment(), EmojiPickFragment.OnEmojiPickListener {
                 changeErrorVisibility(false)
                 changeLoadingVisibility(false)
                 changeInputFieldVisibility(true)
-                adapter.submitList(state.messagesWithDates) {
+                messageAdapter.submitList(state.messagesWithDates) {
                     changeContentVisibility(true)
                 }
             }
@@ -96,6 +119,9 @@ class MessageFragment : Fragment(), EmojiPickFragment.OnEmojiPickListener {
             is UIEvent.FailedSendMessage -> showToast(R.string.failed_send_message)
             is UIEvent.FailedAddReaction -> showToast(R.string.failed_add_reaction)
             is UIEvent.FailedRemoveReaction -> showToast(R.string.failed_remove_reaction)
+            is UIEvent.FailedRefreshMessages -> showToast(R.string.failed_refresh_messages)
+            is UIEvent.ShowLoadingNextMessagePage -> messageAdapter.isLoading = true
+            is UIEvent.HideLoadingNextMessagePage -> messageAdapter.isLoading = false
         }
     }
 
@@ -136,23 +162,32 @@ class MessageFragment : Fragment(), EmojiPickFragment.OnEmojiPickListener {
 
     private fun initErrorView() {
         binding.error.setOnErrorButtonClickListener {
-            viewModel.refreshMessages()
+            viewModel.requestNextMessagePage(isRetry = true)
         }
 
         binding.error.text = requireContext().getString(R.string.error_text)
     }
 
-    private fun initRecycler() {
+    private fun initMessageRecycler() {
         initAdapter()
-        binding.recyclerView.adapter = adapter
+        binding.recyclerView.adapter = messageAdapter
 
         val layoutManager = LinearLayoutManager(requireContext())
         layoutManager.stackFromEnd = true
         binding.recyclerView.layoutManager = layoutManager
+
+        binding.recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
+            override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
+                val lastItemPosition = layoutManager.findFirstVisibleItemPosition()
+                if (lastItemPosition == LOADING_START_POSITION) {
+                    viewModel.requestNextMessagePage()
+                }
+            }
+        })
     }
 
     private fun initAdapter() {
-        adapter = MessageAdapter().apply {
+        messageAdapter = MessageAdapter().apply {
             setOnAddMyReactionListener { messageId, emoji ->
                 viewModel.addReaction(messageId, emoji)
             }
@@ -164,13 +199,23 @@ class MessageFragment : Fragment(), EmojiPickFragment.OnEmojiPickListener {
             }
         }
 
-        adapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
+        messageAdapter.registerAdapterDataObserver(object : RecyclerView.AdapterDataObserver() {
             override fun onItemRangeInserted(positionStart: Int, itemCount: Int) {
-                if (positionStart == adapter.itemCount - 1) {
-                    binding.recyclerView.smoothScrollToPosition(adapter.itemCount)
+                if (positionStart >= messageAdapter.itemCount - 1) {
+                    binding.recyclerView.smoothScrollToPosition(messageAdapter.itemCount)
                 }
             }
         })
+    }
+
+    private fun initInputFileRecycler() {
+        attachedFileAdapter = AttachedFileAdapter()
+        binding.recyclerInputFiles.adapter = attachedFileAdapter
+        binding.recyclerInputFiles.layoutManager = LinearLayoutManager(
+            requireContext(),
+            LinearLayoutManager.HORIZONTAL,
+            false
+        )
     }
 
     private fun initInputField() {
@@ -180,8 +225,13 @@ class MessageFragment : Fragment(), EmojiPickFragment.OnEmojiPickListener {
 
                 if (inputText.isNotEmpty()) {
                     inputField.setText("")
-                    viewModel.sendMessage(inputText)
+                    viewModel.sendMessage(inputText, attachedFileAdapter.files)
+                    attachedFileAdapter.clearFiles()
                 }
+            }
+
+            addFileButton.setOnClickListener {
+                sharedViewModel.pickFile()
             }
 
             inputField.doOnTextChanged { _, _, _, _ ->
@@ -202,23 +252,12 @@ class MessageFragment : Fragment(), EmojiPickFragment.OnEmojiPickListener {
     }
 
     override fun onEmojiPick(messageId: Long, emoji: Emoji) {
-        val messageItem = adapter.items.find { item ->
-            item is MessageItem && item.message.id == messageId
-        } as? MessageItem ?: return
-
-        val groupedReaction = messageItem.message.groupedReactions.find {
-            it.emoji.name == emoji.name
-        }
-
-        if (groupedReaction == null || !groupedReaction.isSelected) {
-            viewModel.addReaction(messageId, emoji)
-        } else {
-            viewModel.removeReaction(messageId, emoji)
-        }
+        viewModel.changeReaction(messageId, emoji)
     }
 
     companion object {
 
+        private const val LOADING_START_POSITION = 5
         private const val EMOJI_PICK_FRAGMENT_TAG = "TAG_EMOJI_PICK"
     }
 }

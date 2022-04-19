@@ -30,7 +30,7 @@ abstract class BaseChannelsFragment : Fragment() {
         super.onResume()
 
         sharedViewModel.searchQuery.observe(viewLifecycleOwner) {
-            channelsViewModel.loadChannels(it)
+            channelsViewModel.searchChannels(it)
         }
     }
 
@@ -43,7 +43,7 @@ abstract class BaseChannelsFragment : Fragment() {
     protected fun initRecycler(recyclerView: RecyclerView) {
         adapter = ChannelsAdapter().apply {
             setOnExpandedChannelListener {
-                channelsViewModel.loadTopicsInChannel(it)
+                channelsViewModel.loadTopics(it)
             }
 
             setOnTopicClickListener { channel, topic ->
@@ -62,7 +62,7 @@ abstract class BaseChannelsFragment : Fragment() {
 
     protected fun initErrorView(errorView: ErrorView) {
         errorView.setOnErrorButtonClickListener {
-            channelsViewModel.loadChannelsByLastQuery()
+            channelsViewModel.searchChannelsByLastQuery()
         }
 
         errorView.text = requireContext().getString(R.string.error_text)
@@ -106,7 +106,7 @@ abstract class BaseChannelsFragment : Fragment() {
         when (event) {
             is UIEvent.SubmitTopicsInChannel -> submitTopicsInChannel(event.channelId, event.topics)
             is UIEvent.FailedLoadTopics -> showToast(requireContext()
-                .getString(R.string.failed_load_topics))
+                .getString(R.string.failed_load_actual_topics))
         }
     }
 

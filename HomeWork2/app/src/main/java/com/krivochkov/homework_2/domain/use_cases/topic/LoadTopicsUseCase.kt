@@ -7,5 +7,6 @@ class LoadTopicsUseCase(
     private val repository: ChannelRepository = ChannelRepositoryImpl()
 ) {
 
-    operator fun invoke(channelId: Long) = repository.loadTopicsInChannel(channelId)
+    operator fun invoke(channelId: Long, cached: Boolean = false) =
+        if (cached) repository.getCachedTopics(channelId) else repository.getTopics(channelId)
 }

@@ -13,8 +13,12 @@ class GetMessagesUseCase(
         channelName: String,
         topicName: String,
         lastMessageId: Long = 0,
-        numBefore: Int = 1000
+        numBefore: Int = 1000,
+        cached: Boolean = false
     ): Single<List<Message>> {
-        return messageRepository.getMessages(channelName, topicName, lastMessageId, numBefore)
+        return if (cached)
+            messageRepository.getCachedMessages(channelName, topicName)
+        else
+            messageRepository.getMessages(channelName, topicName, lastMessageId, numBefore)
     }
 }

@@ -6,7 +6,7 @@ interface SearchComponent<T> {
 
     val searchStatus: LiveData<SearchStatus<T>>
 
-    fun search(query: String)
+    fun search(searchQuery: SearchQuery)
 
     fun searchByLastQuery()
 

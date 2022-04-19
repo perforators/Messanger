@@ -5,7 +5,7 @@ import io.reactivex.Single
 
 interface UserRepository {
 
-    fun loadUsers(): Single<List<User>>
+    fun getUsers(): Single<List<User>>
 
-    fun loadMyUser(): Single<User>
+    fun getMyUser(): Single<User>
 }

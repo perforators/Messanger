@@ -2,15 +2,22 @@ package com.krivochkov.homework_2.presentation
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.activity.viewModels
 import androidx.core.view.isVisible
 import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.krivochkov.homework_2.R
 import com.krivochkov.homework_2.databinding.ActivityMainBinding
+import com.krivochkov.homework_2.presentation.message.FilePickerSharedViewModel
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+    private val filePickerSharedViewModel: FilePickerSharedViewModel by viewModels()
+
+    private val filePicker = FilePicker(activityResultRegistry, this) {
+        filePickerSharedViewModel.sendFileUri(it)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,6 +38,12 @@ class MainActivity : AppCompatActivity() {
                     window.statusBarColor = getColor(R.color.black_100)
                     showBottomNav()
                 }
+            }
+        }
+
+        filePickerSharedViewModel.pickFileEvent.observe(this) {
+            it.getContentIfNotHandled()?.let {
+                filePicker.pickFile()
             }
         }
     }

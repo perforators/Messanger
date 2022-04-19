@@ -1,7 +1,6 @@
 package com.krivochkov.homework_2.utils
 
-private const val HEX_PREFIX = "0x"
-
-//Example: "1f600".convertEmojiToUtf()
 fun String.convertEmojiToUtf() =
-    String(Character.toChars(Integer.decode("${HEX_PREFIX}$this")))
+    this.split("-").fold("") { acc, s ->
+        acc + String(Character.toChars(Integer.decode("0x$s")))
+    }

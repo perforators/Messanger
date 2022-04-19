@@ -1,5 +1,6 @@
 package com.krivochkov.homework_2.data.repositories
 
+import com.krivochkov.homework_2.data.mappers.mapToUser
 import com.krivochkov.homework_2.data.sources.remote.data_sources.UserRemoteDataSourceImpl
 import com.krivochkov.homework_2.data.sources.remote.data_sources.UserRemoteDataSource
 import com.krivochkov.homework_2.domain.models.User
@@ -12,25 +13,22 @@ class UserRepositoryImpl(
     private val userRemoteDataSource: UserRemoteDataSource = UserRemoteDataSourceImpl()
 ) : UserRepository {
 
-    override fun loadUsers(): Single<List<User>> {
+    override fun getUsers(): Single<List<User>> {
         return userRemoteDataSource.getAllUsers()
             .flatMapObservable { Observable.fromIterable(it) }
             .filter { !it.isBot }
             .flatMapSingle { userDto ->
                 getUserStatus(userDto.email)
-                    .map { userDto.toUser(it) }
+                    .map { userDto.mapToUser(it) }
                     .subscribeOn(Schedulers.io())
-                    .retry(COUNT_RETRY) // пока не смог придумать,
-                // как ограничить запросы на получение статуса,
-                // т.к. сервер выдаёт ошибку, если много флудишь запросами.
-                // Без параллельности общий запрос на пользователей идёт значительно дольше
+                    .retry(COUNT_RETRY)
             }
             .toList()
     }
 
-    override fun loadMyUser(): Single<User> {
+    override fun getMyUser(): Single<User> {
         return userRemoteDataSource.getOwnUser()
-            .flatMap { userDto -> getUserStatus(userDto.email).map { userDto.toUser(it) } }
+            .flatMap { userDto -> getUserStatus(userDto.email).map { userDto.mapToUser(it) } }
     }
 
     private fun getUserStatus(userEmail: String): Single<String> {

@@ -1,5 +1,11 @@
 package com.krivochkov.homework_2.data.repositories
 
+import android.util.Log
+import com.krivochkov.homework_2.data.mappers.mapToMessage
+import com.krivochkov.homework_2.data.mappers.mapToMessageEntity
+import com.krivochkov.homework_2.data.sources.local.data_sources.MessageLocalDataSource
+import com.krivochkov.homework_2.data.sources.local.data_sources.MessageLocalDataSourceImpl
+import com.krivochkov.homework_2.data.sources.local.entity.MessageEntity
 import com.krivochkov.homework_2.data.sources.remote.dto.NarrowDto
 import com.krivochkov.homework_2.data.sources.remote.data_sources.MessageRemoteDataSourceImpl
 import com.krivochkov.homework_2.data.sources.remote.data_sources.MessageRemoteDataSource
@@ -9,11 +15,14 @@ import com.krivochkov.homework_2.domain.repositories.MessageRepository
 import com.krivochkov.homework_2.domain.repositories.UserRepository
 import io.reactivex.Completable
 import io.reactivex.Single
+import io.reactivex.rxkotlin.subscribeBy
+import io.reactivex.schedulers.Schedulers
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class MessageRepositoryImpl(
     private val messageRemoteDataSource: MessageRemoteDataSource = MessageRemoteDataSourceImpl(),
+    private val messageLocalDataSource: MessageLocalDataSource = MessageLocalDataSourceImpl(),
     private val userRepository: UserRepository = UserRepositoryImpl()
 ) : MessageRepository {
 
@@ -39,12 +48,13 @@ class MessageRepositoryImpl(
 
         return messageRemoteDataSource.getMessages(request)
             .flatMap { messagesDto ->
-                userRepository.loadMyUser()
+                userRepository.getMyUser()
                     .map { myUser ->
                         messagesDto.map { messageDto ->
-                            messageDto.toMessage(myUser.id)
+                            messageDto.mapToMessage(myUser.id)
                         }
                     }
+                    .doOnSuccess { cacheMessages(channelName, topicName, it) }
             }
     }
 
@@ -67,8 +77,53 @@ class MessageRepositoryImpl(
         return messageRemoteDataSource.addReaction(messageId, emojiName)
     }
 
+    override fun getCachedMessages(channelName: String, topicName: String): Single<List<Message>> {
+        return messageLocalDataSource.getMessages(channelName, topicName)
+            .map { it.map { messageEntity -> messageEntity.mapToMessage() } }
+    }
+
+    private fun cacheMessages(channelName: String, topicName: String, messages: List<Message>) {
+        messageLocalDataSource.getMessages(channelName, topicName)
+            .map { cachedMessages ->
+                val newMessages = messages.map { it.mapToMessageEntity(channelName, topicName) }
+                messageLocalDataSource.refreshMessages(
+                    channelName,
+                    topicName,
+                    getUpdatedListMessages(cachedMessages, newMessages)
+                )
+            }
+            .subscribeOn(Schedulers.io())
+            .subscribeBy(
+                onSuccess = { Log.d(TAG, "Сообщения успешно сохранены") },
+                onError = { Log.d(TAG, "Произошла ошибка при сохранении сообщений") }
+            )
+    }
+
+    private fun getUpdatedListMessages(
+        cachedMessages: List<MessageEntity>,
+        newMessages: List<MessageEntity>
+    ): List<MessageEntity> {
+        if (newMessages.isEmpty()) return cachedMessages
+        if (cachedMessages.isEmpty()) return newMessages
+
+        val resultMessages = mutableListOf<MessageEntity>().apply {
+            addAll(newMessages)
+            cachedMessages.forEach { message ->
+                if (find { message.id == it.id } == null) add(message)
+            }
+            sortBy { it.date }
+        }
+
+        return if (resultMessages.size > MAX_COUNT_CACHED_MESSAGES)
+            resultMessages.subList(resultMessages.size - MAX_COUNT_CACHED_MESSAGES, resultMessages.size)
+        else
+            resultMessages
+    }
+
     companion object {
 
+        private const val TAG = "MessageRepositoryImpl"
+        private const val MAX_COUNT_CACHED_MESSAGES = 50
         private const val DEFAULT_TYPE = "stream"
         private const val DEFAULT_ANCHOR = "newest"
         private const val DEFAULT_NUM_AFTER = "0"

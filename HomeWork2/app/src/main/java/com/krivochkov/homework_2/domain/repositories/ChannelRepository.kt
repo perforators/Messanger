@@ -6,9 +6,15 @@ import io.reactivex.Single
 
 interface ChannelRepository {
 
-    fun loadAllChannels(): Single<List<Channel>>
+    fun getAllChannels(): Single<List<Channel>>
 
-    fun loadSubscribedChannels(): Single<List<Channel>>
+    fun getCachedAllChannels(): Single<List<Channel>>
 
-    fun loadTopicsInChannel(channelId: Long): Single<List<Topic>>
+    fun getSubscribedChannels(): Single<List<Channel>>
+
+    fun getCachedSubscribedChannels(): Single<List<Channel>>
+
+    fun getTopics(channelId: Long): Single<List<Topic>>
+
+    fun getCachedTopics(channelId: Long): Single<List<Topic>>
 }

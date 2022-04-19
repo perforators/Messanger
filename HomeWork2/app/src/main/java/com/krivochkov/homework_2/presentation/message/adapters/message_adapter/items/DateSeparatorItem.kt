@@ -1,4 +1,4 @@
-package com.krivochkov.homework_2.presentation.message.adapter.items
+package com.krivochkov.homework_2.presentation.message.adapters.message_adapter.items
 
 import com.krivochkov.homework_2.presentation.Item
 
