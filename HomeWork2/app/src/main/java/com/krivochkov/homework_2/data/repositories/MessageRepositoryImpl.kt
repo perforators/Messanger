@@ -33,7 +33,7 @@ class MessageRepositoryImpl(
             NarrowDto(NarrowDto.OPERATOR_TOPIC, topicName)
         )
 
-        val anchor = if (lastMessageId <= 0) DEFAULT_ANCHOR else lastMessageId
+        val anchor = if (lastMessageId <= 0) DEFAULT_ANCHOR else lastMessageId - 1
 
         val request = Request.Builder()
             .addQuery(ANCHOR_KEY, anchor.toString())

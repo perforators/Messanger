@@ -39,7 +39,7 @@ class MessageReducer : ScreenDslReducer<MessageEvent, MessageEvent.Ui, MessageEv
                     event.messages + state.items.removeLoadingItem()
                 }
 
-                val lastMessageId = (itemsList.first { it is Message } as Message).id - 1
+                val lastMessageId = (itemsList.first { it is Message } as Message).id
                 state {
                     copy(
                         items = itemsList,
