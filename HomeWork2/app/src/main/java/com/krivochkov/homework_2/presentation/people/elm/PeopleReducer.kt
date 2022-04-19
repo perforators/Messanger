@@ -22,7 +22,7 @@ class PeopleReducer : ScreenDslReducer<PeopleEvent, PeopleEvent.Ui, PeopleEvent.
         return when (event) {
             is PeopleEvent.Ui.Init -> {
                 if (state.isInitialized.not()) {
-                    state { PeopleState(isLoading = true, isInitialized = true) }
+                    state { copy(isLoading = true, isInitialized = true, error = null) }
                     commands { +PeopleCommand.SearchPeople() }
                 } else {
                     Any()

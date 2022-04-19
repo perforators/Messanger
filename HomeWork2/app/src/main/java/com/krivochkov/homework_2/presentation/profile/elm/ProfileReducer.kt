@@ -22,7 +22,7 @@ class ProfileReducer : ScreenDslReducer<ProfileEvent, ProfileEvent.Ui, ProfileEv
         return when (event) {
             is ProfileEvent.Ui.Init -> {
                 if (state.isInitialized.not()) {
-                    state { ProfileState(isLoading = true, isInitialized = true) }
+                    state { copy(isLoading = true, isInitialized = true, error = null) }
                     commands { +ProfileCommand.LoadMyProfile }
                 } else {
                     Any()

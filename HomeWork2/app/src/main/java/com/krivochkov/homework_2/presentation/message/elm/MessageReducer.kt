@@ -93,14 +93,19 @@ class MessageReducer : ScreenDslReducer<MessageEvent, MessageEvent.Ui, MessageEv
     override fun Result.ui(event: MessageEvent.Ui): Any {
         return when (event) {
             is MessageEvent.Ui.Init -> {
-                if (state.isInitialized.not() || state.channelName != event.channelName
-                    || state.topicName != event.topicName) {
+                if (state.isInitialized.not() ||
+                    state.channelName != event.channelName || state.topicName != event.topicName) {
                     state {
-                        MessageState(
+                        copy(
                             channelName = event.channelName,
                             topicName = event.topicName,
+                            items = emptyList(),
+                            attachedFiles = emptyList(),
+                            areCachedItemsSet = false,
                             isLoading = true,
-                            isInitialized = true
+                            isInitialized = true,
+                            error = null,
+                            lastMessageId = 0
                         )
                     }
                     commands {

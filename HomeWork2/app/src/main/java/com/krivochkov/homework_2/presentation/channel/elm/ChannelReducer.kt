@@ -57,7 +57,7 @@ class ChannelReducer : ScreenDslReducer<ChannelEvent, ChannelEvent.Ui, ChannelEv
             is ChannelEvent.Ui.Init -> {
                 // чтобы при изменении конфигурации не скачивать снова каналы
                 if (state.isInitialized.not()) {
-                    state { ChannelState(isLoading = true, isInitialized = true) }
+                    state { copy(isLoading = true, isInitialized = true, error = null) }
                     commands {
                         +ChannelCommand.LoadCachedChannels
                         +ChannelCommand.SearchChannels()
