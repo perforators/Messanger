@@ -122,7 +122,7 @@ class MessageReducer : ScreenDslReducer<MessageEvent, MessageEvent.Ui, MessageEv
                 effects { +MessageEffect.NavigateUp }
             }
             is MessageEvent.Ui.LoadNextPage -> {
-                if (state.items.contains(LoadingItem) || state.areCachedItemsSet) {
+                if (state.items.contains(LoadingItem)) {
                     Any()
                 } else {
                     state { copy(items = listOf(LoadingItem) + items, error = null, isLoading = false) }
