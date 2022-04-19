@@ -5,12 +5,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.krivochkov.homework_2.domain.models.Channel
 import com.krivochkov.homework_2.domain.models.Topic
-import com.krivochkov.homework_2.presentation.SearchQueryQueue
+import com.krivochkov.homework_2.presentation.SearchQueryFilter
 import com.krivochkov.homework_2.presentation.SingleEvent
 
 class SharedViewModel : ViewModel() {
 
-    private val searchQueryQueue = SearchQueryQueue()
+    private val searchQueryFilter = SearchQueryFilter()
 
     private val _selectedTopic: MutableLiveData<SingleEvent<Pair<Channel, Topic>>> = MutableLiveData()
     val selectedTopic: LiveData<SingleEvent<Pair<Channel, Topic>>>
@@ -21,7 +21,7 @@ class SharedViewModel : ViewModel() {
         get() = _searchQuery
 
     init {
-        searchQueryQueue.observeOutputQueries {
+        searchQueryFilter.observeFilteredQueries {
             _searchQuery.value = SingleEvent(it)
         }
     }
@@ -31,11 +31,11 @@ class SharedViewModel : ViewModel() {
     }
 
     fun sendSearchQuery(query: String) {
-        searchQueryQueue.sendQuery(query)
+        searchQueryFilter.sendQuery(query)
     }
 
     override fun onCleared() {
         super.onCleared()
-        searchQueryQueue.dispose()
+        searchQueryFilter.dispose()
     }
 }

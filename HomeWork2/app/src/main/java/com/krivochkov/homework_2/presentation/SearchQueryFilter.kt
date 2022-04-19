@@ -8,11 +8,11 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.subjects.PublishSubject
 import java.util.concurrent.TimeUnit
 
-class SearchQueryQueue {
+class SearchQueryFilter {
 
     private val compositeDisposable = CompositeDisposable()
 
-    private val outputQueries: PublishSubject<String> = PublishSubject.create()
+    private val filteredQueries: PublishSubject<String> = PublishSubject.create()
     private val inputQueries: PublishSubject<String> = PublishSubject.create()
 
     init {
@@ -20,8 +20,8 @@ class SearchQueryQueue {
     }
 
     @SuppressLint("CheckResult")
-    fun observeOutputQueries(onNext: (String) -> Unit) {
-        outputQueries.subscribe(onNext)
+    fun observeFilteredQueries(onNext: (String) -> Unit) {
+        filteredQueries.subscribe(onNext)
     }
 
     fun sendQuery(query: String) {
@@ -38,7 +38,7 @@ class SearchQueryQueue {
             .distinctUntilChanged()
             .debounce(SEARCH_DELAY, TimeUnit.MILLISECONDS)
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribeBy(onNext = { outputQueries.onNext(it) })
+            .subscribeBy(onNext = { filteredQueries.onNext(it) })
             .addTo(compositeDisposable)
     }
 
