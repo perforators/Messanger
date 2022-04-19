@@ -67,8 +67,10 @@ class PeopleFragment : ElmFragment<PeopleEvent, PeopleEffect, PeopleState>() {
         initRecycler()
         initErrorView()
 
-        viewModel.searchQuery.observe(viewLifecycleOwner) {
-            store.accept(PeopleEvent.Ui.SearchPeople(it))
+        viewModel.searchQuery.observe(viewLifecycleOwner) { singleEvent ->
+            singleEvent.getContentIfNotHandled()?.let {
+                store.accept(PeopleEvent.Ui.SearchPeople(it))
+            }
         }
     }
 
