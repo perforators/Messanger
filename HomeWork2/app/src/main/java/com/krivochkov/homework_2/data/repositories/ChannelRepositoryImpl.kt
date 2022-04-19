@@ -5,29 +5,24 @@ import com.krivochkov.homework_2.data.mappers.mapToChannelEntity
 import com.krivochkov.homework_2.data.mappers.mapToTopic
 import com.krivochkov.homework_2.data.mappers.mapToTopicEntity
 import com.krivochkov.homework_2.data.sources.local.data_sources.ChannelLocalDataSource
-import com.krivochkov.homework_2.data.sources.local.data_sources.ChannelLocalDataSourceImpl
 import com.krivochkov.homework_2.data.sources.local.data_sources.TopicLocalDataSource
-import com.krivochkov.homework_2.data.sources.local.data_sources.TopicLocalDataSourceImpl
 import com.krivochkov.homework_2.data.sources.remote.data_sources.ChannelRemoteDataSource
-import com.krivochkov.homework_2.data.sources.remote.data_sources.ChannelRemoteDataSourceImpl
 import com.krivochkov.homework_2.domain.models.Channel
 import com.krivochkov.homework_2.domain.models.Topic
 import com.krivochkov.homework_2.domain.repositories.ChannelRepository
 import io.reactivex.Single
-import io.reactivex.schedulers.Schedulers
 
 class ChannelRepositoryImpl(
-    private val channelRemoteDataSource: ChannelRemoteDataSource = ChannelRemoteDataSourceImpl(),
-    private val channelLocalDataSource: ChannelLocalDataSource = ChannelLocalDataSourceImpl(),
-    private val topicLocalDataSource: TopicLocalDataSource = TopicLocalDataSourceImpl()
+    private val channelRemoteDataSource: ChannelRemoteDataSource,
+    private val channelLocalDataSource: ChannelLocalDataSource,
+    private val topicLocalDataSource: TopicLocalDataSource
 ) : ChannelRepository {
 
-    override fun getAllChannels(): Single<List<Channel>> {
-        val allChannels = channelRemoteDataSource.getAllChannels()
-            .subscribeOn(Schedulers.io())
+    override fun getAllChannels(cached: Boolean): Single<List<Channel>> {
+        if (cached) return getCachedAllChannels()
 
+        val allChannels = channelRemoteDataSource.getAllChannels()
         val subscribedChannels = channelRemoteDataSource.getSubscribedChannels()
-            .subscribeOn(Schedulers.io())
 
         return allChannels.zipWith(subscribedChannels) { all, subscribed ->
             val notSubscribed = all.toMutableList().apply { removeAll(subscribed) }
@@ -46,7 +41,9 @@ class ChannelRepositoryImpl(
         }
     }
 
-    override fun getSubscribedChannels(): Single<List<Channel>> {
+    override fun getSubscribedChannels(cached: Boolean): Single<List<Channel>> {
+        if (cached) return getCachedSubscribedChannels()
+
         return channelRemoteDataSource.getSubscribedChannels()
             .map {
                 channelLocalDataSource.refreshChannelsByCategory(
@@ -73,12 +70,12 @@ class ChannelRepositoryImpl(
             .map { it.map { topicEntity -> topicEntity.mapToTopic() } }
     }
 
-    override fun getCachedAllChannels(): Single<List<Channel>> {
+    private fun getCachedAllChannels(): Single<List<Channel>> {
         return channelLocalDataSource.getAllChannels()
             .map { it.map { channelEntity -> channelEntity.mapToChannel() } }
     }
 
-    override fun getCachedSubscribedChannels(): Single<List<Channel>> {
+    private fun getCachedSubscribedChannels(): Single<List<Channel>> {
         return channelLocalDataSource.getSubscribedChannels()
             .map { it.map { channelEntity -> channelEntity.mapToChannel() } }
     }

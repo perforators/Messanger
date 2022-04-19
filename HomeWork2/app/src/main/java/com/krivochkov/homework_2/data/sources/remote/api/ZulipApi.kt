@@ -30,6 +30,9 @@ interface ZulipApi {
     @GET("messages")
     fun getAllMessages(@QueryMap queryMap: Map<String, String>): Single<MessagesResponse>
 
+    @GET("messages/{msg_id}")
+    fun getSingleMessage(@Path("msg_id") messageId: Long): Single<SingleMessageResponse>
+
     @POST("messages")
     fun sendMessage(@QueryMap queryMap: Map<String, String>): Completable
 

@@ -40,7 +40,6 @@ class ChannelFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initTabLayout()
-        initSearchLayout()
 
         sharedViewModel.selectedTopic.observe(this) {
             it.getContentIfNotHandled()?.let { result ->
@@ -48,6 +47,11 @@ class ChannelFragment : Fragment() {
                 navigateToMessageFragment(channel, topic)
             }
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        initSearchLayout()
     }
 
     private fun initTabLayout() {

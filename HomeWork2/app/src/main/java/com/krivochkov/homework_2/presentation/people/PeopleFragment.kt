@@ -1,7 +1,6 @@
 package com.krivochkov.homework_2.presentation.people
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,16 +10,42 @@ import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.krivochkov.homework_2.R
 import com.krivochkov.homework_2.databinding.FragmentPeopleBinding
+import com.krivochkov.homework_2.di.GlobalDI
 import com.krivochkov.homework_2.presentation.people.adapter.PeopleAdapter
+import com.krivochkov.homework_2.presentation.people.elm.PeopleEffect
+import com.krivochkov.homework_2.presentation.people.elm.PeopleEvent
+import com.krivochkov.homework_2.presentation.people.elm.PeopleState
+import vivid.money.elmslie.android.base.ElmFragment
 
-class PeopleFragment : Fragment() {
+class PeopleFragment : ElmFragment<PeopleEvent, PeopleEffect, PeopleState>() {
 
     private var _binding: FragmentPeopleBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var adapter: PeopleAdapter
 
-    private val viewModel: PeopleViewModel by viewModels()
+    private val viewModel by viewModels<PeopleViewModel>()
+
+    override val initEvent: PeopleEvent
+        get() = PeopleEvent.Ui.Init
+
+    override fun createStore() =
+        GlobalDI.INSTANCE.presentationModule.peopleStoreFactory.provide()
+
+    override fun render(state: PeopleState) {
+        binding.apply {
+            peopleRecycler.isVisible = state.isLoading.not() && state.error == null
+
+            adapter.submitUsers(state.people) {
+                loading.loadingLayout.apply {
+                    isVisible = state.isLoading
+                    if (state.isLoading) startShimmer() else stopShimmer()
+                }
+            }
+
+            error.isVisible = state.error != null
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -40,12 +65,16 @@ class PeopleFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initRecycler()
-        initSearchLayout()
         initErrorView()
 
-        viewModel.state.observe(this) { state ->
-            render(state)
+        viewModel.searchQuery.observe(viewLifecycleOwner) {
+            store.accept(PeopleEvent.Ui.SearchPeople(it))
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        initSearchLayout()
     }
 
     private fun initRecycler() {
@@ -56,7 +85,7 @@ class PeopleFragment : Fragment() {
 
     private fun initErrorView() {
         binding.error.setOnErrorButtonClickListener {
-            viewModel.searchUsersByLastQuery()
+            store.accept(PeopleEvent.Ui.SearchPeopleByLastQuery)
         }
 
         binding.error.text = requireContext().getString(R.string.error_text)
@@ -67,44 +96,7 @@ class PeopleFragment : Fragment() {
             requireContext().getString(R.string.hint_search_view_users)
 
         binding.search.searchView.addTextChangedListener { text ->
-            viewModel.searchUsers(text?.toString().orEmpty())
+            viewModel.addQueryToQueue(text?.toString().orEmpty())
         }
-    }
-
-    private fun render(state: ScreenState) {
-        when (state) {
-            is ScreenState.PeopleLoaded -> {
-                changeLoadingVisibility(false)
-                changeErrorVisibility(false)
-                adapter.submitUsers(state.users) {
-                    changeContentVisibility(true)
-                }
-            }
-            is ScreenState.Loading -> {
-                changeErrorVisibility(false)
-                changeContentVisibility(false)
-                changeLoadingVisibility(true)
-            }
-            is ScreenState.Error -> {
-                changeContentVisibility(false)
-                changeLoadingVisibility(false)
-                changeErrorVisibility(true)
-            }
-        }
-    }
-
-    private fun changeLoadingVisibility(visibility: Boolean) {
-        binding.loading.loadingLayout.apply {
-            isVisible = visibility
-            if (visibility) startShimmer() else stopShimmer()
-        }
-    }
-
-    private fun changeErrorVisibility(visibility: Boolean) {
-        binding.error.isVisible = visibility
-    }
-
-    private fun changeContentVisibility(visibility: Boolean) {
-        binding.peopleRecycler.isVisible = visibility
     }
 }

@@ -1,6 +1,5 @@
 package com.krivochkov.homework_2.domain.use_cases.message
 
-import com.krivochkov.homework_2.data.repositories.MessageRepositoryImpl
 import com.krivochkov.homework_2.domain.models.AttachedFile
 import com.krivochkov.homework_2.domain.repositories.MessageRepository
 import com.krivochkov.homework_2.domain.use_cases.file.UploadAttachedFileUseCase
@@ -8,8 +7,8 @@ import io.reactivex.Completable
 import io.reactivex.Observable
 
 class SendMessageUseCase(
-    private val repository: MessageRepository = MessageRepositoryImpl(),
-    private val uploadAttachedFileUseCase: UploadAttachedFileUseCase = UploadAttachedFileUseCase()
+    private val repository: MessageRepository,
+    private val uploadAttachedFileUseCase: UploadAttachedFileUseCase
 ) {
 
     operator fun invoke(

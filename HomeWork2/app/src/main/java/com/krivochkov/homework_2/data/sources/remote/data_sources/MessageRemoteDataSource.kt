@@ -9,6 +9,8 @@ interface MessageRemoteDataSource {
 
     fun getMessages(request: Request): Single<List<MessageDto>>
 
+    fun getSingleMessage(messageId: Long): Single<MessageDto>
+
     fun sendMessage(request: Request): Completable
 
     fun addReaction(messageId: Long, emojiName: String): Completable

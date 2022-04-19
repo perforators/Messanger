@@ -1,13 +1,10 @@
 package com.krivochkov.homework_2.domain.use_cases.message
 
-import com.krivochkov.homework_2.data.repositories.MessageRepositoryImpl
 import com.krivochkov.homework_2.domain.models.Message
 import com.krivochkov.homework_2.domain.repositories.MessageRepository
 import io.reactivex.Single
 
-class GetMessagesUseCase(
-    private val messageRepository: MessageRepository = MessageRepositoryImpl()
-) {
+class GetMessagesUseCase(private val messageRepository: MessageRepository) {
 
     operator fun invoke(
         channelName: String,

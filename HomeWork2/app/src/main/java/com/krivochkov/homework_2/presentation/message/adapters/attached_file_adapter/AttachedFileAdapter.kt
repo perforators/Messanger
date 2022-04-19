@@ -8,7 +8,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.krivochkov.homework_2.databinding.InputFileItemBinding
 import com.krivochkov.homework_2.domain.models.AttachedFile
 
-class AttachedFileAdapter : RecyclerView.Adapter<AttachedFileAdapter.FileViewHolder>() {
+class AttachedFileAdapter(
+    private val onCancelClick: (file: AttachedFile) -> Unit
+) : RecyclerView.Adapter<AttachedFileAdapter.FileViewHolder>() {
 
     private val differ: AsyncListDiffer<AttachedFile> = AsyncListDiffer(this, DiffCallback())
 
@@ -30,29 +32,12 @@ class AttachedFileAdapter : RecyclerView.Adapter<AttachedFileAdapter.FileViewHol
         private val onCancelClick: (file: AttachedFile) -> Unit
     ) : RecyclerView.ViewHolder(binding.root) {
 
-            fun bind(attachedFile: AttachedFile) {
-                binding.apply {
-                    fileName.text = attachedFile.name
-                    cancelButton.setOnClickListener { onCancelClick(attachedFile) }
-                }
+        fun bind(attachedFile: AttachedFile) {
+            binding.apply {
+                fileName.text = attachedFile.name
+                cancelButton.setOnClickListener { onCancelClick(attachedFile) }
             }
-    }
-
-    fun addFile(file: AttachedFile) {
-        val files = files.toMutableList()
-        if (!files.contains(file)) {
-            files.add(file)
         }
-        differ.submitList(files)
-    }
-
-    fun clearFiles() {
-        files = emptyList()
-    }
-
-    private fun removeFile(file: AttachedFile) {
-        val files = files.toMutableList().apply { remove(file) }
-        differ.submitList(files)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FileViewHolder {
@@ -62,7 +47,7 @@ class AttachedFileAdapter : RecyclerView.Adapter<AttachedFileAdapter.FileViewHol
                 parent,
                 false
             ),
-            onCancelClick = { removeFile(it) }
+            onCancelClick = onCancelClick
         )
     }
 

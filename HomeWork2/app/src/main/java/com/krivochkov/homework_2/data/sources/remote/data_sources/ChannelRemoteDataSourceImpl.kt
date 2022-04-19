@@ -1,13 +1,12 @@
 package com.krivochkov.homework_2.data.sources.remote.data_sources
 
 import com.krivochkov.homework_2.data.sources.remote.api.ZulipApi
-import com.krivochkov.homework_2.data.sources.remote.api.ZulipApiProvider
 import com.krivochkov.homework_2.data.sources.remote.dto.ChannelDto
 import com.krivochkov.homework_2.data.sources.remote.dto.TopicDto
 import io.reactivex.Single
 
 class ChannelRemoteDataSourceImpl(
-    private val api: ZulipApi = ZulipApiProvider.zulipApi
+    private val api: ZulipApi
 ) : ChannelRemoteDataSource {
 
     override fun getAllChannels(): Single<List<ChannelDto>> {

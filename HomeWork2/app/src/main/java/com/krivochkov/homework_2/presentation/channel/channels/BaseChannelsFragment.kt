@@ -1,9 +1,6 @@
 package com.krivochkov.homework_2.presentation.channel.channels
 
-import android.os.Bundle
-import android.view.View
 import android.widget.Toast
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -11,26 +8,27 @@ import androidx.recyclerview.widget.RecyclerView
 import com.krivochkov.homework_2.R
 import com.krivochkov.homework_2.presentation.channel.SharedViewModel
 import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.ChannelsAdapter
-import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.items.ChannelItem
-import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.items.TopicItem
+import com.krivochkov.homework_2.presentation.channel.elm.ChannelEffect
+import com.krivochkov.homework_2.presentation.channel.elm.ChannelEvent
+import com.krivochkov.homework_2.presentation.channel.elm.ChannelState
 import com.krivochkov.homework_2.presentation.custom_views.ErrorView
+import vivid.money.elmslie.android.base.ElmFragment
 
-abstract class BaseChannelsFragment : Fragment() {
+abstract class BaseChannelsFragment : ElmFragment<ChannelEvent, ChannelEffect, ChannelState>() {
 
     private val sharedViewModel: SharedViewModel by activityViewModels()
-    private lateinit var adapter: ChannelsAdapter
-    protected abstract val channelsViewModel: BaseChannelsViewModel
+    protected lateinit var adapter: ChannelsAdapter
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        setObservers()
-    }
+    override val initEvent: ChannelEvent
+        get() = ChannelEvent.Ui.Init
 
     override fun onResume() {
         super.onResume()
 
-        sharedViewModel.searchQuery.observe(viewLifecycleOwner) {
-            channelsViewModel.searchChannels(it)
+        sharedViewModel.searchQuery.observe(viewLifecycleOwner) { singleEvent ->
+            singleEvent.getContentIfNotHandled()?.let { query ->
+                store.accept(ChannelEvent.Ui.SearchChannels(query))
+            }
         }
     }
 
@@ -40,14 +38,29 @@ abstract class BaseChannelsFragment : Fragment() {
         sharedViewModel.searchQuery.removeObservers(viewLifecycleOwner)
     }
 
+    override fun handleEffect(effect: ChannelEffect) {
+        when (effect) {
+            is ChannelEffect.ShowTopicContent ->
+                sharedViewModel.selectTopic(effect.channel, effect.topic)
+            is ChannelEffect.ShowErrorLoadingTopics ->
+                showToast(requireContext().getString(R.string.failed_load_actual_topics))
+            is ChannelEffect.ShowErrorLoadingCachedChannels ->
+                showToast(requireContext().getString(R.string.failed_load_cached_channels))
+        }
+    }
+
     protected fun initRecycler(recyclerView: RecyclerView) {
         adapter = ChannelsAdapter().apply {
-            setOnExpandedChannelListener {
-                channelsViewModel.loadTopics(it)
+            setOnExpandedChannelListener { channelId ->
+                store.accept(ChannelEvent.Ui.ExpandChannel(channelId))
+            }
+
+            setOnCollapsedChannelListener { channelId ->
+                store.accept(ChannelEvent.Ui.CollapseChannel(channelId))
             }
 
             setOnTopicClickListener { channel, topic ->
-                sharedViewModel.selectTopic(channel, topic)
+                store.accept(ChannelEvent.Ui.TopicClick(channel, topic))
             }
         }
         recyclerView.adapter = adapter
@@ -62,66 +75,10 @@ abstract class BaseChannelsFragment : Fragment() {
 
     protected fun initErrorView(errorView: ErrorView) {
         errorView.setOnErrorButtonClickListener {
-            channelsViewModel.searchChannelsByLastQuery()
+            store.accept(ChannelEvent.Ui.SearchChannelsByLastQuery)
         }
 
         errorView.text = requireContext().getString(R.string.error_text)
-    }
-
-    private fun setObservers() {
-        channelsViewModel.state.observe(viewLifecycleOwner) { state ->
-            render(state)
-        }
-
-        channelsViewModel.event.observe(viewLifecycleOwner) { singleEvent ->
-            singleEvent.getContentIfNotHandled()?.let { event ->
-                handleEvent(event)
-            }
-        }
-    }
-
-    private fun render(state: ScreenState) {
-        when (state) {
-            is ScreenState.ChannelsLoaded -> {
-                changeLoadingVisibility(false)
-                changeErrorVisibility(false)
-                submitChannels(state.channels) {
-                    changeContentVisibility(true)
-                }
-            }
-            is ScreenState.Loading -> {
-                changeContentVisibility(false)
-                changeErrorVisibility(false)
-                changeLoadingVisibility(true)
-            }
-            is ScreenState.Error -> {
-                changeContentVisibility(false)
-                changeLoadingVisibility(false)
-                changeErrorVisibility(true)
-            }
-        }
-    }
-
-    private fun handleEvent(event: UIEvent) {
-        when (event) {
-            is UIEvent.SubmitTopicsInChannel -> submitTopicsInChannel(event.channelId, event.topics)
-            is UIEvent.FailedLoadTopics -> showToast(requireContext()
-                .getString(R.string.failed_load_actual_topics))
-        }
-    }
-
-    protected abstract fun changeLoadingVisibility(visibility: Boolean)
-
-    protected abstract fun changeErrorVisibility(visibility: Boolean)
-
-    protected abstract fun changeContentVisibility(visibility: Boolean)
-
-    private fun submitChannels(channels: List<ChannelItem>, onCommitted: (() -> Unit)? = null) {
-        adapter.submitChannels(channels, onCommitted)
-    }
-
-    private fun submitTopicsInChannel(channelId: Long, topics: List<TopicItem>) {
-        adapter.submitTopicsInChannel(channelId, topics)
     }
 
     private fun showToast(text: String) {
