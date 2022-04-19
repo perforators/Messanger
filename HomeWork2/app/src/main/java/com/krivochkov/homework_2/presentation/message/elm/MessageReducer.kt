@@ -96,11 +96,16 @@ class MessageReducer : ScreenDslReducer<MessageEvent, MessageEvent.Ui, MessageEv
                 if (state.isInitialized.not() ||
                     state.channelName != event.channelName || state.topicName != event.topicName) {
                     state {
-                        MessageState(
+                        copy(
                             channelName = event.channelName,
                             topicName = event.topicName,
                             isLoading = true,
                             isInitialized = true,
+                            items = emptyList(),
+                            attachedFiles = emptyList(),
+                            areCachedItemsSet = false,
+                            error = null,
+                            lastMessageId = 0
                         )
                     }
                     commands {
