@@ -5,12 +5,12 @@ class PaginationAdapterHelper(
 ) {
 
     fun onBind(adapterPosition: Int) {
-        if (adapterPosition <= DEFAULT_LOAD_MORE_SUBSTITUTIONS) {
+        if (adapterPosition == DEFAULT_LOAD_MORE_SUBSTITUTIONS) {
             onLoadMoreCallback()
         }
     }
 
     companion object {
-        private const val DEFAULT_LOAD_MORE_SUBSTITUTIONS = 5
+        private const val DEFAULT_LOAD_MORE_SUBSTITUTIONS = 4
     }
 }
