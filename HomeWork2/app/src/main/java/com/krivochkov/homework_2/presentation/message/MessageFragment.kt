@@ -180,7 +180,7 @@ class MessageFragment :
 
     private fun initErrorView() {
         binding.error.setOnErrorButtonClickListener {
-            store.accept(MessageEvent.Ui.Init(channelName, topicName))
+            store.accept(MessageEvent.Ui.RefreshFirstPage)
         }
 
         binding.error.text = requireContext().getString(R.string.error_text)

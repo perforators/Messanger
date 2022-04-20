@@ -135,6 +135,7 @@ class MessageReducer : ScreenDslReducer<MessageEvent, MessageEvent.Ui, MessageEv
             }
             is MessageEvent.Ui.RefreshFirstPage -> {
                 commands {
+                    state { copy(isLoading = items.isEmpty(), error = null) }
                     +MessageCommand.LoadPage(
                         state.channelName, state.topicName, 0, state.pageSize
                     )
