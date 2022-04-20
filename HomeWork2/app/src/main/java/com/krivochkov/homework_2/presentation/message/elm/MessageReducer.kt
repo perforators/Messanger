@@ -20,6 +20,11 @@ class MessageReducer : ScreenDslReducer<MessageEvent, MessageEvent.Ui, MessageEv
                         areCachedItemsSet = true,
                     )
                 }
+                commands {
+                    +MessageCommand.LoadPage(
+                        state.channelName, state.topicName, 0, state.pageSize
+                    )
+                }
             }
             is MessageEvent.Internal.PageLoaded -> {
                 val itemsList = if (event.isFirstPage && state.areCachedItemsSet.not()) {
@@ -110,9 +115,6 @@ class MessageReducer : ScreenDslReducer<MessageEvent, MessageEvent.Ui, MessageEv
                     }
                     commands {
                         +MessageCommand.LoadCachedMessages(state.channelName, state.topicName)
-                        +MessageCommand.LoadPage(
-                            state.channelName, state.topicName, 0, state.pageSize
-                        )
                     }
                 } else {
                     Any()

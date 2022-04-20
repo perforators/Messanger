@@ -33,6 +33,7 @@ class ChannelReducer : ScreenDslReducer<ChannelEvent, ChannelEvent.Ui, ChannelEv
                         channels = event.channels
                     )
                 }
+                commands { +ChannelCommand.SearchChannels() }
             }
             is ChannelEvent.Internal.ChannelsFound -> {
                 state { copy(isLoading = false, error = null, channels = event.channels) }
@@ -58,10 +59,7 @@ class ChannelReducer : ScreenDslReducer<ChannelEvent, ChannelEvent.Ui, ChannelEv
                 // чтобы при изменении конфигурации не скачивать снова каналы
                 if (state.isInitialized.not()) {
                     state { copy(isLoading = true, isInitialized = true, error = null) }
-                    commands {
-                        +ChannelCommand.LoadCachedChannels
-                        +ChannelCommand.SearchChannels()
-                    }
+                    commands { +ChannelCommand.LoadCachedChannels }
                 } else {
                     Any()
                 }
