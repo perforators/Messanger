@@ -1,12 +1,11 @@
 package com.krivochkov.homework_2.data.sources.local.data_sources
 
 import com.krivochkov.homework_2.data.sources.local.dao.MessageDao
-import com.krivochkov.homework_2.data.sources.local.database.DatabaseInstance
 import com.krivochkov.homework_2.data.sources.local.entity.MessageEntity
 import io.reactivex.Single
 
 class MessageLocalDataSourceImpl(
-    private val dao: MessageDao = DatabaseInstance.instance!!.messageDao()
+    private val dao: MessageDao
 ) : MessageLocalDataSource {
 
     override fun getMessages(channelName: String, topicName: String): Single<List<MessageEntity>> {

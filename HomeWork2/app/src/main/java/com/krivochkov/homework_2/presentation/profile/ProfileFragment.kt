@@ -3,19 +3,40 @@ package com.krivochkov.homework_2.presentation.profile
 import android.os.Bundle
 import android.view.*
 import androidx.core.view.isVisible
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import com.krivochkov.homework_2.R
 import com.krivochkov.homework_2.databinding.FragmentProfileBinding
+import com.krivochkov.homework_2.di.GlobalDI
 import com.krivochkov.homework_2.domain.models.User
+import com.krivochkov.homework_2.presentation.profile.elm.ProfileEffect
+import com.krivochkov.homework_2.presentation.profile.elm.ProfileEvent
+import com.krivochkov.homework_2.presentation.profile.elm.ProfileState
 import com.krivochkov.homework_2.utils.loadImage
+import vivid.money.elmslie.android.base.ElmFragment
 
-class ProfileFragment : Fragment() {
+class ProfileFragment : ElmFragment<ProfileEvent, ProfileEffect, ProfileState>() {
 
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
 
-    private val viewModel: ProfileViewModel by viewModels()
+    override val initEvent: ProfileEvent
+        get() = ProfileEvent.Ui.Init
+
+    override fun createStore() =
+        GlobalDI.INSTANCE.presentationModule.profileStoreFactory.provide()
+
+    override fun render(state: ProfileState) {
+        binding.apply {
+            loading.loadingLayout.apply {
+                isVisible = state.isLoading
+                if (state.isLoading) startShimmer() else stopShimmer()
+            }
+
+            profile.profileLayout.isVisible = state.isLoading.not() && state.error == null
+            state.profile?.let { showProfile(it) }
+
+            error.isVisible = state.error != null
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,39 +56,14 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initErrorView()
-
-        viewModel.state.observe(this) { state ->
-            render(state)
-        }
     }
 
     private fun initErrorView() {
         binding.error.setOnErrorButtonClickListener {
-            viewModel.loadMyProfile()
+            store.accept(ProfileEvent.Ui.LoadMyProfile)
         }
 
         binding.error.text = requireContext().getString(R.string.error_text)
-    }
-
-    private fun render(state: ScreenState) {
-        when (state) {
-            is ScreenState.ProfileLoaded -> {
-                changeLoadingVisibility(false)
-                changeErrorVisibility(false)
-                changeContentVisibility(true)
-                showProfile(state.user)
-            }
-            is ScreenState.Loading -> {
-                changeContentVisibility(false)
-                changeErrorVisibility(false)
-                changeLoadingVisibility(true)
-            }
-            is ScreenState.Error -> {
-                changeLoadingVisibility(false)
-                changeContentVisibility(false)
-                changeErrorVisibility(true)
-            }
-        }
     }
 
     private fun showProfile(user: User) {
@@ -81,21 +77,6 @@ class ProfileFragment : Fragment() {
             onlineStatus.setTextColor(getColorByStatus(user.status))
             profileLayout.isVisible = true
         }
-    }
-
-    private fun changeLoadingVisibility(visibility: Boolean) {
-        binding.loading.loadingLayout.apply {
-            isVisible = visibility
-            if (visibility) startShimmer() else stopShimmer()
-        }
-    }
-
-    private fun changeErrorVisibility(visibility: Boolean) {
-        binding.error.isVisible = visibility
-    }
-
-    private fun changeContentVisibility(visibility: Boolean) {
-        binding.profile.profileLayout.isVisible = visibility
     }
 
     private fun getColorByStatus(status: String): Int {

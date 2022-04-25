@@ -19,7 +19,9 @@ import com.krivochkov.homework_2.presentation.message.adapters.message_adapter.v
 import com.krivochkov.homework_2.presentation.message.adapters.message_adapter.view_holders.MessageViewHolder
 import java.lang.IllegalStateException
 
-class MessageAdapter : RecyclerView.Adapter<BaseViewHolder>() {
+class MessageAdapter(
+    private val paginationAdapterHelper: PaginationAdapterHelper
+) : RecyclerView.Adapter<BaseViewHolder>() {
 
     private val differ: AsyncListDiffer<Item> = AsyncListDiffer(this, DiffCallback())
 
@@ -27,18 +29,11 @@ class MessageAdapter : RecyclerView.Adapter<BaseViewHolder>() {
         get() = differ.currentList
         set(value) = submitList(value)
 
-    var isLoading: Boolean = false
-        set(value) {
-            if (field == value) return
-            field = value
-            if (field) showLoadingItem() else hideLoadingItem()
-        }
-
     private var onAddMyReaction: (messageId: Long, emoji: Emoji) -> Unit = { _, _ -> }
     private var onRemoveMyReaction: (messageId: Long, emoji: Emoji) -> Unit = { _, _ -> }
     private var onChoosingReaction: (messageId: Long) -> Unit = {  }
 
-    fun submitList(items: List<Item>, onCommitted: (() -> Unit)? = null) {
+    private fun submitList(items: List<Item>, onCommitted: (() -> Unit)? = null) {
         differ.submitList(items, onCommitted)
     }
 
@@ -52,16 +47,6 @@ class MessageAdapter : RecyclerView.Adapter<BaseViewHolder>() {
 
     fun setOnChoosingReactionListener(listener: (messageId: Long) -> Unit) {
         onChoosingReaction = listener
-    }
-
-    private fun showLoadingItem() {
-        val items = items.toMutableList().apply { add(0, LoadingItem) }
-        submitList(items)
-    }
-
-    private fun hideLoadingItem() {
-        val items = items.toMutableList().apply { remove(LoadingItem) }
-        submitList(items)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
@@ -100,6 +85,7 @@ class MessageAdapter : RecyclerView.Adapter<BaseViewHolder>() {
             is DateSeparatorViewHolder -> holder
                 .bind(differ.currentList[position] as DateSeparatorItem)
         }
+        paginationAdapterHelper.onBind(position)
     }
 
     override fun getItemViewType(position: Int) = differ.currentList[position].getType()

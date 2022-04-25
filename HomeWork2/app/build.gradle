@@ -74,4 +74,9 @@ dependencies {
     implementation "androidx.room:room-runtime:$roomVersion"
     kapt "androidx.room:room-compiler:$roomVersion"
     implementation "androidx.room:room-rxjava2:$roomVersion"
+
+    // Elm
+    implementation "com.github.vivid-money.elmslie:elmslie-core:$elmsilieVersion"
+    implementation "com.github.vivid-money.elmslie:elmslie-android:$elmsilieVersion"
+    implementation "com.github.vivid-money.elmslie:elmslie-rxjava-2:$elmsilieVersion"
 }

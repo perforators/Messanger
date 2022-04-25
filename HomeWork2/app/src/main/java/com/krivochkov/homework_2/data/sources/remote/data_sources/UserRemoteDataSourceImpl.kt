@@ -1,13 +1,12 @@
 package com.krivochkov.homework_2.data.sources.remote.data_sources
 
 import com.krivochkov.homework_2.data.sources.remote.api.ZulipApi
-import com.krivochkov.homework_2.data.sources.remote.api.ZulipApiProvider
 import com.krivochkov.homework_2.data.sources.remote.dto.PresenceDto
 import com.krivochkov.homework_2.data.sources.remote.dto.UserDto
 import io.reactivex.Single
 
 class UserRemoteDataSourceImpl(
-    private val api: ZulipApi = ZulipApiProvider.zulipApi
+    private val api: ZulipApi
 ) : UserRemoteDataSource {
 
     override fun getAllUsers(): Single<List<UserDto>> {

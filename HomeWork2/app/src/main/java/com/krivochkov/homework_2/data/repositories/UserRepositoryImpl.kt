@@ -1,7 +1,6 @@
 package com.krivochkov.homework_2.data.repositories
 
 import com.krivochkov.homework_2.data.mappers.mapToUser
-import com.krivochkov.homework_2.data.sources.remote.data_sources.UserRemoteDataSourceImpl
 import com.krivochkov.homework_2.data.sources.remote.data_sources.UserRemoteDataSource
 import com.krivochkov.homework_2.domain.models.User
 import com.krivochkov.homework_2.domain.repositories.UserRepository
@@ -10,7 +9,7 @@ import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 
 class UserRepositoryImpl(
-    private val userRemoteDataSource: UserRemoteDataSource = UserRemoteDataSourceImpl()
+    private val userRemoteDataSource: UserRemoteDataSource
 ) : UserRepository {
 
     override fun getUsers(): Single<List<User>> {

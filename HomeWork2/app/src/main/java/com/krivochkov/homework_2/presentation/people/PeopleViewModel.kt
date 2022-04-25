@@ -1,57 +1,36 @@
 package com.krivochkov.homework_2.presentation.people
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import com.krivochkov.homework_2.domain.models.User
-import com.krivochkov.homework_2.domain.use_cases.user.LoadAllUsersUseCase
-import com.krivochkov.homework_2.presentation.search_component.SearchComponent
-import com.krivochkov.homework_2.presentation.search_component.SearchComponentImpl
-import com.krivochkov.homework_2.presentation.search_component.SearchQuery
-import com.krivochkov.homework_2.presentation.search_component.SearchStatus
-import io.reactivex.disposables.CompositeDisposable
+import com.krivochkov.homework_2.presentation.SearchQueryFilter
+import com.krivochkov.homework_2.presentation.SingleEvent
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.rxkotlin.subscribeBy
 
-class PeopleViewModel(
-    private val loadAllUsersUseCase: LoadAllUsersUseCase = LoadAllUsersUseCase()
-) : ViewModel() {
+class PeopleViewModel : ViewModel() {
 
-    private val compositeDisposable = CompositeDisposable()
+    private val searchQueryFilter = SearchQueryFilter()
 
-    private val searchComponent: SearchComponent<User> by lazy {
-        SearchComponentImpl(
-            source = { loadAllUsersUseCase() },
-            filter = { user, query -> user.fullName.contains(query) }
-        )
-    }
-
-    private val _state: MutableLiveData<ScreenState> = MutableLiveData()
-    val state: LiveData<ScreenState>
-        get() = _state
+    private val _searchQuery: MutableLiveData<SingleEvent<String>> = MutableLiveData()
+    val searchQuery: LiveData<SingleEvent<String>>
+        get() = _searchQuery
 
     init {
-        searchComponent.searchStatus.observeForever { searchStatus ->
-            when (searchStatus) {
-                is SearchStatus.Success -> _state.value =
-                    ScreenState.PeopleLoaded(searchStatus.data)
-                is SearchStatus.Error -> _state.value = ScreenState.Error
-                is SearchStatus.Searching -> _state.value = ScreenState.Loading
-            }
-        }
-
-        searchUsers()
+        searchQueryFilter.getFilterQueriesObservable()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onNext = { _searchQuery.value = SingleEvent(it) },
+                onError = { Log.d(TAG, it.printStackTrace().toString()) }
+            )
     }
 
-    fun searchUsers(query: String = "") {
-        searchComponent.search(SearchQuery(query))
+    fun addQueryToQueue(query: String) {
+        searchQueryFilter.sendQuery(query)
     }
 
-    fun searchUsersByLastQuery() {
-        searchComponent.searchByLastQuery()
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        compositeDisposable.dispose()
-        searchComponent.clearSearch()
+    companion object {
+        private const val TAG = "PeopleViewModel"
     }
 }

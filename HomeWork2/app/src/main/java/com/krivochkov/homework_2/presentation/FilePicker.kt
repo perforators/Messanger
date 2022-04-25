@@ -12,11 +12,11 @@ class FilePicker(
     onPick: (fileUri: Uri?) -> Unit
 ) {
 
-    private val getFile: ActivityResultLauncher<String> = activityResultRegistry
+    private val filePickerLauncher: ActivityResultLauncher<String> = activityResultRegistry
             .register(REGISTRY_KEY, lifecycleOwner, ActivityResultContracts.GetContent(), onPick)
 
     fun pickFile() {
-        getFile.launch(MIME_TYPE)
+        filePickerLauncher.launch(MIME_TYPE)
     }
 
     companion object {

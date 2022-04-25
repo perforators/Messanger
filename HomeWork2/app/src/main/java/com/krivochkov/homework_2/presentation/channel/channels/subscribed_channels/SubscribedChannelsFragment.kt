@@ -5,17 +5,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
-import androidx.fragment.app.viewModels
 import com.krivochkov.homework_2.R
 import com.krivochkov.homework_2.databinding.FragmentSubscribedChannelsBinding
+import com.krivochkov.homework_2.di.GlobalDI
 import com.krivochkov.homework_2.presentation.channel.channels.BaseChannelsFragment
+import com.krivochkov.homework_2.presentation.channel.elm.ChannelState
 
 class SubscribedChannelsFragment : BaseChannelsFragment() {
 
     private var _binding: FragmentSubscribedChannelsBinding? = null
     private val binding get() = _binding!!
-
-    override val channelsViewModel: SubscribedChannelsViewModel by viewModels()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,20 +37,23 @@ class SubscribedChannelsFragment : BaseChannelsFragment() {
         initErrorView(binding.channels.error)
     }
 
-    override fun changeLoadingVisibility(visibility: Boolean) {
-        binding.channels.loading.loadingLayout.apply {
-            isVisible = visibility
-            if (visibility) startShimmer() else stopShimmer()
+    override fun render(state: ChannelState) {
+        binding.channels.apply {
+            channelsRecyclerView.isVisible = state.isLoading.not() && state.error == null
+
+            adapter.submitChannels(state.channels) {
+                loading.loadingLayout.apply {
+                    isVisible = state.isLoading
+                    if (state.isLoading) startShimmer() else stopShimmer()
+                }
+            }
+
+            error.isVisible = state.error != null
         }
     }
 
-    override fun changeErrorVisibility(visibility: Boolean) {
-        binding.channels.error.isVisible = visibility
-    }
-
-    override fun changeContentVisibility(visibility: Boolean) {
-        binding.channels.channelsRecyclerView.isVisible = visibility
-    }
+    override fun createStore() =
+        GlobalDI.INSTANCE.presentationModule.subscribedChannelsStoreFactory.provide()
 
     companion object {
 

@@ -8,3 +8,8 @@ import kotlinx.serialization.Serializable
 data class MessagesResponse(
     @SerialName("messages") val messages: List<MessageDto>
 )
+
+@Serializable
+data class SingleMessageResponse(
+    @SerialName("message") val message: MessageDto
+)

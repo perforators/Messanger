@@ -1,12 +1,11 @@
 package com.krivochkov.homework_2.data.sources.local.data_sources
 
 import com.krivochkov.homework_2.data.sources.local.dao.ChannelDao
-import com.krivochkov.homework_2.data.sources.local.database.DatabaseInstance
 import com.krivochkov.homework_2.data.sources.local.entity.ChannelEntity
 import io.reactivex.Single
 
 class ChannelLocalDataSourceImpl(
-    private val dao: ChannelDao = DatabaseInstance.instance!!.channelDao()
+    private val dao: ChannelDao
 ) : ChannelLocalDataSource {
 
     override fun getAllChannels(): Single<List<ChannelEntity>> {

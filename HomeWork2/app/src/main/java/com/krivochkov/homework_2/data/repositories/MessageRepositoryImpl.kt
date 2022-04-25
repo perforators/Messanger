@@ -4,11 +4,9 @@ import android.util.Log
 import com.krivochkov.homework_2.data.mappers.mapToMessage
 import com.krivochkov.homework_2.data.mappers.mapToMessageEntity
 import com.krivochkov.homework_2.data.sources.local.data_sources.MessageLocalDataSource
-import com.krivochkov.homework_2.data.sources.local.data_sources.MessageLocalDataSourceImpl
 import com.krivochkov.homework_2.data.sources.local.entity.MessageEntity
-import com.krivochkov.homework_2.data.sources.remote.dto.NarrowDto
-import com.krivochkov.homework_2.data.sources.remote.data_sources.MessageRemoteDataSourceImpl
 import com.krivochkov.homework_2.data.sources.remote.data_sources.MessageRemoteDataSource
+import com.krivochkov.homework_2.data.sources.remote.dto.NarrowDto
 import com.krivochkov.homework_2.data.sources.remote.request.*
 import com.krivochkov.homework_2.domain.models.Message
 import com.krivochkov.homework_2.domain.repositories.MessageRepository
@@ -21,9 +19,9 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class MessageRepositoryImpl(
-    private val messageRemoteDataSource: MessageRemoteDataSource = MessageRemoteDataSourceImpl(),
-    private val messageLocalDataSource: MessageLocalDataSource = MessageLocalDataSourceImpl(),
-    private val userRepository: UserRepository = UserRepositoryImpl()
+    private val messageRemoteDataSource: MessageRemoteDataSource,
+    private val messageLocalDataSource: MessageLocalDataSource,
+    private val userRepository: UserRepository
 ) : MessageRepository {
 
     override fun getMessages(
@@ -37,7 +35,7 @@ class MessageRepositoryImpl(
             NarrowDto(NarrowDto.OPERATOR_TOPIC, topicName)
         )
 
-        val anchor = if (lastMessageId <= 0) DEFAULT_ANCHOR else lastMessageId
+        val anchor = if (lastMessageId <= 0) DEFAULT_ANCHOR else lastMessageId - 1
 
         val request = Request.Builder()
             .addQuery(ANCHOR_KEY, anchor.toString())
@@ -55,6 +53,16 @@ class MessageRepositoryImpl(
                         }
                     }
                     .doOnSuccess { cacheMessages(channelName, topicName, it) }
+            }
+    }
+
+    override fun getSingleMessage(messageId: Long): Single<Message> {
+        return messageRemoteDataSource.getSingleMessage(messageId)
+            .flatMap { messageDto ->
+                userRepository.getMyUser()
+                    .map { myUser ->
+                        messageDto.mapToMessage(myUser.id)
+                    }
             }
     }
 
@@ -93,10 +101,7 @@ class MessageRepositoryImpl(
                 )
             }
             .subscribeOn(Schedulers.io())
-            .subscribeBy(
-                onSuccess = { Log.d(TAG, "Сообщения успешно сохранены") },
-                onError = { Log.d(TAG, "Произошла ошибка при сохранении сообщений") }
-            )
+            .subscribeBy(onError = { Log.d(TAG, it.printStackTrace().toString()) } )
     }
 
     private fun getUpdatedListMessages(
