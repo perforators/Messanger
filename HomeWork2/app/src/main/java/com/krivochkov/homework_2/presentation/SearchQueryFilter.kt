@@ -1,6 +1,6 @@
 package com.krivochkov.homework_2.presentation
 
-import android.annotation.SuppressLint
+import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.addTo
@@ -19,9 +19,8 @@ class SearchQueryFilter {
         initInputQueriesProcessing()
     }
 
-    @SuppressLint("CheckResult")
-    fun observeFilteredQueries(onNext: (String) -> Unit) {
-        filteredQueries.subscribe(onNext)
+    fun getFilterQueriesObservable(): Observable<String> {
+        return filteredQueries
     }
 
     fun sendQuery(query: String) {

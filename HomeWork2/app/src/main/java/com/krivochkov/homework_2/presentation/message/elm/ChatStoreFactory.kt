@@ -2,14 +2,14 @@ package com.krivochkov.homework_2.presentation.message.elm
 
 import vivid.money.elmslie.core.ElmStoreCompat
 
-class MessageStoreFactory(
-    private val actor: MessageActor
+class ChatStoreFactory(
+    private val actor: ChatActor
 ) {
 
     private val store by lazy {
         ElmStoreCompat(
-            initialState = MessageState(),
-            reducer = MessageReducer(),
+            initialState = ChatState(),
+            reducer = ChatReducer(),
             actor = actor
         )
     }

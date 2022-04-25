@@ -29,7 +29,7 @@
 
     <fragment
         android:id="@+id/navigation_messages"
-        android:name="com.krivochkov.homework_2.presentation.message.MessageFragment"
+        android:name="com.krivochkov.homework_2.presentation.message.ChatFragment"
         android:label="@string/title_message"
         tools:layout="@layout/fragment_message">
         <argument

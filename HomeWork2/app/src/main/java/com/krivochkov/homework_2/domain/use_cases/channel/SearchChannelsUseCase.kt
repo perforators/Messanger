@@ -8,7 +8,5 @@ class SearchChannelsUseCase(private val loadChannelsUseCase: LoadChannelsUseCase
 
     operator fun invoke(query: String): Single<List<Channel>> =
         loadChannelsUseCase.load()
-            .flatMapObservable { channels -> Observable.fromIterable(channels) }
-            .filter { it.name.contains(query) }
-            .toList()
+            .map { it.filter { it.name.contains(query) } }
 }

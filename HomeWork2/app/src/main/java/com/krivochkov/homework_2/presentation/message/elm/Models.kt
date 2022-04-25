@@ -4,7 +4,7 @@ import com.krivochkov.homework_2.domain.models.AttachedFile
 import com.krivochkov.homework_2.domain.models.Emoji
 import com.krivochkov.homework_2.domain.models.Message
 
-data class MessageState(
+data class ChatState(
     val channelName: String = "",
     val topicName: String = "",
     val items: List<Any> = emptyList(),
@@ -22,9 +22,9 @@ data class MessageState(
     }
 }
 
-sealed class MessageEvent {
+sealed class ChatEvent {
 
-    sealed class Ui : MessageEvent() {
+    sealed class Ui : ChatEvent() {
         data class Init(val channelName: String, val topicName: String) : Ui()
         object LoadNextPage : Ui()
         object RefreshFirstPage : Ui()
@@ -40,7 +40,7 @@ sealed class MessageEvent {
         data class UpdateReaction(val messageId: Long, val emoji: Emoji) : Ui()
     }
 
-    sealed class Internal : MessageEvent() {
+    sealed class Internal : ChatEvent() {
         data class CachedMessagesLoaded(val messages: List<Message>) : Internal()
         data class PageLoaded(val messages: List<Message>, val isFirstPage: Boolean) : Internal()
         data class SingleMessageLoaded(val message: Message) : Internal()
@@ -55,35 +55,35 @@ sealed class MessageEvent {
     }
 }
 
-sealed class MessageEffect {
-    object CachedMessagesLoadError : MessageEffect()
-    object NextPageLoadError : MessageEffect()
-    object SendMessageError : MessageEffect()
-    object AddReactionError : MessageEffect()
-    object RemoveReactionError : MessageEffect()
-    object RefreshSingleMessageError : MessageEffect()
-    data class ShowEmojiPicker(val messageId: Long) : MessageEffect()
-    object ShowFilePicker : MessageEffect()
-    object NavigateUp : MessageEffect()
+sealed class ChatEffect {
+    object CachedMessagesLoadError : ChatEffect()
+    object NextPageLoadError : ChatEffect()
+    object SendMessageError : ChatEffect()
+    object AddReactionError : ChatEffect()
+    object RemoveReactionError : ChatEffect()
+    object RefreshSingleMessageError : ChatEffect()
+    data class ShowEmojiPicker(val messageId: Long) : ChatEffect()
+    object ShowFilePicker : ChatEffect()
+    object NavigateUp : ChatEffect()
 }
 
-sealed class MessageCommand {
-    data class LoadCachedMessages(val channelName: String, val topicName: String) : MessageCommand()
-    data class LoadSingleMessage(val messageId: Long) : MessageCommand()
-    data class AddReaction(val messageId: Long, val emojiName: String) : MessageCommand()
-    data class RemoveReaction(val messageId: Long, val emojiName: String) : MessageCommand()
+sealed class ChatCommand {
+    data class LoadCachedMessages(val channelName: String, val topicName: String) : ChatCommand()
+    data class LoadSingleMessage(val messageId: Long) : ChatCommand()
+    data class AddReaction(val messageId: Long, val emojiName: String) : ChatCommand()
+    data class RemoveReaction(val messageId: Long, val emojiName: String) : ChatCommand()
 
     data class LoadPage(
         val channelName: String,
         val topicName: String,
         val lastMessageId: Long,
         val pageSize: Int
-    ) : MessageCommand()
+    ) : ChatCommand()
 
     data class SendMessage(
         val channelName: String,
         val topicName: String,
         val message: String,
         val attachedFiles: List<AttachedFile>
-    ) : MessageCommand()
+    ) : ChatCommand()
 }

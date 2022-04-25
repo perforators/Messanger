@@ -2,8 +2,8 @@ package com.krivochkov.homework_2.di
 
 import com.krivochkov.homework_2.presentation.channel.elm.ChannelActor
 import com.krivochkov.homework_2.presentation.channel.elm.ChannelStoreFactory
-import com.krivochkov.homework_2.presentation.message.elm.MessageActor
-import com.krivochkov.homework_2.presentation.message.elm.MessageStoreFactory
+import com.krivochkov.homework_2.presentation.message.elm.ChatActor
+import com.krivochkov.homework_2.presentation.message.elm.ChatStoreFactory
 import com.krivochkov.homework_2.presentation.people.elm.PeopleActor
 import com.krivochkov.homework_2.presentation.people.elm.PeopleStoreFactory
 import com.krivochkov.homework_2.presentation.profile.elm.ProfileActor
@@ -36,7 +36,7 @@ class PresentationModule(private val domainModule: DomainModule) {
     }
 
     private val messageActor by lazy {
-        MessageActor(
+        ChatActor(
             domainModule.getMessagesUseCase,
             domainModule.getSingleMessageUseCase,
             domainModule.sendMessageUseCase,
@@ -53,5 +53,5 @@ class PresentationModule(private val domainModule: DomainModule) {
 
     val profileStoreFactory by lazy { ProfileStoreFactory(profileActor) }
 
-    val messageStoreFactory by lazy { MessageStoreFactory(messageActor) }
+    val messageStoreFactory by lazy { ChatStoreFactory(messageActor) }
 }

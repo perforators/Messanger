@@ -4,14 +4,14 @@ import com.krivochkov.homework_2.domain.models.Message
 import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.items.LoadingItem
 import vivid.money.elmslie.core.store.dsl_reducer.ScreenDslReducer
 
-class MessageReducer : ScreenDslReducer<MessageEvent, MessageEvent.Ui, MessageEvent.Internal, MessageState, MessageEffect, MessageCommand>(
-    MessageEvent.Ui::class,
-    MessageEvent.Internal::class
+class ChatReducer : ScreenDslReducer<ChatEvent, ChatEvent.Ui, ChatEvent.Internal, ChatState, ChatEffect, ChatCommand>(
+    ChatEvent.Ui::class,
+    ChatEvent.Internal::class
 ) {
 
-    override fun Result.internal(event: MessageEvent.Internal): Any {
+    override fun Result.internal(event: ChatEvent.Internal): Any {
         return when (event) {
-            is MessageEvent.Internal.CachedMessagesLoaded -> {
+            is ChatEvent.Internal.CachedMessagesLoaded -> {
                 state {
                     copy(
                         isLoading = event.messages.isEmpty(),
@@ -21,12 +21,12 @@ class MessageReducer : ScreenDslReducer<MessageEvent, MessageEvent.Ui, MessageEv
                     )
                 }
                 commands {
-                    +MessageCommand.LoadPage(
+                    +ChatCommand.LoadPage(
                         state.channelName, state.topicName, 0, state.pageSize
                     )
                 }
             }
-            is MessageEvent.Internal.PageLoaded -> {
+            is ChatEvent.Internal.PageLoaded -> {
                 val itemsList = if (event.isFirstPage && state.areCachedItemsSet.not()) {
                     val indexOfOccurrence = state.items.indexOfFirst {
                         it is Message && it.id == event.messages[0].id
@@ -55,49 +55,49 @@ class MessageReducer : ScreenDslReducer<MessageEvent, MessageEvent.Ui, MessageEv
                     )
                 }
             }
-            is MessageEvent.Internal.SingleMessageLoaded -> {
+            is ChatEvent.Internal.SingleMessageLoaded -> {
                 val itemsList = state.items.toMutableList().apply {
                     replaceMessage(event.message.id) { event.message }
                 }
                 state { copy(items = itemsList) }
             }
-            is MessageEvent.Internal.MessageSent -> {
+            is ChatEvent.Internal.MessageSent -> {
                 commands {
-                    +MessageCommand.LoadPage(event.channelName, event.topicName, 0, state.pageSize)
+                    +ChatCommand.LoadPage(event.channelName, event.topicName, 0, state.pageSize)
                 }
             }
-            is MessageEvent.Internal.ReactionUpdated -> {
-                commands { +MessageCommand.LoadSingleMessage(event.messageId) }
+            is ChatEvent.Internal.ReactionUpdated -> {
+                commands { +ChatCommand.LoadSingleMessage(event.messageId) }
             }
-            is MessageEvent.Internal.ErrorLoadingCachedMessages -> {
-                effects { +MessageEffect.CachedMessagesLoadError }
+            is ChatEvent.Internal.ErrorLoadingCachedMessages -> {
+                effects { +ChatEffect.CachedMessagesLoadError }
             }
-            is MessageEvent.Internal.ErrorLoadingPage -> {
+            is ChatEvent.Internal.ErrorLoadingPage -> {
                 if (state.items.isEmpty()) {
                     state { copy(error = event.error, isLoading = false) }
                 } else {
                     state { copy(items = state.items.removeLoadingItem(), isLoading = false) }
-                    effects { +MessageEffect.NextPageLoadError }
+                    effects { +ChatEffect.NextPageLoadError }
                 }
             }
-            is MessageEvent.Internal.ErrorSendingMessage -> {
-                effects { +MessageEffect.SendMessageError }
+            is ChatEvent.Internal.ErrorSendingMessage -> {
+                effects { +ChatEffect.SendMessageError }
             }
-            is MessageEvent.Internal.ErrorLoadingSingleMessage -> {
-                effects { +MessageEffect.RefreshSingleMessageError }
+            is ChatEvent.Internal.ErrorLoadingSingleMessage -> {
+                effects { +ChatEffect.RefreshSingleMessageError }
             }
-            is MessageEvent.Internal.ErrorAddingReaction -> {
-                effects { +MessageEffect.AddReactionError }
+            is ChatEvent.Internal.ErrorAddingReaction -> {
+                effects { +ChatEffect.AddReactionError }
             }
-            is MessageEvent.Internal.ErrorRemovingReaction -> {
-                effects { +MessageEffect.RemoveReactionError }
+            is ChatEvent.Internal.ErrorRemovingReaction -> {
+                effects { +ChatEffect.RemoveReactionError }
             }
         }
     }
 
-    override fun Result.ui(event: MessageEvent.Ui): Any {
+    override fun Result.ui(event: ChatEvent.Ui): Any {
         return when (event) {
-            is MessageEvent.Ui.Init -> {
+            is ChatEvent.Ui.Init -> {
                 if (state.isInitialized.not() ||
                     state.channelName != event.channelName || state.topicName != event.topicName) {
                     state {
@@ -114,75 +114,75 @@ class MessageReducer : ScreenDslReducer<MessageEvent, MessageEvent.Ui, MessageEv
                         )
                     }
                     commands {
-                        +MessageCommand.LoadCachedMessages(state.channelName, state.topicName)
+                        +ChatCommand.LoadCachedMessages(state.channelName, state.topicName)
                     }
                 } else {
                     Any()
                 }
             }
-            is MessageEvent.Ui.BackButtonClick -> {
-                effects { +MessageEffect.NavigateUp }
+            is ChatEvent.Ui.BackButtonClick -> {
+                effects { +ChatEffect.NavigateUp }
             }
-            is MessageEvent.Ui.LoadNextPage -> {
+            is ChatEvent.Ui.LoadNextPage -> {
                 if (state.items.contains(LoadingItem)) {
                     Any()
                 } else {
                     state { copy(items = listOf(LoadingItem) + items, error = null, isLoading = false) }
                     commands {
-                        +MessageCommand.LoadPage(
+                        +ChatCommand.LoadPage(
                             state.channelName, state.topicName, state.lastMessageId, state.pageSize
                         )
                     }
                 }
             }
-            is MessageEvent.Ui.RefreshFirstPage -> {
+            is ChatEvent.Ui.RefreshFirstPage -> {
                 commands {
                     state { copy(isLoading = items.isEmpty(), error = null) }
-                    +MessageCommand.LoadPage(
+                    +ChatCommand.LoadPage(
                         state.channelName, state.topicName, 0, state.pageSize
                     )
                 }
             }
-            is MessageEvent.Ui.ShowEmojiPicker -> {
-                effects { +MessageEffect.ShowEmojiPicker(event.messageId) }
+            is ChatEvent.Ui.ShowEmojiPicker -> {
+                effects { +ChatEffect.ShowEmojiPicker(event.messageId) }
             }
-            is MessageEvent.Ui.ShowFilePicker -> {
-                effects { +MessageEffect.ShowFilePicker }
+            is ChatEvent.Ui.ShowFilePicker -> {
+                effects { +ChatEffect.ShowFilePicker }
             }
-            is MessageEvent.Ui.AddAttachedFile -> {
+            is ChatEvent.Ui.AddAttachedFile -> {
                 state { copy(attachedFiles = attachedFiles + event.attachedFile) }
             }
-            is MessageEvent.Ui.RemoveAttachedFile -> {
+            is ChatEvent.Ui.RemoveAttachedFile -> {
                 val attachedFiles = state.attachedFiles.toMutableList().apply {
                     remove(event.attachedFile)
                 }
                 state { copy(attachedFiles = attachedFiles) }
             }
-            is MessageEvent.Ui.SendMessage -> {
+            is ChatEvent.Ui.SendMessage -> {
                 val attachedFiles = state.attachedFiles
                 state { copy(attachedFiles = emptyList()) }
                 commands {
-                    +MessageCommand.SendMessage(
+                    +ChatCommand.SendMessage(
                         state.channelName, state.topicName, event.message, attachedFiles
                     )
                 }
             }
-            is MessageEvent.Ui.RefreshMessage -> {
-                commands { +MessageCommand.LoadSingleMessage(event.messageId) }
+            is ChatEvent.Ui.RefreshMessage -> {
+                commands { +ChatCommand.LoadSingleMessage(event.messageId) }
             }
-            is MessageEvent.Ui.AddReaction -> {
-                commands { +MessageCommand.AddReaction(event.messageId, event.emoji.name) }
+            is ChatEvent.Ui.AddReaction -> {
+                commands { +ChatCommand.AddReaction(event.messageId, event.emoji.name) }
             }
-            is MessageEvent.Ui.RemoveReaction -> {
-                commands { +MessageCommand.RemoveReaction(event.messageId, event.emoji.name) }
+            is ChatEvent.Ui.RemoveReaction -> {
+                commands { +ChatCommand.RemoveReaction(event.messageId, event.emoji.name) }
             }
-            is MessageEvent.Ui.UpdateReaction -> {
+            is ChatEvent.Ui.UpdateReaction -> {
                 val message = state.items.find { it is Message && it.id == event.messageId } as? Message
                 val groupedReaction = message?.groupedReactions?.find { it.emoji.name == event.emoji.name }
                 if (groupedReaction == null || !groupedReaction.isSelected) {
-                    commands { +MessageCommand.AddReaction(event.messageId, event.emoji.name) }
+                    commands { +ChatCommand.AddReaction(event.messageId, event.emoji.name) }
                 } else {
-                    commands { +MessageCommand.RemoveReaction(event.messageId, event.emoji.name) }
+                    commands { +ChatCommand.RemoveReaction(event.messageId, event.emoji.name) }
                 }
             }
         }

@@ -1,5 +1,6 @@
 package com.krivochkov.homework_2.presentation.channel
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -7,6 +8,8 @@ import com.krivochkov.homework_2.domain.models.Channel
 import com.krivochkov.homework_2.domain.models.Topic
 import com.krivochkov.homework_2.presentation.SearchQueryFilter
 import com.krivochkov.homework_2.presentation.SingleEvent
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.rxkotlin.subscribeBy
 
 class SharedViewModel : ViewModel() {
 
@@ -21,9 +24,12 @@ class SharedViewModel : ViewModel() {
         get() = _searchQuery
 
     init {
-        searchQueryFilter.observeFilteredQueries {
-            _searchQuery.value = SingleEvent(it)
-        }
+        searchQueryFilter.getFilterQueriesObservable()
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribeBy(
+                onNext = { _searchQuery.value = SingleEvent(it) },
+                onError = { Log.d(TAG, it.printStackTrace().toString()) }
+            )
     }
 
     fun selectTopic(channel: Channel, topic: Topic) {
@@ -37,5 +43,9 @@ class SharedViewModel : ViewModel() {
     override fun onCleared() {
         super.onCleared()
         searchQueryFilter.dispose()
+    }
+
+    companion object {
+        private const val TAG = "ChannelsSharedViewModel"
     }
 }

@@ -25,18 +25,18 @@ import com.krivochkov.homework_2.presentation.message.adapters.message_adapter.M
 import com.krivochkov.homework_2.presentation.message.adapters.message_adapter.PaginationAdapterHelper
 import com.krivochkov.homework_2.presentation.message.adapters.message_adapter.items.DateSeparatorItem
 import com.krivochkov.homework_2.presentation.message.adapters.message_adapter.items.MessageItem
-import com.krivochkov.homework_2.presentation.message.elm.MessageEffect
-import com.krivochkov.homework_2.presentation.message.elm.MessageEvent
-import com.krivochkov.homework_2.presentation.message.elm.MessageState
+import com.krivochkov.homework_2.presentation.message.elm.ChatEffect
+import com.krivochkov.homework_2.presentation.message.elm.ChatEvent
+import com.krivochkov.homework_2.presentation.message.elm.ChatState
 import com.krivochkov.homework_2.presentation.message.emoji_pick.EmojiPickFragment
 import com.krivochkov.homework_2.utils.convertToDate
 import com.krivochkov.homework_2.utils.createFileAndGetPathWithFileNameFromCache
 import vivid.money.elmslie.android.base.ElmFragment
 
-class MessageFragment :
-    EmojiPickFragment.OnEmojiPickListener, ElmFragment<MessageEvent, MessageEffect, MessageState>() {
+class ChatFragment :
+    EmojiPickFragment.OnEmojiPickListener, ElmFragment<ChatEvent, ChatEffect, ChatState>() {
 
-    private val args by navArgs<MessageFragmentArgs>()
+    private val args by navArgs<ChatFragmentArgs>()
 
     private val channelName: String
         get() = args.channel.name
@@ -52,13 +52,13 @@ class MessageFragment :
 
     private val sharedViewModel: FilePickerSharedViewModel by activityViewModels()
 
-    override val initEvent: MessageEvent
-        get() = MessageEvent.Ui.Init(channelName, topicName)
+    override val initEvent: ChatEvent
+        get() = ChatEvent.Ui.Init(channelName, topicName)
 
     override fun createStore() =
         GlobalDI.INSTANCE.presentationModule.messageStoreFactory.provide()
 
-    override fun render(state: MessageState) {
+    override fun render(state: ChatState) {
         binding.apply {
             loading.loadingLayout.apply {
                 isVisible = state.isLoading
@@ -77,39 +77,39 @@ class MessageFragment :
         }
     }
 
-    override fun handleEffect(effect: MessageEffect) {
+    override fun handleEffect(effect: ChatEffect) {
         when (effect) {
-            is MessageEffect.CachedMessagesLoadError -> {
+            is ChatEffect.CachedMessagesLoadError -> {
                 showToast(R.string.failed_load_cached_messages)
             }
-            is MessageEffect.NextPageLoadError -> {
+            is ChatEffect.NextPageLoadError -> {
                 showToast(R.string.failed_load_next_page)
             }
-            is MessageEffect.SendMessageError -> {
+            is ChatEffect.SendMessageError -> {
                 showToast(R.string.failed_send_message)
             }
-            is MessageEffect.AddReactionError -> {
+            is ChatEffect.AddReactionError -> {
                 showToast(R.string.failed_add_reaction)
             }
-            is MessageEffect.RemoveReactionError -> {
+            is ChatEffect.RemoveReactionError -> {
                 showToast(R.string.failed_remove_reaction)
             }
-            is MessageEffect.RefreshSingleMessageError -> {
+            is ChatEffect.RefreshSingleMessageError -> {
                 showToast(R.string.failed_refresh_message)
             }
-            is MessageEffect.ShowEmojiPicker -> {
+            is ChatEffect.ShowEmojiPicker -> {
                 showEmojiPick(effect.messageId)
             }
-            is MessageEffect.ShowFilePicker -> {
+            is ChatEffect.ShowFilePicker -> {
                 sharedViewModel.pickFile()
             }
-            is MessageEffect.NavigateUp -> {
+            is ChatEffect.NavigateUp -> {
                 findNavController().navigateUp()
             }
         }
     }
 
-    override fun mapList(state: MessageState): List<Item> {
+    override fun mapList(state: ChatState): List<Item> {
         val itemsList = state.items.toMutableList()
         return if (itemsList.contains(LoadingItem)) {
             listOf(LoadingItem) + itemsList.filterIsInstance<Message>().toMessageItemsWithDates()
@@ -118,7 +118,7 @@ class MessageFragment :
         }
     }
 
-    override fun renderList(state: MessageState, list: List<Any>) {
+    override fun renderList(state: ChatState, list: List<Any>) {
         messageAdapter.items = list.filterIsInstance<Item>()
     }
 
@@ -143,7 +143,7 @@ class MessageFragment :
                 val (path, fileName) =
                     createFileAndGetPathWithFileNameFromCache(requireContext(), uri)
                 val type = requireContext().contentResolver.getType(uri) ?: return@let
-                store.accept(MessageEvent.Ui.AddAttachedFile(AttachedFile(fileName, type, path)))
+                store.accept(ChatEvent.Ui.AddAttachedFile(AttachedFile(fileName, type, path)))
             }
         }
     }
@@ -174,13 +174,13 @@ class MessageFragment :
         )
 
         binding.toolbarLayout.backButton.setOnClickListener {
-            store.accept(MessageEvent.Ui.BackButtonClick)
+            store.accept(ChatEvent.Ui.BackButtonClick)
         }
     }
 
     private fun initErrorView() {
         binding.error.setOnErrorButtonClickListener {
-            store.accept(MessageEvent.Ui.RefreshFirstPage)
+            store.accept(ChatEvent.Ui.RefreshFirstPage)
         }
 
         binding.error.text = requireContext().getString(R.string.error_text)
@@ -197,16 +197,16 @@ class MessageFragment :
 
     private fun initAdapter() {
         messageAdapter = MessageAdapter(
-            PaginationAdapterHelper { store.accept(MessageEvent.Ui.LoadNextPage) }
+            PaginationAdapterHelper { store.accept(ChatEvent.Ui.LoadNextPage) }
         ).apply {
             setOnAddMyReactionListener { messageId, emoji ->
-                store.accept(MessageEvent.Ui.AddReaction(messageId, emoji))
+                store.accept(ChatEvent.Ui.AddReaction(messageId, emoji))
             }
             setOnRemoveMyReactionListener { messageId, emoji ->
-                store.accept(MessageEvent.Ui.RemoveReaction(messageId, emoji))
+                store.accept(ChatEvent.Ui.RemoveReaction(messageId, emoji))
             }
             setOnChoosingReactionListener { messageId ->
-                store.accept(MessageEvent.Ui.ShowEmojiPicker(messageId))
+                store.accept(ChatEvent.Ui.ShowEmojiPicker(messageId))
             }
         }
 
@@ -221,7 +221,7 @@ class MessageFragment :
 
     private fun initInputFileRecycler() {
         attachedFileAdapter = AttachedFileAdapter {
-            store.accept(MessageEvent.Ui.RemoveAttachedFile(it))
+            store.accept(ChatEvent.Ui.RemoveAttachedFile(it))
         }
         binding.recyclerInputFiles.adapter = attachedFileAdapter
         binding.recyclerInputFiles.layoutManager = LinearLayoutManager(
@@ -239,13 +239,13 @@ class MessageFragment :
                 if (inputText.isNotEmpty()) {
                     inputField.setText("")
                     store.accept(
-                        MessageEvent.Ui.SendMessage(inputText)
+                        ChatEvent.Ui.SendMessage(inputText)
                     )
                 }
             }
 
             addFileButton.setOnClickListener {
-                store.accept(MessageEvent.Ui.ShowFilePicker)
+                store.accept(ChatEvent.Ui.ShowFilePicker)
             }
 
             inputField.doOnTextChanged { _, _, _, _ ->
@@ -266,7 +266,7 @@ class MessageFragment :
     }
 
     override fun onEmojiPick(messageId: Long, emoji: Emoji) {
-        store.accept(MessageEvent.Ui.UpdateReaction(messageId, emoji))
+        store.accept(ChatEvent.Ui.UpdateReaction(messageId, emoji))
     }
 
     private fun List<Message>.toMessageItemsWithDates(): List<Item> {

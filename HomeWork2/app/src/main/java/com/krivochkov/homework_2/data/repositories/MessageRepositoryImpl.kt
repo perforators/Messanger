@@ -1,5 +1,6 @@
 package com.krivochkov.homework_2.data.repositories
 
+import android.util.Log
 import com.krivochkov.homework_2.data.mappers.mapToMessage
 import com.krivochkov.homework_2.data.mappers.mapToMessageEntity
 import com.krivochkov.homework_2.data.sources.local.data_sources.MessageLocalDataSource
@@ -12,6 +13,7 @@ import com.krivochkov.homework_2.domain.repositories.MessageRepository
 import com.krivochkov.homework_2.domain.repositories.UserRepository
 import io.reactivex.Completable
 import io.reactivex.Single
+import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -99,7 +101,7 @@ class MessageRepositoryImpl(
                 )
             }
             .subscribeOn(Schedulers.io())
-            .subscribe()
+            .subscribeBy(onError = { Log.d(TAG, it.printStackTrace().toString()) } )
     }
 
     private fun getUpdatedListMessages(
@@ -125,6 +127,7 @@ class MessageRepositoryImpl(
 
     companion object {
 
+        private const val TAG = "MessageRepositoryImpl"
         private const val MAX_COUNT_CACHED_MESSAGES = 50
         private const val DEFAULT_TYPE = "stream"
         private const val DEFAULT_ANCHOR = "newest"
