@@ -4,8 +4,9 @@ import com.krivochkov.homework_2.data.sources.remote.api.ZulipApi
 import com.krivochkov.homework_2.data.sources.remote.dto.ChannelDto
 import com.krivochkov.homework_2.data.sources.remote.dto.TopicDto
 import io.reactivex.Single
+import javax.inject.Inject
 
-class ChannelRemoteDataSourceImpl(
+class ChannelRemoteDataSourceImpl @Inject constructor(
     private val api: ZulipApi
 ) : ChannelRemoteDataSource {
 

@@ -3,8 +3,9 @@ package com.krivochkov.homework_2.data.sources.local.data_sources
 import com.krivochkov.homework_2.data.sources.local.dao.MessageDao
 import com.krivochkov.homework_2.data.sources.local.entity.MessageEntity
 import io.reactivex.Single
+import javax.inject.Inject
 
-class MessageLocalDataSourceImpl(
+class MessageLocalDataSourceImpl @Inject constructor(
     private val dao: MessageDao
 ) : MessageLocalDataSource {
 
