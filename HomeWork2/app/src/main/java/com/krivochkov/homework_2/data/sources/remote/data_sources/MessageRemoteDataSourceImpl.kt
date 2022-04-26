@@ -5,8 +5,9 @@ import com.krivochkov.homework_2.data.sources.remote.dto.MessageDto
 import com.krivochkov.homework_2.data.sources.remote.request.Request
 import io.reactivex.Completable
 import io.reactivex.Single
+import javax.inject.Inject
 
-class MessageRemoteDataSourceImpl(
+class MessageRemoteDataSourceImpl @Inject constructor(
     private val api: ZulipApi
 ) : MessageRemoteDataSource {
 

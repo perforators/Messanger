@@ -4,8 +4,9 @@ import com.krivochkov.homework_2.data.sources.remote.api.ZulipApi
 import com.krivochkov.homework_2.data.sources.remote.dto.PresenceDto
 import com.krivochkov.homework_2.data.sources.remote.dto.UserDto
 import io.reactivex.Single
+import javax.inject.Inject
 
-class UserRemoteDataSourceImpl(
+class UserRemoteDataSourceImpl @Inject constructor(
     private val api: ZulipApi
 ) : UserRemoteDataSource {
 

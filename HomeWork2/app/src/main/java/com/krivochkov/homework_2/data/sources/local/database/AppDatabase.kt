@@ -25,8 +25,4 @@ abstract class AppDatabase: RoomDatabase() {
     abstract fun topicDao(): TopicDao
 
     abstract fun messageDao(): MessageDao
-
-    companion object {
-        const val DB_NAME = "App database"
-    }
 }

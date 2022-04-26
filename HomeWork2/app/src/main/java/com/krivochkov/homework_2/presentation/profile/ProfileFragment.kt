@@ -1,28 +1,43 @@
 package com.krivochkov.homework_2.presentation.profile
 
+import android.content.Context
 import android.os.Bundle
 import android.view.*
 import androidx.core.view.isVisible
+import androidx.fragment.app.viewModels
 import com.krivochkov.homework_2.R
+import com.krivochkov.homework_2.appComponent
 import com.krivochkov.homework_2.databinding.FragmentProfileBinding
-import com.krivochkov.homework_2.di.GlobalDI
+import com.krivochkov.homework_2.di.profile.DaggerProfileScreenComponent
 import com.krivochkov.homework_2.domain.models.User
 import com.krivochkov.homework_2.presentation.profile.elm.ProfileEffect
 import com.krivochkov.homework_2.presentation.profile.elm.ProfileEvent
 import com.krivochkov.homework_2.presentation.profile.elm.ProfileState
 import com.krivochkov.homework_2.utils.loadImage
 import vivid.money.elmslie.android.base.ElmFragment
+import javax.inject.Inject
 
 class ProfileFragment : ElmFragment<ProfileEvent, ProfileEffect, ProfileState>() {
+
+    @Inject
+    internal lateinit var profileViewModelFactory: ProfileViewModelFactory
 
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
 
+    private val viewModel: ProfileViewModel by viewModels { profileViewModelFactory }
+
     override val initEvent: ProfileEvent
         get() = ProfileEvent.Ui.Init
 
-    override fun createStore() =
-        GlobalDI.INSTANCE.presentationModule.profileStoreFactory.provide()
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        DaggerProfileScreenComponent.factory()
+            .create(appComponent())
+            .inject(this)
+    }
+
+    override fun createStore() = viewModel.peopleStore
 
     override fun render(state: ProfileState) {
         binding.apply {

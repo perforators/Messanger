@@ -17,8 +17,9 @@ import io.reactivex.rxkotlin.subscribeBy
 import io.reactivex.schedulers.Schedulers
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import javax.inject.Inject
 
-class MessageRepositoryImpl(
+class MessageRepositoryImpl @Inject constructor(
     private val messageRemoteDataSource: MessageRemoteDataSource,
     private val messageLocalDataSource: MessageLocalDataSource,
     private val userRepository: UserRepository
