@@ -1,6 +1,5 @@
 package com.krivochkov.homework_2.presentation.people
 
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -10,39 +9,28 @@ import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.krivochkov.homework_2.R
-import com.krivochkov.homework_2.appComponent
 import com.krivochkov.homework_2.databinding.FragmentPeopleBinding
-import com.krivochkov.homework_2.di.people.DaggerPeopleScreenComponent
+import com.krivochkov.homework_2.di.GlobalDI
 import com.krivochkov.homework_2.presentation.people.adapter.PeopleAdapter
 import com.krivochkov.homework_2.presentation.people.elm.PeopleEffect
 import com.krivochkov.homework_2.presentation.people.elm.PeopleEvent
 import com.krivochkov.homework_2.presentation.people.elm.PeopleState
 import vivid.money.elmslie.android.base.ElmFragment
-import javax.inject.Inject
 
 class PeopleFragment : ElmFragment<PeopleEvent, PeopleEffect, PeopleState>() {
-
-    @Inject
-    internal lateinit var peopleViewModelFactory: PeopleViewModelFactory
 
     private var _binding: FragmentPeopleBinding? = null
     private val binding get() = _binding!!
 
     private lateinit var adapter: PeopleAdapter
 
-    private val viewModel: PeopleViewModel by viewModels { peopleViewModelFactory }
+    private val viewModel by viewModels<PeopleViewModel>()
 
     override val initEvent: PeopleEvent
         get() = PeopleEvent.Ui.Init
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        DaggerPeopleScreenComponent.factory()
-            .create(appComponent())
-            .inject(this)
-    }
-
-    override fun createStore() = viewModel.peopleStore
+    override fun createStore() =
+        GlobalDI.INSTANCE.presentationModule.peopleStoreFactory.provide()
 
     override fun render(state: PeopleState) {
         binding.apply {
