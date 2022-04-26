@@ -1,10 +1,7 @@
 package com.krivochkov.homework_2.presentation.channel.channels
 
-import android.os.Bundle
-import android.view.View
 import android.widget.Toast
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -20,10 +17,6 @@ import vivid.money.elmslie.android.base.ElmFragment
 abstract class BaseChannelsFragment : ElmFragment<ChannelEvent, ChannelEffect, ChannelState>() {
 
     private val sharedViewModel: SharedViewModel by activityViewModels()
-    protected val channelsViewModel: ChannelsViewModel by viewModels { channelsViewModelFactory }
-
-    internal abstract var channelsViewModelFactory: ChannelsViewModelFactory
-
     protected lateinit var adapter: ChannelsAdapter
 
     override val initEvent: ChannelEvent
@@ -34,7 +27,7 @@ abstract class BaseChannelsFragment : ElmFragment<ChannelEvent, ChannelEffect, C
 
         sharedViewModel.searchQuery.observe(viewLifecycleOwner) { singleEvent ->
             singleEvent.getContentIfNotHandled()?.let { query ->
-                channelsViewModel.sendSearchQuery(query)
+                store.accept(ChannelEvent.Ui.SearchChannels(query))
             }
         }
     }
@@ -43,16 +36,6 @@ abstract class BaseChannelsFragment : ElmFragment<ChannelEvent, ChannelEffect, C
         super.onPause()
 
         sharedViewModel.searchQuery.removeObservers(viewLifecycleOwner)
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        channelsViewModel.searchQuery.observe(viewLifecycleOwner) { singleEvent ->
-            singleEvent.getContentIfNotHandled()?.let { query ->
-                store.accept(ChannelEvent.Ui.SearchChannels(query))
-            }
-        }
     }
 
     override fun handleEffect(effect: ChannelEffect) {

@@ -6,16 +6,12 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.krivochkov.homework_2.presentation.SearchQueryFilter
 import com.krivochkov.homework_2.presentation.SingleEvent
-import com.krivochkov.homework_2.presentation.people.elm.PeopleStoreFactory
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 
-class PeopleViewModel(
-    peopleStoreFactory: PeopleStoreFactory,
-    private val searchQueryFilter: SearchQueryFilter
-) : ViewModel() {
+class PeopleViewModel : ViewModel() {
 
-    val peopleStore = peopleStoreFactory.provide()
+    private val searchQueryFilter = SearchQueryFilter()
 
     private val _searchQuery: MutableLiveData<SingleEvent<String>> = MutableLiveData()
     val searchQuery: LiveData<SingleEvent<String>>

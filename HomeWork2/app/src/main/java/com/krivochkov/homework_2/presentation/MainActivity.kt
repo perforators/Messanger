@@ -8,7 +8,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.krivochkov.homework_2.R
 import com.krivochkov.homework_2.databinding.ActivityMainBinding
-import com.krivochkov.homework_2.presentation.chat.FilePickerSharedViewModel
+import com.krivochkov.homework_2.presentation.message.FilePickerSharedViewModel
 
 class MainActivity : AppCompatActivity() {
 

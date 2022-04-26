@@ -11,9 +11,8 @@ import com.krivochkov.homework_2.domain.models.Channel
 import com.krivochkov.homework_2.domain.models.Topic
 import com.krivochkov.homework_2.domain.repositories.ChannelRepository
 import io.reactivex.Single
-import javax.inject.Inject
 
-class ChannelRepositoryImpl @Inject constructor(
+class ChannelRepositoryImpl(
     private val channelRemoteDataSource: ChannelRemoteDataSource,
     private val channelLocalDataSource: ChannelLocalDataSource,
     private val topicLocalDataSource: TopicLocalDataSource

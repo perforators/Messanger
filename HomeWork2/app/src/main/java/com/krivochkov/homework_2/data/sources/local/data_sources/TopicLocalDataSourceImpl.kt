@@ -3,9 +3,8 @@ package com.krivochkov.homework_2.data.sources.local.data_sources
 import com.krivochkov.homework_2.data.sources.local.dao.TopicDao
 import com.krivochkov.homework_2.data.sources.local.entity.TopicEntity
 import io.reactivex.Single
-import javax.inject.Inject
 
-class TopicLocalDataSourceImpl @Inject constructor(
+class TopicLocalDataSourceImpl(
     private val dao: TopicDao
 ) : TopicLocalDataSource {
 

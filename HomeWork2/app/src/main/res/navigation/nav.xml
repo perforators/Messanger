@@ -29,9 +29,9 @@
 
     <fragment
         android:id="@+id/navigation_messages"
-        android:name="com.krivochkov.homework_2.presentation.chat.ChatFragment"
+        android:name="com.krivochkov.homework_2.presentation.message.ChatFragment"
         android:label="@string/title_message"
-        tools:layout="@layout/fragment_chat">
+        tools:layout="@layout/fragment_message">
         <argument
             android:name="channel"
             app:argType="com.krivochkov.homework_2.domain.models.Channel" />
