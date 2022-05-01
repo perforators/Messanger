@@ -1,8 +1,9 @@
 package com.krivochkov.homework_2.domain.use_cases.message
 
-import com.krivochkov.homework_2.domain.repositories.MessageRepository
+import com.krivochkov.homework_2.domain.models.Message
+import io.reactivex.Single
 
-class GetSingleMessageUseCase(private val messageRepository: MessageRepository) {
+interface GetSingleMessageUseCase {
 
-    operator fun invoke(messageId: Long) = messageRepository.getSingleMessage(messageId)
+    operator fun invoke(messageId: Long): Single<Message>
 }

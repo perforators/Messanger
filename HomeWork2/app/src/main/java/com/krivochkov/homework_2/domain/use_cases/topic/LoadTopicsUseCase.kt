@@ -1,9 +1,9 @@
 package com.krivochkov.homework_2.domain.use_cases.topic
 
-import com.krivochkov.homework_2.domain.repositories.ChannelRepository
+import com.krivochkov.homework_2.domain.models.Topic
+import io.reactivex.Single
 
-class LoadTopicsUseCase(private val repository: ChannelRepository) {
+interface LoadTopicsUseCase {
 
-    operator fun invoke(channelId: Long, cached: Boolean = false) =
-        if (cached) repository.getCachedTopics(channelId) else repository.getTopics(channelId)
+    operator fun invoke(channelId: Long, cached: Boolean = false): Single<List<Topic>>
 }

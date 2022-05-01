@@ -5,5 +5,5 @@ import io.reactivex.Single
 
 interface LoadChannelsUseCase {
 
-    fun load(cached: Boolean = false): Single<List<Channel>>
+    operator fun invoke(cached: Boolean = false): Single<List<Channel>>
 }

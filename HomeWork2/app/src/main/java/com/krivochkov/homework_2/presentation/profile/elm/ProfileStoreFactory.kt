@@ -1,8 +1,11 @@
 package com.krivochkov.homework_2.presentation.profile.elm
 
+import com.krivochkov.homework_2.di.profile.annotations.ProfileScreenScope
 import vivid.money.elmslie.core.ElmStoreCompat
+import javax.inject.Inject
 
-class ProfileStoreFactory(
+@ProfileScreenScope
+class ProfileStoreFactory @Inject constructor(
     private val actor: ProfileActor
 ) {
 

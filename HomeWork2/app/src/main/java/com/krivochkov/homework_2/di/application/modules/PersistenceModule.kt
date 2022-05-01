@@ -33,6 +33,7 @@ class PersistenceModule {
     fun provideTopicDao(database: AppDatabase): TopicDao = database.topicDao()
 
     companion object {
+
         private const val DB_NAME = "App database"
     }
 }

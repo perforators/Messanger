@@ -1,8 +1,11 @@
 package com.krivochkov.homework_2.presentation.people.elm
 
+import com.krivochkov.homework_2.di.people.annotations.PeopleScreenScope
 import vivid.money.elmslie.core.ElmStoreCompat
+import javax.inject.Inject
 
-class PeopleStoreFactory(
+@PeopleScreenScope
+class PeopleStoreFactory @Inject constructor(
     private val actor: PeopleActor
 ) {
 

@@ -25,6 +25,7 @@ class NetworkModule {
     }
 
     @Provides
+    @Singleton
     fun provideRetrofit(
         converterFactory: Converter.Factory,
         callAdapterFactory: CallAdapter.Factory,
@@ -39,6 +40,7 @@ class NetworkModule {
     }
 
     @Provides
+    @Singleton
     fun provideOkHttpClient(
         headerInterceptor: HeaderInterceptor,
         httpLoggingInterceptor: HttpLoggingInterceptor

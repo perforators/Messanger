@@ -1,7 +1,7 @@
 package com.krivochkov.homework_2.di.channels.modules
 
-import com.krivochkov.homework_2.di.channels.annotations.ChannelsScreenScope
 import com.krivochkov.homework_2.di.channels.annotations.AllChannels
+import com.krivochkov.homework_2.di.channels.annotations.ChannelsScreenScope
 import com.krivochkov.homework_2.di.channels.annotations.SubscribedChannels
 import com.krivochkov.homework_2.domain.use_cases.channel.LoadChannelsUseCase
 import com.krivochkov.homework_2.domain.use_cases.channel.SearchChannelsUseCase

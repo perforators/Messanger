@@ -1,6 +1,5 @@
 package com.krivochkov.homework_2.di.channels
 
-import com.krivochkov.homework_2.di.application.ApplicationComponent
 import com.krivochkov.homework_2.di.channels.annotations.ChannelsScreenScope
 import com.krivochkov.homework_2.di.channels.modules.ChannelsDomainModule
 import com.krivochkov.homework_2.di.channels.modules.ChannelsElmModule
@@ -16,7 +15,7 @@ import dagger.Component
         ChannelsElmModule::class,
         ChannelsViewModelModule::class
     ],
-    dependencies = [ApplicationComponent::class]
+    dependencies = [ChannelsScreenDependencies::class]
 )
 interface ChannelsScreenComponent {
 
@@ -27,6 +26,6 @@ interface ChannelsScreenComponent {
     @Component.Factory
     interface Factory {
 
-        fun create(applicationComponent: ApplicationComponent): ChannelsScreenComponent
+        fun create(dependencies: ChannelsScreenDependencies): ChannelsScreenComponent
     }
 }

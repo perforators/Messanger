@@ -1,9 +1,8 @@
 package com.krivochkov.homework_2.domain.use_cases.reaction
 
-import com.krivochkov.homework_2.domain.repositories.MessageRepository
+import io.reactivex.Completable
 
-class AddReactionUseCase(private val repository: MessageRepository) {
+interface AddReactionUseCase {
 
-    operator fun invoke(messageId: Long, emojiName: String) =
-        repository.addReaction(messageId, emojiName)
+    operator fun invoke(messageId: Long, emojiName: String): Completable
 }

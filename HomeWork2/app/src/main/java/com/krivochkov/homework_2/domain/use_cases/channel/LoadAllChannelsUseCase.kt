@@ -1,8 +1,11 @@
 package com.krivochkov.homework_2.domain.use_cases.channel
 
 import com.krivochkov.homework_2.domain.repositories.ChannelRepository
+import javax.inject.Inject
 
-class LoadAllChannelsUseCase(private val repository: ChannelRepository) : LoadChannelsUseCase {
+class LoadAllChannelsUseCase @Inject constructor(
+    private val repository: ChannelRepository
+) : LoadChannelsUseCase {
 
-    override fun load(cached: Boolean) = repository.getAllChannels(cached)
+    override operator fun invoke(cached: Boolean) = repository.getAllChannels(cached)
 }

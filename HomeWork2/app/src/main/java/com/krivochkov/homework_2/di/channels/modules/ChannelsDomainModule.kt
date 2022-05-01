@@ -2,36 +2,22 @@ package com.krivochkov.homework_2.di.channels.modules
 
 import com.krivochkov.homework_2.di.channels.annotations.AllChannels
 import com.krivochkov.homework_2.di.channels.annotations.SubscribedChannels
-import com.krivochkov.homework_2.domain.repositories.ChannelRepository
-import com.krivochkov.homework_2.domain.use_cases.channel.LoadAllChannelsUseCase
-import com.krivochkov.homework_2.domain.use_cases.channel.LoadChannelsUseCase
-import com.krivochkov.homework_2.domain.use_cases.channel.LoadSubscribedChannelsUseCase
-import com.krivochkov.homework_2.domain.use_cases.channel.SearchChannelsUseCase
+import com.krivochkov.homework_2.domain.use_cases.channel.*
 import com.krivochkov.homework_2.domain.use_cases.topic.LoadTopicsUseCase
+import com.krivochkov.homework_2.domain.use_cases.topic.LoadTopicsUseCaseImpl
+import dagger.Binds
 import dagger.Module
 import dagger.Provides
 
-@Module
+@Module(includes = [ChannelsDomainModule.BindsModule::class])
 class ChannelsDomainModule {
-
-    @Provides
-    @AllChannels
-    fun provideLoadAllChannelsUseCase(repository: ChannelRepository): LoadChannelsUseCase {
-        return LoadAllChannelsUseCase(repository)
-    }
-
-    @Provides
-    @SubscribedChannels
-    fun provideLoadSubscribedChannelsUseCase(repository: ChannelRepository): LoadChannelsUseCase {
-        return LoadSubscribedChannelsUseCase(repository)
-    }
 
     @Provides
     @AllChannels
     fun provideSearchAllChannelsUseCase(
         @AllChannels loadChannelsUseCase: LoadChannelsUseCase
     ): SearchChannelsUseCase {
-        return SearchChannelsUseCase(loadChannelsUseCase)
+        return SearchChannelsUseCaseImpl(loadChannelsUseCase)
     }
 
     @Provides
@@ -39,11 +25,21 @@ class ChannelsDomainModule {
     fun provideSearchSubscribedChannelsUseCase(
         @SubscribedChannels loadChannelsUseCase: LoadChannelsUseCase
     ): SearchChannelsUseCase {
-        return SearchChannelsUseCase(loadChannelsUseCase)
+        return SearchChannelsUseCaseImpl(loadChannelsUseCase)
     }
 
-    @Provides
-    fun provideLoadTopicsUseCase(repository: ChannelRepository): LoadTopicsUseCase {
-        return LoadTopicsUseCase(repository)
+    @Module
+    interface BindsModule {
+
+        @Binds
+        fun bindLoadTopicsUseCase(impl: LoadTopicsUseCaseImpl): LoadTopicsUseCase
+
+        @Binds
+        @AllChannels
+        fun bindLoadAllChannelsUseCase(impl: LoadAllChannelsUseCase): LoadChannelsUseCase
+
+        @Binds
+        @SubscribedChannels
+        fun bindLoadSubscribedChannelsUseCase(impl: LoadSubscribedChannelsUseCase): LoadChannelsUseCase
     }
 }

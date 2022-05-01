@@ -1,13 +1,11 @@
 package com.krivochkov.homework_2.di.chat.modules
 
-import com.krivochkov.homework_2.di.chat.annotations.ChatScreenScope
 import com.krivochkov.homework_2.domain.use_cases.message.GetMessagesUseCase
 import com.krivochkov.homework_2.domain.use_cases.message.GetSingleMessageUseCase
 import com.krivochkov.homework_2.domain.use_cases.message.SendMessageUseCase
 import com.krivochkov.homework_2.domain.use_cases.reaction.AddReactionUseCase
 import com.krivochkov.homework_2.domain.use_cases.reaction.RemoveReactionUseCase
 import com.krivochkov.homework_2.presentation.chat.elm.ChatActor
-import com.krivochkov.homework_2.presentation.chat.elm.ChatStoreFactory
 import dagger.Module
 import dagger.Provides
 
@@ -29,11 +27,5 @@ class ChatElmModule {
             addReactionUseCase,
             removeReactionUseCase
         )
-    }
-
-    @Provides
-    @ChatScreenScope
-    fun provideChatStoreFactory(actor: ChatActor): ChatStoreFactory {
-        return ChatStoreFactory(actor)
     }
 }
