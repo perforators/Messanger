@@ -18,7 +18,7 @@ class ChannelActor(
     private val switcher = Switcher()
 
     override fun execute(command: ChannelCommand): Observable<ChannelEvent> = when (command) {
-        is ChannelCommand.LoadCachedChannels -> loadChannelsUseCase.load(cached = true)
+        is ChannelCommand.LoadCachedChannels -> loadChannelsUseCase(cached = true)
             .map { channels -> channels.map { channel -> ChannelItem(channel) } }
             .mapEvents(
                 { list -> ChannelEvent.Internal.CachedChannelsLoaded(list) },

@@ -3,8 +3,9 @@ package com.krivochkov.homework_2.data.sources.local.data_sources
 import com.krivochkov.homework_2.data.sources.local.dao.ChannelDao
 import com.krivochkov.homework_2.data.sources.local.entity.ChannelEntity
 import io.reactivex.Single
+import javax.inject.Inject
 
-class ChannelLocalDataSourceImpl(
+class ChannelLocalDataSourceImpl @Inject constructor(
     private val dao: ChannelDao
 ) : ChannelLocalDataSource {
 

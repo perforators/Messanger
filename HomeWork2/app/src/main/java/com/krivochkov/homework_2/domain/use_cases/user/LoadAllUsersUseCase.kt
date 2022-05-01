@@ -1,8 +1,11 @@
 package com.krivochkov.homework_2.domain.use_cases.user
 
 import com.krivochkov.homework_2.domain.repositories.UserRepository
+import javax.inject.Inject
 
-class LoadAllUsersUseCase(private val repository: UserRepository) {
+class LoadAllUsersUseCase @Inject constructor(
+    private val repository: UserRepository
+) : LoadUsersUseCase {
 
-    operator fun invoke() = repository.getUsers()
+    override operator fun invoke() = repository.getUsers()
 }
