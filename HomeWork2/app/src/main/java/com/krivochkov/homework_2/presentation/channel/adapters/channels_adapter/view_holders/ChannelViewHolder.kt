@@ -31,12 +31,14 @@ class ChannelViewHolder(
     }
 
     private fun showUpArrow() {
-        binding.arrow.background =
+        binding.arrow.setImageDrawable(
             AppCompatResources.getDrawable(context, R.drawable.arrow_up_picture)
+        )
     }
 
     private fun showDownArrow() {
-        binding.arrow.background =
+        binding.arrow.setImageDrawable(
             AppCompatResources.getDrawable(context, R.drawable.arrow_down_picture)
+        )
     }
 }
