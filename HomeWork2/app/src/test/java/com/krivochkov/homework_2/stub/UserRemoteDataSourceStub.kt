@@ -7,18 +7,17 @@ import io.reactivex.Single
 
 class UserRemoteDataSourceStub : UserRemoteDataSource {
 
-    var userProvider: () -> Single<UserDto> = {
+    var ownUserProvider: () -> Single<UserDto> = {
         Single.just(UserDto(id = 0, avatar = "", email = "", fullName = "", isBot = false))
     }
     var presenceProvider: () -> Single<PresenceDto> = {
         Single.just(PresenceDto(status = "", timestamp = 0))
     }
+    var usersProvider: () -> Single<List<UserDto>> = { Single.just(emptyList()) }
 
-    override fun getOwnUser(): Single<UserDto> = userProvider()
+    override fun getOwnUser(): Single<UserDto> = ownUserProvider()
 
     override fun getUserPresence(userEmail: String): Single<PresenceDto> = presenceProvider()
 
-    override fun getAllUsers(): Single<List<UserDto>> {
-        throw UnsupportedOperationException()
-    }
+    override fun getAllUsers(): Single<List<UserDto>> = usersProvider()
 }

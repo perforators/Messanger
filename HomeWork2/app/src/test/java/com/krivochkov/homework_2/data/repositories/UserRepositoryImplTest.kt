@@ -17,7 +17,7 @@ class UserRepositoryImplTest {
     fun `getMyUser by default returns own user`() {
         val ownUser = createUserDto(id = 55, email = "krivochkov01@mail.ru", fullName = "Egor")
         val userRemoteDataSource = UserRemoteDataSourceStub().apply {
-            userProvider = { Single.just(ownUser) }
+            ownUserProvider = { Single.just(ownUser) }
         }
         val userRepository = UserRepositoryImpl(userRemoteDataSource)
 
@@ -27,6 +27,29 @@ class UserRepositoryImplTest {
             assertEquals("Egor", user.fullName)
             assertEquals("krivochkov01@mail.ru", user.email)
             assertEquals(55, user.id)
+            true
+        }
+    }
+
+    @Test
+    fun `getUsers by default returns user list`() {
+        val userList = listOf(
+            createUserDto(id = 1, fullName = "Andrey", email = "andrey@mail.ru"),
+            createUserDto(id = 2, fullName = "Egor", email = "egor@mail.ru"),
+            createUserDto(id = 3, fullName = "Anton", email = "anton@mail.ru")
+        )
+        val userRemoteDataSource = UserRemoteDataSourceStub().apply {
+            usersProvider = { Single.just(userList) }
+        }
+        val userRepository = UserRepositoryImpl(userRemoteDataSource)
+
+        val testObserver = userRepository.getUsers().test()
+
+        testObserver.assertValue { users ->
+            assertEquals(3, users.size)
+            assertEquals("Andrey", users[0].fullName)
+            assertEquals("Egor", users[1].fullName)
+            assertEquals("Anton", users[2].fullName)
             true
         }
     }

@@ -1,5 +1,6 @@
 package com.krivochkov.homework_2.presentation.profile.elm
 
+import android.accounts.NetworkErrorException
 import com.krivochkov.homework_2.domain.models.User
 import com.krivochkov.homework_2.stub.LoadMyUserUseCaseStub
 import com.krivochkov.homework_2.util.RxRule
@@ -28,6 +29,21 @@ class ProfileActorTest {
             assertTrue(event is ProfileEvent.Internal.ProfileLoaded)
             event as ProfileEvent.Internal.ProfileLoaded
             assertEquals(ownUser, event.profile)
+            true
+        }
+    }
+
+    @Test
+    fun `execute for LoadMyProfile command and by throwing out an error returns ErrorLoadingProfile event`() {
+        val loadMyUserUseCase = LoadMyUserUseCaseStub().apply {
+            userProvider = { Single.error(NetworkErrorException()) }
+        }
+        val profileActor = ProfileActor(loadMyUserUseCase)
+
+        val testObserver = profileActor.execute(ProfileCommand.LoadMyProfile).test()
+
+        testObserver.assertValue { event ->
+            assertTrue(event is ProfileEvent.Internal.ErrorLoadingProfile)
             true
         }
     }
