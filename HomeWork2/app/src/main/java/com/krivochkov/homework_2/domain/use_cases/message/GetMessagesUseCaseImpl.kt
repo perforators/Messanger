@@ -16,9 +16,10 @@ class GetMessagesUseCaseImpl @Inject constructor(
         numBefore: Int,
         cached: Boolean
     ): Single<List<Message>> {
-        return if (cached)
+        return if (cached) {
             messageRepository.getCachedMessages(channelName, topicName)
-        else
+        } else {
             messageRepository.getMessages(channelName, topicName, lastMessageId, numBefore)
+        }
     }
 }

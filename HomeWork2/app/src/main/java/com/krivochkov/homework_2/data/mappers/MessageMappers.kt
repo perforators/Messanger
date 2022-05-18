@@ -37,10 +37,10 @@ fun MessageEntity.mapToMessage() = Message(
     groupedReactions = groupedReactions
 )
 
-fun Message.mapToMessageEntity(channelName: String, topicName: String) = MessageEntity(
+fun Message.mapToMessageEntity(channelName: String) = MessageEntity(
     id = id,
     channelName = channelName,
-    topicName = topicName,
+    topicName = topic,
     userName = userName,
     avatar = avatarUrl,
     isMyMessage = isMyMessage,

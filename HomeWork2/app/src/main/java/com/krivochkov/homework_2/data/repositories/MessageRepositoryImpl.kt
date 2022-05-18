@@ -86,63 +86,70 @@ class MessageRepositoryImpl @Inject constructor(
 
     override fun getCachedMessages(channelName: String, topicName: String): Single<List<Message>> {
         return if (topicName.isNotEmpty()) {
-            messageLocalDataSource.getMessagesFromTopic(channelName, topicName)
+            messageLocalDataSource.getAllMessagesFromTopic(channelName, topicName)
         } else {
-            messageLocalDataSource.getMessagesFromChannel(channelName)
+            messageLocalDataSource.getAllMessagesFromChannel(channelName)
         }.map { it.map { messageEntity -> messageEntity.mapToMessage() } }
     }
 
     private fun cacheMessages(channelName: String, messages: List<Message>) {
         val groups = messages.groupBy { it.topic }
-        groups.forEach { cacheMessagesByTopic(channelName, it.key, it.value) }
+        groups.forEach { cacheMessagesForTopic(channelName, it.key, it.value) }
     }
 
-    private fun cacheMessagesByTopic(
+    private fun cacheMessagesForTopic(
         channelName: String,
         topicName: String,
         messages: List<Message>
     ) {
-        messageLocalDataSource.getMessagesFromTopic(channelName, topicName)
+        messageLocalDataSource.getAllMessagesFromTopic(channelName, topicName)
             .map { cachedMessages ->
-                val newMessages = messages.map { it.mapToMessageEntity(channelName, topicName) }
-                messageLocalDataSource.refreshMessages(
-                    channelName,
-                    topicName,
-                    getUpdatedListMessages(cachedMessages, newMessages)
+                val updatedMessages = getUpdatedMessageList(
+                    cachedMessages = cachedMessages,
+                    newMessages = messages.map { it.mapToMessageEntity(channelName) }
                 )
+                val resultList = if (updatedMessages.size > MAX_COUNT_CACHED_MESSAGES_FOR_TOPIC) {
+                    updatedMessages.subList(
+                        fromIndex = updatedMessages.size - MAX_COUNT_CACHED_MESSAGES_FOR_TOPIC,
+                        toIndex = updatedMessages.size
+                    )
+                }
+                else {
+                    updatedMessages
+                }
+                messageLocalDataSource.updateMessagesInTopic(channelName, topicName, resultList)
             }
             .subscribeOn(Schedulers.io())
             .subscribeBy(onError = { Log.d(TAG, it.printStackTrace().toString()) })
     }
 
-    private fun getUpdatedListMessages(
+    private fun getUpdatedMessageList(
         cachedMessages: List<MessageEntity>,
         newMessages: List<MessageEntity>
     ): List<MessageEntity> {
         if (newMessages.isEmpty()) return cachedMessages
         if (cachedMessages.isEmpty()) return newMessages
 
-        val resultMessages = mutableListOf<MessageEntity>().apply {
-            addAll(newMessages)
-            cachedMessages.forEach { message ->
-                if (find { message.id == it.id } == null) add(message)
+        val startTime = newMessages.first().date
+        val endTime = newMessages.last().date
+        val messagesBeforeStartTime = mutableListOf<MessageEntity>()
+        val messagesAfterEndTime = mutableListOf<MessageEntity>()
+
+        cachedMessages.forEach { cachedMessage ->
+            if (cachedMessage.date < startTime) {
+                messagesBeforeStartTime.add(cachedMessage)
+            } else if (cachedMessage.date > endTime) {
+                messagesAfterEndTime.add(cachedMessage)
             }
-            sortBy { it.date }
         }
 
-        return if (resultMessages.size > MAX_COUNT_CACHED_MESSAGES)
-            resultMessages.subList(
-                resultMessages.size - MAX_COUNT_CACHED_MESSAGES,
-                resultMessages.size
-            )
-        else
-            resultMessages
+        return messagesBeforeStartTime + newMessages + messagesAfterEndTime
     }
 
     companion object {
 
         private const val TAG = "MessageRepositoryImpl"
-        private const val MAX_COUNT_CACHED_MESSAGES = 50
+        private const val MAX_COUNT_CACHED_MESSAGES_FOR_TOPIC = 50
         private const val DEFAULT_TYPE = "stream"
         private const val DEFAULT_ANCHOR = "newest"
         private const val DEFAULT_NUM_AFTER = "0"

@@ -9,19 +9,19 @@ class MessageLocalDataSourceImpl @Inject constructor(
     private val dao: MessageDao
 ) : MessageLocalDataSource {
 
-    override fun getMessagesFromTopic(channelName: String, topicName: String): Single<List<MessageEntity>> {
-        return dao.getMessagesFromTopic(channelName, topicName)
+    override fun getAllMessagesFromTopic(channelName: String, topicName: String): Single<List<MessageEntity>> {
+        return dao.getAllMessagesFromTopic(channelName, topicName)
     }
 
-    override fun getMessagesFromChannel(channelName: String): Single<List<MessageEntity>> {
-        return dao.getMessagesFromChannel(channelName)
+    override fun getAllMessagesFromChannel(channelName: String): Single<List<MessageEntity>> {
+        return dao.getAllMessagesFromChannel(channelName)
     }
 
-    override fun refreshMessages(
+    override fun updateMessagesInTopic(
         channelName: String,
         topicName: String,
-        messages: List<MessageEntity>
+        newMessages: List<MessageEntity>
     ) {
-        dao.refreshMessages(channelName, topicName, messages)
+        dao.updateMessagesInTopic(channelName, topicName, newMessages)
     }
 }

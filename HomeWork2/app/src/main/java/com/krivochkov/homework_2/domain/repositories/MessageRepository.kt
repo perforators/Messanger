@@ -8,7 +8,7 @@ interface MessageRepository {
 
     fun getMessages(
         channelName: String,
-        topicName: String,
+        topicName: String = "",
         lastMessageId: Long,
         numBefore: Int
     ): Single<List<Message>>
