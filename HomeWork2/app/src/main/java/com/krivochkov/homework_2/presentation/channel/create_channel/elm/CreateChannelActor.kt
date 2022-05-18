@@ -28,7 +28,9 @@ class CreateChannelActor(
                             if (channelExists) {
                                 CreateChannelEvent.Internal.ChannelExists(command.name)
                             } else {
-                                CreateChannelEvent.Internal.ChannelNotExists(command.name, command.description)
+                                CreateChannelEvent.Internal.ChannelNotExists(
+                                    command.name, command.description
+                                )
                             }
                         },
                         { error -> CreateChannelEvent.Internal.ErrorCreatingChannel(error) }

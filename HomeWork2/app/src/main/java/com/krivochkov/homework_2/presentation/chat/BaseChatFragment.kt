@@ -7,6 +7,7 @@ import android.widget.ImageButton
 import android.widget.TextView
 import android.widget.Toast
 import androidx.annotation.LayoutRes
+import androidx.annotation.StringRes
 import androidx.core.view.isVisible
 import androidx.core.widget.doOnTextChanged
 import androidx.fragment.app.activityViewModels
@@ -154,7 +155,7 @@ abstract class BaseChatFragment(@LayoutRes contentLayoutId: Int) :
             setOnChoosingReactionListener { messageId ->
                 store.accept(ChatEvent.Ui.ShowEmojiPicker(messageId))
             }
-            setOnTopicClickListener { topic ->
+            setOnHeaderTopicClickListener { topic ->
                 store.accept(ChatEvent.Ui.ShowTopicChatContent(topic))
             }
         }
@@ -217,7 +218,7 @@ abstract class BaseChatFragment(@LayoutRes contentLayoutId: Int) :
             .show(childFragmentManager, EMOJI_PICK_FRAGMENT_TAG)
     }
 
-    private fun showToast(stringResId: Int) {
+    private fun showToast(@StringRes stringResId: Int) {
         val text = requireContext().getString(stringResId)
         Toast.makeText(requireContext(), text, Toast.LENGTH_LONG).show()
     }

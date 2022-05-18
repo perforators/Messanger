@@ -3,7 +3,7 @@ package com.krivochkov.homework_2.presentation.chat.mappers
 import com.krivochkov.homework_2.domain.models.Message
 import com.krivochkov.homework_2.domain.models.Topic
 import com.krivochkov.homework_2.presentation.Item
-import com.krivochkov.homework_2.presentation.chat.adapters.chat_adapter.items.BeginningTopicItem
+import com.krivochkov.homework_2.presentation.chat.adapters.chat_adapter.items.HeaderTopicItem
 import com.krivochkov.homework_2.presentation.chat.adapters.chat_adapter.items.DateSeparatorItem
 import com.krivochkov.homework_2.presentation.chat.adapters.chat_adapter.items.MessageItem
 import com.krivochkov.homework_2.utils.convertToDate
@@ -34,7 +34,7 @@ fun List<Message>.toMessageItemsWithDatesAndTopics(): List<Item> {
         timeGroup.value.forEach { message ->
             if (lastTopic == null || (lastTopic != null && message.topic != lastTopic)) {
                 lastTopic = message.topic
-                listItems += BeginningTopicItem(Topic(lastTopic!!))
+                listItems += HeaderTopicItem(Topic(lastTopic!!))
                 listItems += MessageItem(message)
             } else {
                 listItems += MessageItem(message)

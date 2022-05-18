@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.core.view.isVisible
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -37,7 +38,7 @@ class TopicPickFragment
     private val channelId: Long
         get() = args.channelId
 
-    private val binding: FragmentTopicPickBinding by viewBinding()
+    private val binding: FragmentTopicPickBinding by viewBinding(FragmentTopicPickBinding::bind)
 
     private lateinit var adapter: TopicPickAdapter
 
@@ -96,7 +97,7 @@ class TopicPickFragment
         }
     }
 
-    private fun showToast(stringResId: Int) {
+    private fun showToast(@StringRes stringResId: Int) {
         val text = requireContext().getString(stringResId)
         Toast.makeText(requireContext(), text, Toast.LENGTH_LONG).show()
     }

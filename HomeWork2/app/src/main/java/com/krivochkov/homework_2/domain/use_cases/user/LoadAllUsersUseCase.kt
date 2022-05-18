@@ -7,5 +7,9 @@ class LoadAllUsersUseCase @Inject constructor(
     private val repository: UserRepository
 ) : LoadUsersUseCase {
 
-    override operator fun invoke() = repository.getUsers()
+    override operator fun invoke(cached: Boolean) = if (cached) {
+        repository.getCachedUsers()
+    } else {
+        repository.getUsers()
+    }
 }

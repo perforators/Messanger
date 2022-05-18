@@ -18,12 +18,18 @@ sealed class MyProfileEvent {
 
     sealed class Internal : MyProfileEvent() {
         data class ProfileLoaded(val profile: User) : Internal()
+        data class CachedProfileLoaded(val profile: User) : Internal()
         data class ErrorLoadingProfile(val error: Throwable) : Internal()
+        data class ErrorLoadingCachedProfile(val error: Throwable) : Internal()
     }
 }
 
-sealed class MyProfileEffect
+sealed class MyProfileEffect {
+    object ShowErrorLoadingCachedMyProfile : MyProfileEffect()
+    object ShowErrorLoadingActualMyProfile : MyProfileEffect()
+}
 
 sealed class MyProfileCommand {
     object LoadMyProfile : MyProfileCommand()
+    object LoadCachedMyProfile : MyProfileCommand()
 }

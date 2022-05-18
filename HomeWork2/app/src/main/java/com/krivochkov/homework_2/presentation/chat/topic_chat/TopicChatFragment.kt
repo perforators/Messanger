@@ -25,7 +25,7 @@ class TopicChatFragment : BaseChatFragment(R.layout.fragment_topic_chat) {
     private val topicName: String
         get() = args.topic.name
 
-    private val viewBinding: FragmentTopicChatBinding by viewBinding()
+    private val viewBinding: FragmentTopicChatBinding by viewBinding(FragmentTopicChatBinding::bind)
 
     override val initEvent: ChatEvent
         get() = ChatEvent.Ui.Init(channelName, topicName)

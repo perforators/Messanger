@@ -34,7 +34,7 @@
         tools:layout="@layout/fragment_people" >
         <action
             android:id="@+id/action_navigation_people_to_otherProfileFragment"
-            app:destination="@id/otherProfileFragment" />
+            app:destination="@id/navigation_other_profile" />
     </fragment>
 
     <fragment
@@ -85,10 +85,11 @@
             app:argType="long"
             android:defaultValue="-1L" />
     </fragment>
+
     <fragment
-        android:id="@+id/otherProfileFragment"
+        android:id="@+id/navigation_other_profile"
         android:name="com.krivochkov.homework_2.presentation.profile.other_profile.OtherProfileFragment"
-        android:label="fragment_other_profile"
+        android:label="@string/title_other_channel"
         tools:layout="@layout/fragment_other_profile" >
         <argument
             android:name="user"

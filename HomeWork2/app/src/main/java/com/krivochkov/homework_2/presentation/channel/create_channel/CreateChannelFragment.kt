@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
@@ -25,7 +26,9 @@ class CreateChannelFragment :
     @Inject
     internal lateinit var createChannelViewModelFactory: CreateChannelViewModelFactory
 
-    private val binding: FragmentCreateChannelBinding by viewBinding()
+    private val binding: FragmentCreateChannelBinding by viewBinding(
+        FragmentCreateChannelBinding::bind
+    )
 
     private val viewModel: CreateChannelViewModel by viewModels { createChannelViewModelFactory }
 
@@ -96,7 +99,7 @@ class CreateChannelFragment :
         }
     }
 
-    private fun showToast(stringResId: Int) {
+    private fun showToast(@StringRes stringResId: Int) {
         val text = requireContext().getString(stringResId)
         Toast.makeText(requireContext(), text, Toast.LENGTH_LONG).show()
     }

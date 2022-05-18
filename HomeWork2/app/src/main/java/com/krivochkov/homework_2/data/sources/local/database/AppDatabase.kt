@@ -8,12 +8,14 @@ import com.krivochkov.homework_2.data.sources.local.converters.ReactionsListConv
 import com.krivochkov.homework_2.data.sources.local.dao.ChannelDao
 import com.krivochkov.homework_2.data.sources.local.dao.MessageDao
 import com.krivochkov.homework_2.data.sources.local.dao.TopicDao
+import com.krivochkov.homework_2.data.sources.local.dao.UserDao
 import com.krivochkov.homework_2.data.sources.local.entity.ChannelEntity
 import com.krivochkov.homework_2.data.sources.local.entity.MessageEntity
 import com.krivochkov.homework_2.data.sources.local.entity.TopicEntity
+import com.krivochkov.homework_2.data.sources.local.entity.UserEntity
 
 @Database(
-    entities = [ChannelEntity::class, TopicEntity::class, MessageEntity::class],
+    entities = [ChannelEntity::class, TopicEntity::class, MessageEntity::class, UserEntity::class],
     version = 1,
     exportSchema = false
 )
@@ -25,4 +27,6 @@ abstract class AppDatabase: RoomDatabase() {
     abstract fun topicDao(): TopicDao
 
     abstract fun messageDao(): MessageDao
+
+    abstract fun userDao(): UserDao
 }

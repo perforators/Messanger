@@ -3,6 +3,8 @@ package com.krivochkov.homework_2.presentation.profile.my_profile
 import android.content.Context
 import android.os.Bundle
 import android.view.*
+import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.core.view.isVisible
 import androidx.fragment.app.viewModels
 import by.kirich1409.viewbindingdelegate.viewBinding
@@ -14,6 +16,7 @@ import com.krivochkov.homework_2.domain.models.User
 import com.krivochkov.homework_2.presentation.profile.my_profile.elm.MyProfileEffect
 import com.krivochkov.homework_2.presentation.profile.my_profile.elm.MyProfileEvent
 import com.krivochkov.homework_2.presentation.profile.my_profile.elm.MyProfileState
+import com.krivochkov.homework_2.presentation.profile.utils.OFFLINE_STATUS
 import com.krivochkov.homework_2.presentation.profile.utils.getColorByStatus
 import com.krivochkov.homework_2.utils.loadImage
 import vivid.money.elmslie.android.base.ElmFragment
@@ -24,7 +27,7 @@ class MyProfileFragment : ElmFragment<MyProfileEvent, MyProfileEffect, MyProfile
     @Inject
     internal lateinit var profileViewModelFactory: MyProfileViewModelFactory
 
-    private val binding: FragmentMyProfileBinding by viewBinding()
+    private val binding: FragmentMyProfileBinding by viewBinding(FragmentMyProfileBinding::bind)
 
     private val viewModel: MyProfileViewModel by viewModels { profileViewModelFactory }
 
@@ -54,6 +57,15 @@ class MyProfileFragment : ElmFragment<MyProfileEvent, MyProfileEffect, MyProfile
         }
     }
 
+    override fun handleEffect(effect: MyProfileEffect) {
+        when (effect) {
+            is MyProfileEffect.ShowErrorLoadingCachedMyProfile ->
+                showToast(R.string.failed_load_cached_my_profile)
+            is MyProfileEffect.ShowErrorLoadingActualMyProfile ->
+                showToast(R.string.failed_load_actual_my_profile)
+        }
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initErrorView()
@@ -69,14 +81,20 @@ class MyProfileFragment : ElmFragment<MyProfileEvent, MyProfileEffect, MyProfile
 
     private fun showProfile(user: User) {
         binding.profile.apply {
-            if (user.avatarUrl == null)
+            if (user.avatarUrl == null) {
                 avatar.setImageResource(R.mipmap.ic_launcher)
-            else
+            } else {
                 avatar.loadImage(user.avatarUrl)
+            }
             fullName.text = user.fullName
-            onlineStatus.text = user.status
+            onlineStatus.text = user.status.ifEmpty { OFFLINE_STATUS }
             onlineStatus.setTextColor(getColorByStatus(user.status, requireContext()))
             profileLayout.isVisible = true
         }
+    }
+
+    private fun showToast(@StringRes stringResId: Int) {
+        val text = requireContext().getString(stringResId)
+        Toast.makeText(requireContext(), text, Toast.LENGTH_LONG).show()
     }
 }

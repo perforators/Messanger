@@ -16,7 +16,7 @@ import com.krivochkov.homework_2.presentation.channel.adapters.pager_adapter.Pag
 
 class ChannelFragment : Fragment(R.layout.fragment_channel) {
 
-    private val binding: FragmentChannelBinding by viewBinding()
+    private val binding: FragmentChannelBinding by viewBinding(FragmentChannelBinding::bind)
 
     private val sharedViewModel: SharedViewModel by activityViewModels()
 

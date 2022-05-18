@@ -3,9 +3,9 @@ package com.krivochkov.homework_2.presentation.channel.channels.elm
 import com.krivochkov.homework_2.domain.use_cases.channel.LoadChannelsUseCase
 import com.krivochkov.homework_2.domain.use_cases.channel.SearchChannelsUseCase
 import com.krivochkov.homework_2.domain.use_cases.topic.LoadTopicsUseCase
-import com.krivochkov.homework_2.presentation.elm_core.Switcher
 import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.items.ChannelItem
 import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.items.TopicItem
+import com.krivochkov.homework_2.presentation.elm_core.Switcher
 import io.reactivex.Observable
 import vivid.money.elmslie.core.ActorCompat
 

@@ -31,7 +31,9 @@ class ChannelRepositoryImpl @Inject constructor(
         return allChannels.zipWith(subscribedChannels) { all, subscribed ->
             channelLocalDataSource.updateAllChannels(
                 all.map { channelDto ->
-                    channelDto.mapToChannelEntity(subscribed.any { channelDto.id == it.id })
+                    channelDto.mapToChannelEntity(
+                        isSubscribed = subscribed.any { channelDto.id == it.id }
+                    )
                 }
             )
             all.map { it.mapToChannel() }

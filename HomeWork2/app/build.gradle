@@ -92,5 +92,5 @@ dependencies {
     androidTestImplementation "androidx.test.ext:junit:$junitExtVersion"
     androidTestImplementation "com.kaspersky.android-components:kaspresso:$kaspressoVersion"
 
-    implementation "com.github.kirich1409:viewbindingpropertydelegate:$viewBindingDelegateVersion"
+    implementation "com.github.kirich1409:viewbindingpropertydelegate-noreflection:$viewBindingDelegateVersion"
 }

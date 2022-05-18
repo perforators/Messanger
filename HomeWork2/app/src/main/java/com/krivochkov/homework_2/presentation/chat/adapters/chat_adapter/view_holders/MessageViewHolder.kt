@@ -25,10 +25,11 @@ class MessageViewHolder(
 
         binding.messageLayout.apply {
             removeAllEmoji()
-            if (message.avatarUrl == null)
+            if (message.avatarUrl == null) {
                 setAvatar(R.mipmap.ic_launcher)
-            else
+            } else {
                 setAvatar(message.avatarUrl)
+            }
             setMessage(message.text)
             setUserName(message.userName)
             isMyMessage = message.isMyMessage

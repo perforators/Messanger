@@ -29,13 +29,19 @@ class ChatActor(
                 { error -> ChatEvent.Internal.ErrorLoadingSingleMessage(error) }
             )
         is ChatCommand.LoadPage ->
-            getMessagesUseCase(command.channelName, command.topicName, command.lastMessageId, command.pageSize)
+            getMessagesUseCase(
+                command.channelName, command.topicName, command.lastMessageId, command.pageSize
+            )
                 .mapEvents(
-                    { messages -> ChatEvent.Internal.PageLoaded(messages, command.lastMessageId == 0L) },
+                    { messages ->
+                        ChatEvent.Internal.PageLoaded(messages, command.lastMessageId == 0L)
+                    },
                     { error -> ChatEvent.Internal.ErrorLoadingPage(error) }
                 )
         is ChatCommand.SendMessage ->
-            sendMessageUseCase(command.channelName, command.topicName, command.message, command.attachedFiles)
+            sendMessageUseCase(
+                command.channelName, command.topicName, command.message, command.attachedFiles
+            )
                 .mapEvents(
                     successEvent = ChatEvent.Internal.MessageSent,
                     failureEventMapper = { error -> ChatEvent.Internal.ErrorSendingMessage(error) }

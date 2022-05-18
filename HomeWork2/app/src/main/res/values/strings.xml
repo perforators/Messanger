@@ -8,6 +8,7 @@
     </string>
     <string name="title_channel_chat">Channel chat</string>
     <string name="title_topic_chat">Topic chat</string>
+    <string name="title_other_channel">Other channel</string>
     <string name="title_channels">Channels</string>
     <string name="title_people">People</string>
     <string name="title_topic_pick">People</string>
@@ -34,9 +35,21 @@
     <string name="failed_load_actual_topics">
         Не удалось загрузить актуальные топики. Проверьте интернет соединение!
     </string>
+    <string name="failed_load_cached_people">
+        Не удалось загрузить кэшированных пользователей
+    </string>
+    <string name="failed_search_actual_people">
+        Не удалось найти актуальные профили пользователей. Проверьте интернет соединение!
+    </string>
     <string name="failed_load_cached_channels">Не удалось загрузить кэшированные каналы</string>
     <string name="failed_search_actual_channels">
         Не удалось найти актуальные каналы. Проверьте интернет соединение!
+    </string>
+    <string name="failed_load_cached_my_profile">
+        Не удалось загрузить свой кэшированный профиль
+    </string>
+    <string name="failed_load_actual_my_profile">
+        Не удалось загрузить свой актуальный профиль. Проверьте интернет соединение!
     </string>
     <string name="failed_load_cached_topics">Не удалось загрузить кэшированные каналы</string>
     <string name="failed_load_cached_messages">Не удалось загрузить кэшированные сообщения</string>

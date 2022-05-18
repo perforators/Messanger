@@ -12,8 +12,23 @@ class PeopleReducer : ScreenDslReducer<PeopleEvent, PeopleEvent.Ui, PeopleEvent.
             is PeopleEvent.Internal.PeopleFound -> {
                 state { copy(isLoading = false, error = null, people = event.people) }
             }
+            is PeopleEvent.Internal.CachedPeopleLoaded -> {
+                state {
+                    copy(isLoading = event.people.isEmpty(), error = null, people = event.people)
+                }
+                commands { +PeopleCommand.SearchPeople() }
+            }
             is PeopleEvent.Internal.ErrorSearchPeople -> {
-                state { copy(isLoading = false, error = event.error) }
+                if (state.people.isEmpty()) {
+                    state { copy(isLoading = false, error = event.error) }
+                } else {
+                    state { copy(isLoading = false) }
+                    effects { +PeopleEffect.ShowErrorSearchingActualPeople }
+                }
+            }
+            is PeopleEvent.Internal.ErrorLoadingCachedPeople -> {
+                effects { +PeopleEffect.ShowErrorLoadingCachedPeople }
+                commands { +PeopleCommand.SearchPeople() }
             }
         }
     }
@@ -23,7 +38,7 @@ class PeopleReducer : ScreenDslReducer<PeopleEvent, PeopleEvent.Ui, PeopleEvent.
             is PeopleEvent.Ui.Init -> {
                 if (state.isInitialized.not()) {
                     state { copy(isLoading = true, isInitialized = true, error = null) }
-                    commands { +PeopleCommand.SearchPeople() }
+                    commands { +PeopleCommand.LoadCachedPeople }
                 } else {
                     Any()
                 }

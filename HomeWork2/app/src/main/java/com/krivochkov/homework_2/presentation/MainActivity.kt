@@ -33,7 +33,8 @@ class MainActivity : AppCompatActivity() {
                 R.id.navigation_channel_chat,
                 R.id.navigation_create_channel,
                 R.id.navigation_topic_pick,
-                R.id.navigation_topic_chat -> {
+                R.id.navigation_topic_chat,
+                R.id.navigation_other_profile -> {
                     window.statusBarColor = getColor(R.color.teal)
                     hideBottomNav()
                 }

@@ -15,7 +15,9 @@ import com.krivochkov.homework_2.utils.loadImage
 
 class OtherProfileFragment : Fragment(R.layout.fragment_other_profile) {
 
-    private val binding: FragmentOtherProfileBinding by viewBinding()
+    private val binding: FragmentOtherProfileBinding by viewBinding(
+        FragmentOtherProfileBinding::bind
+    )
 
     private val args by navArgs<OtherProfileFragmentArgs>()
 

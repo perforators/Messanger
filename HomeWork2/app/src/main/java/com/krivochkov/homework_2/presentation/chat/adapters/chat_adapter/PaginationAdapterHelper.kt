@@ -11,6 +11,6 @@ class PaginationAdapterHelper(
     }
 
     companion object {
-        private const val DEFAULT_LOAD_MORE_SUBSTITUTIONS = 4
+        private const val DEFAULT_LOAD_MORE_SUBSTITUTIONS = 3
     }
 }

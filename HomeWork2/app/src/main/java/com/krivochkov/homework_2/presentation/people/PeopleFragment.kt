@@ -3,6 +3,8 @@ package com.krivochkov.homework_2.presentation.people
 import android.content.Context
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
+import androidx.annotation.StringRes
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
@@ -26,7 +28,7 @@ class PeopleFragment : ElmFragment<PeopleEvent, PeopleEffect, PeopleState>(R.lay
     @Inject
     internal lateinit var peopleViewModelFactory: PeopleViewModelFactory
 
-    private val binding: FragmentPeopleBinding by viewBinding()
+    private val binding: FragmentPeopleBinding by viewBinding(FragmentPeopleBinding::bind)
 
     private lateinit var adapter: PeopleAdapter
 
@@ -62,6 +64,10 @@ class PeopleFragment : ElmFragment<PeopleEvent, PeopleEffect, PeopleState>(R.lay
     override fun handleEffect(effect: PeopleEffect) {
         when (effect) {
             is PeopleEffect.ShowUserDetailScreen -> navigateToUserDetailScreen(effect.user)
+            is PeopleEffect.ShowErrorLoadingCachedPeople ->
+                showToast(R.string.failed_load_cached_people)
+            is PeopleEffect.ShowErrorSearchingActualPeople ->
+                showToast(R.string.failed_search_actual_people)
         }
     }
 
@@ -111,5 +117,10 @@ class PeopleFragment : ElmFragment<PeopleEvent, PeopleEffect, PeopleState>(R.lay
         findNavController().navigate(
             PeopleFragmentDirections.actionNavigationPeopleToOtherProfileFragment(user)
         )
+    }
+
+    private fun showToast(@StringRes stringResId: Int) {
+        val text = requireContext().getString(stringResId)
+        Toast.makeText(requireContext(), text, Toast.LENGTH_LONG).show()
     }
 }

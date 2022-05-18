@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.annotation.LayoutRes
+import androidx.annotation.StringRes
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -64,13 +65,13 @@ abstract class BaseChannelsFragment(@LayoutRes contentLayoutId: Int) :
             is ChannelEffect.ShowCreateChannelScreen ->
                 sharedViewModel.showCreateChannelScreen()
             is ChannelEffect.ShowErrorLoadingCachedTopics ->
-                showToast(requireContext().getString(R.string.failed_load_cached_topics))
+                showToast(R.string.failed_load_cached_topics)
             is ChannelEffect.ShowErrorLoadingActualTopics ->
-                showToast(requireContext().getString(R.string.failed_load_actual_topics))
+                showToast(R.string.failed_load_actual_topics)
             is ChannelEffect.ShowErrorLoadingCachedChannels ->
-                showToast(requireContext().getString(R.string.failed_load_cached_channels))
+                showToast(R.string.failed_load_cached_channels)
             is ChannelEffect.ShowErrorSearchingActualChannels ->
-                showToast(requireContext().getString(R.string.failed_search_actual_channels))
+                showToast(R.string.failed_search_actual_channels)
             is ChannelEffect.ShowChannelContent -> sharedViewModel.selectChannel(effect.channel)
         }
     }
@@ -115,7 +116,8 @@ abstract class BaseChannelsFragment(@LayoutRes contentLayoutId: Int) :
         errorView.text = requireContext().getString(R.string.error_text)
     }
 
-    private fun showToast(text: String) {
+    private fun showToast(@StringRes stringResId: Int) {
+        val text = requireContext().getString(stringResId)
         Toast.makeText(requireContext(), text, Toast.LENGTH_LONG).show()
     }
 }

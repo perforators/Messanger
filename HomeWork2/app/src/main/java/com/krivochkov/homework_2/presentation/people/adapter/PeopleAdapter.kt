@@ -57,10 +57,7 @@ class PeopleAdapter(
         differ.submitList(users, onCommitted)
     }
 
-    override fun onCreateViewHolder(
-        parent: ViewGroup,
-        viewType: Int
-    ): UserViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
         return UserViewHolder(
             UserItemBinding.inflate(
                 LayoutInflater.from(parent.context),

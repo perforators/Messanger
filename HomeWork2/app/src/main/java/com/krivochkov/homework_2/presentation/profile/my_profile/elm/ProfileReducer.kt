@@ -12,8 +12,20 @@ class ProfileReducer : ScreenDslReducer<MyProfileEvent, MyProfileEvent.Ui, MyPro
             is MyProfileEvent.Internal.ProfileLoaded -> {
                 state { copy(isLoading = false, error = null, profile = event.profile) }
             }
+            is MyProfileEvent.Internal.CachedProfileLoaded -> {
+                state { copy(isLoading = false, error = null, profile = event.profile) }
+                commands { +MyProfileCommand.LoadMyProfile }
+            }
             is MyProfileEvent.Internal.ErrorLoadingProfile -> {
-                state { copy(isLoading = false, error = event.error) }
+                if (state.profile == null) {
+                    state { copy(isLoading = false, error = event.error) }
+                } else {
+                    effects { +MyProfileEffect.ShowErrorLoadingActualMyProfile }
+                }
+            }
+            is MyProfileEvent.Internal.ErrorLoadingCachedProfile -> {
+                effects { +MyProfileEffect.ShowErrorLoadingCachedMyProfile }
+                commands { +MyProfileCommand.LoadMyProfile }
             }
         }
     }
@@ -23,7 +35,7 @@ class ProfileReducer : ScreenDslReducer<MyProfileEvent, MyProfileEvent.Ui, MyPro
             is MyProfileEvent.Ui.Init -> {
                 if (state.isInitialized.not()) {
                     state { copy(isLoading = true, isInitialized = true, error = null) }
-                    commands { +MyProfileCommand.LoadMyProfile }
+                    commands { +MyProfileCommand.LoadCachedMyProfile }
                 } else {
                     Any()
                 }

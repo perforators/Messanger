@@ -14,5 +14,10 @@ class ProfileActor(
                 { profile -> MyProfileEvent.Internal.ProfileLoaded(profile) },
                 { error -> MyProfileEvent.Internal.ErrorLoadingProfile(error) }
             )
+        is MyProfileCommand.LoadCachedMyProfile -> loadMyUserUseCase(cached = true)
+            .mapEvents(
+                { profile -> MyProfileEvent.Internal.CachedProfileLoaded(profile) },
+                { error -> MyProfileEvent.Internal.ErrorLoadingCachedProfile(error) }
+            )
     }
 }

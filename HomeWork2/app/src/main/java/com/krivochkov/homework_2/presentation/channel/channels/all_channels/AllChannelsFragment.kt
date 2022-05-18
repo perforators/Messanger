@@ -21,7 +21,7 @@ class AllChannelsFragment : BaseChannelsFragment(R.layout.fragment_all_channels)
     @AllChannels
     override lateinit var channelsViewModelFactory: ChannelsViewModelFactory
 
-    private val binding: FragmentAllChannelsBinding by viewBinding()
+    private val binding: FragmentAllChannelsBinding by viewBinding(FragmentAllChannelsBinding::bind)
 
     override fun onAttach(context: Context) {
         super.onAttach(context)

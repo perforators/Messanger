@@ -87,7 +87,9 @@ class EmojiView @JvmOverloads constructor(
     }
 
     override fun onCreateDrawableState(extraSpace: Int): IntArray {
-        val drawableState = super.onCreateDrawableState(extraSpace + SUPPORTED_DRAWABLE_STATE.size)
+        val drawableState = super.onCreateDrawableState(
+            extraSpace + SUPPORTED_DRAWABLE_STATE.size
+        )
         if (isSelected) {
             mergeDrawableStates(drawableState, SUPPORTED_DRAWABLE_STATE)
         }

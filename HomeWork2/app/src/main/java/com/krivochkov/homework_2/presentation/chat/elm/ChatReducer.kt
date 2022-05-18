@@ -37,7 +37,8 @@ class ChatReducer : ScreenDslReducer<ChatEvent, ChatEvent.Ui, ChatEvent.Internal
                             addAll(this.lastIndex + 1, event.messages)
                         }
                     } else {
-                        val updatedMessages = state.items.subList(0, indexOfOccurrence).toMutableList()
+                        val updatedMessages =
+                            state.items.subList(0, indexOfOccurrence).toMutableList()
                         updatedMessages.apply { addAll(indexOfOccurrence, event.messages) }
                     }
                 } else if (event.isFirstPage && state.areCachedItemsSet) {
@@ -65,7 +66,9 @@ class ChatReducer : ScreenDslReducer<ChatEvent, ChatEvent.Ui, ChatEvent.Internal
             }
             is ChatEvent.Internal.MessageSent -> {
                 commands {
-                    +ChatCommand.LoadPage(state.channelName, state.topicName, 0, state.pageSize)
+                    +ChatCommand.LoadPage(
+                        state.channelName, state.topicName, 0, state.pageSize
+                    )
                 }
             }
             is ChatEvent.Internal.ReactionUpdated -> {
@@ -138,7 +141,9 @@ class ChatReducer : ScreenDslReducer<ChatEvent, ChatEvent.Ui, ChatEvent.Internal
                 if (state.items.contains(LoadingItem)) {
                     Any()
                 } else {
-                    state { copy(items = listOf(LoadingItem) + items, error = null, isLoading = false) }
+                    state {
+                        copy(items = listOf(LoadingItem) + items, error = null, isLoading = false)
+                    }
                     commands {
                         +ChatCommand.LoadPage(
                             state.channelName, state.topicName, state.lastMessageId, state.pageSize
@@ -174,7 +179,10 @@ class ChatReducer : ScreenDslReducer<ChatEvent, ChatEvent.Ui, ChatEvent.Internal
                 state { copy(attachedFiles = emptyList()) }
                 commands {
                     +ChatCommand.SendMessage(
-                        state.channelName, state.topicForSendingMessages, event.message, attachedFiles
+                        state.channelName,
+                        state.topicForSendingMessages,
+                        event.message,
+                        attachedFiles
                     )
                 }
             }
@@ -188,8 +196,12 @@ class ChatReducer : ScreenDslReducer<ChatEvent, ChatEvent.Ui, ChatEvent.Internal
                 commands { +ChatCommand.RemoveReaction(event.messageId, event.emoji.name) }
             }
             is ChatEvent.Ui.UpdateReaction -> {
-                val message = state.items.find { it is Message && it.id == event.messageId } as? Message
-                val groupedReaction = message?.groupedReactions?.find { it.emoji.name == event.emoji.name }
+                val message = state.items.find {
+                    it is Message && it.id == event.messageId
+                } as? Message
+                val groupedReaction = message?.groupedReactions?.find {
+                    it.emoji.name == event.emoji.name
+                }
                 if (groupedReaction == null || !groupedReaction.isSelected) {
                     commands { +ChatCommand.AddReaction(event.messageId, event.emoji.name) }
                 } else {

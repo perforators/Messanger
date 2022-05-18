@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.krivochkov.homework_2.data.sources.local.dao.ChannelDao
 import com.krivochkov.homework_2.data.sources.local.dao.MessageDao
 import com.krivochkov.homework_2.data.sources.local.dao.TopicDao
+import com.krivochkov.homework_2.data.sources.local.dao.UserDao
 import com.krivochkov.homework_2.data.sources.local.database.AppDatabase
 import dagger.Module
 import dagger.Provides
@@ -31,6 +32,9 @@ class PersistenceModule {
 
     @Provides
     fun provideTopicDao(database: AppDatabase): TopicDao = database.topicDao()
+
+    @Provides
+    fun provideUserDao(database: AppDatabase): UserDao = database.userDao()
 
     companion object {
 

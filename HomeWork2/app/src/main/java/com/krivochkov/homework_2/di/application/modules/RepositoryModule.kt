@@ -53,4 +53,7 @@ interface RepositoryModule {
 
     @Binds
     fun bindUserRemoteDataSource(impl: UserRemoteDataSourceImpl): UserRemoteDataSource
+
+    @Binds
+    fun bindUserLocalDataSource(impl: UserLocalDataSourceImpl): UserLocalDataSource
 }

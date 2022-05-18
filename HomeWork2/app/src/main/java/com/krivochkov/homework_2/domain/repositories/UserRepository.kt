@@ -7,5 +7,9 @@ interface UserRepository {
 
     fun getUsers(): Single<List<User>>
 
+    fun getCachedUsers(): Single<List<User>>
+
     fun getMyUser(): Single<User>
+
+    fun getCachedMyUser(): Single<User>
 }

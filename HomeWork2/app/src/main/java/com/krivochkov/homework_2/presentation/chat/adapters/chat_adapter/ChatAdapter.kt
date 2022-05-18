@@ -12,10 +12,10 @@ import com.krivochkov.homework_2.domain.models.Topic
 import com.krivochkov.homework_2.presentation.BaseViewHolder
 import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.items.LoadingItem
 import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.view_holders.LoadingViewHolder
-import com.krivochkov.homework_2.presentation.chat.adapters.chat_adapter.items.BeginningTopicItem
+import com.krivochkov.homework_2.presentation.chat.adapters.chat_adapter.items.HeaderTopicItem
 import com.krivochkov.homework_2.presentation.chat.adapters.chat_adapter.items.DateSeparatorItem
 import com.krivochkov.homework_2.presentation.chat.adapters.chat_adapter.items.MessageItem
-import com.krivochkov.homework_2.presentation.chat.adapters.chat_adapter.view_holders.BeginningTopicViewHolder
+import com.krivochkov.homework_2.presentation.chat.adapters.chat_adapter.view_holders.HeaderTopicViewHolder
 import com.krivochkov.homework_2.presentation.chat.adapters.chat_adapter.view_holders.DateSeparatorViewHolder
 import com.krivochkov.homework_2.presentation.chat.adapters.chat_adapter.view_holders.MessageViewHolder
 import java.lang.IllegalStateException
@@ -33,7 +33,7 @@ class ChatAdapter(
     private var onAddMyReaction: (messageId: Long, emoji: Emoji) -> Unit = { _, _ -> }
     private var onRemoveMyReaction: (messageId: Long, emoji: Emoji) -> Unit = { _, _ -> }
     private var onChoosingReaction: (messageId: Long) -> Unit = {  }
-    private var onTopicClick: (topic: Topic) -> Unit = {  }
+    private var onHeaderTopicClick: (topic: Topic) -> Unit = {  }
 
     private fun submitList(items: List<Item>, onCommitted: (() -> Unit)? = null) {
         differ.submitList(items, onCommitted)
@@ -51,8 +51,8 @@ class ChatAdapter(
         onChoosingReaction = listener
     }
 
-    fun setOnTopicClickListener(listener: (topic: Topic) -> Unit) {
-        onTopicClick = listener
+    fun setOnHeaderTopicClickListener(listener: (topic: Topic) -> Unit) {
+        onHeaderTopicClick = listener
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
@@ -81,13 +81,13 @@ class ChatAdapter(
                     false
                 )
             )
-            BeginningTopicItem.TYPE -> BeginningTopicViewHolder(
-                BeginningTopicItemBinding.inflate(
+            HeaderTopicItem.TYPE -> HeaderTopicViewHolder(
+                HeaderTopicItemBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent,
                     false
                 ),
-                onTopicClick
+                onHeaderTopicClick
             )
             else -> throw IllegalStateException("Unknown viewType")
         }
@@ -98,8 +98,8 @@ class ChatAdapter(
             is MessageViewHolder -> holder.bind(differ.currentList[position] as MessageItem)
             is DateSeparatorViewHolder -> holder
                 .bind(differ.currentList[position] as DateSeparatorItem)
-            is BeginningTopicViewHolder -> holder
-                .bind(differ.currentList[position] as BeginningTopicItem)
+            is HeaderTopicViewHolder -> holder
+                .bind(differ.currentList[position] as HeaderTopicItem)
         }
         paginationAdapterHelper.onBind(position)
     }

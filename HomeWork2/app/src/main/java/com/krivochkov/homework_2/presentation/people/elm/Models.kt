@@ -20,15 +20,20 @@ sealed class PeopleEvent {
     }
 
     sealed class Internal : PeopleEvent() {
+        data class CachedPeopleLoaded(val people: List<User>) : Internal()
         data class PeopleFound(val people: List<User>) : Internal()
         data class ErrorSearchPeople(val error: Throwable) : Internal()
+        data class ErrorLoadingCachedPeople(val error: Throwable) : Internal()
     }
 }
 
 sealed class PeopleEffect {
     data class ShowUserDetailScreen(val user: User) : PeopleEffect()
+    object ShowErrorLoadingCachedPeople : PeopleEffect()
+    object ShowErrorSearchingActualPeople : PeopleEffect()
 }
 
 sealed class PeopleCommand {
     data class SearchPeople(val query: String = "") : PeopleCommand()
+    object LoadCachedPeople : PeopleCommand()
 }

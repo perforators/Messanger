@@ -21,7 +21,9 @@ class SubscribedChannelsFragment : BaseChannelsFragment(R.layout.fragment_subscr
     @SubscribedChannels
     override lateinit var channelsViewModelFactory: ChannelsViewModelFactory
 
-    private val binding: FragmentSubscribedChannelsBinding by viewBinding()
+    private val binding: FragmentSubscribedChannelsBinding by viewBinding(
+        FragmentSubscribedChannelsBinding::bind
+    )
 
     override fun onAttach(context: Context) {
         super.onAttach(context)

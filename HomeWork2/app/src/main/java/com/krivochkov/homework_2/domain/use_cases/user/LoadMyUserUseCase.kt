@@ -5,5 +5,5 @@ import io.reactivex.Single
 
 interface LoadMyUserUseCase {
 
-    operator fun invoke(): Single<User>
+    operator fun invoke(cached: Boolean = false): Single<User>
 }
