@@ -7,5 +7,9 @@ class LoadAllChannelsUseCase @Inject constructor(
     private val repository: ChannelRepository
 ) : LoadChannelsUseCase {
 
-    override operator fun invoke(cached: Boolean) = repository.getAllChannels(cached)
+    override operator fun invoke(cached: Boolean) = if (cached) {
+        repository.getCachedAllChannels()
+    } else {
+        repository.getAllChannels()
+    }
 }

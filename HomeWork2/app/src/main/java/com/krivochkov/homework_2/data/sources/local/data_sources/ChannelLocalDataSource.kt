@@ -9,5 +9,7 @@ interface ChannelLocalDataSource {
 
     fun getSubscribedChannels(): Single<List<ChannelEntity>>
 
-    fun refreshChannelsByCategory(subscribed: Boolean, channels: List<ChannelEntity>)
+    fun updateAllChannels(newChannels: List<ChannelEntity>)
+
+    fun updateSubscribedChannels(newChannels: List<ChannelEntity>)
 }

@@ -17,7 +17,11 @@ class ChannelLocalDataSourceImpl @Inject constructor(
         return dao.getSubscribedChannels()
     }
 
-    override fun refreshChannelsByCategory(subscribed: Boolean, channels: List<ChannelEntity>) {
-        dao.refreshChannels(subscribed, channels)
+    override fun updateAllChannels(newChannels: List<ChannelEntity>) {
+        dao.updateAllChannels(newChannels)
+    }
+
+    override fun updateSubscribedChannels(newChannels: List<ChannelEntity>) {
+        dao.updateSubscribedChannels(newChannels)
     }
 }

@@ -14,6 +14,6 @@ class TopicLocalDataSourceImpl @Inject constructor(
     }
 
     override fun refreshTopicsByChannelId(channelId: Long, newTopics: List<TopicEntity>) {
-        dao.refreshTopics(channelId, newTopics)
+        dao.updateTopics(channelId, newTopics)
     }
 }

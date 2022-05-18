@@ -24,37 +24,25 @@ class ChannelRepositoryImpl @Inject constructor(
     private val topicLocalDataSource: TopicLocalDataSource
 ) : ChannelRepository {
 
-    override fun getAllChannels(cached: Boolean): Single<List<Channel>> {
-        if (cached) return getCachedAllChannels()
-
+    override fun getAllChannels(): Single<List<Channel>> {
         val allChannels = channelRemoteDataSource.getAllChannels()
         val subscribedChannels = channelRemoteDataSource.getSubscribedChannels()
 
         return allChannels.zipWith(subscribedChannels) { all, subscribed ->
-            val notSubscribed = all.toMutableList().apply { removeAll(subscribed) }
-
-            channelLocalDataSource.refreshChannelsByCategory(
-                false,
-                notSubscribed.map { channelDto -> channelDto.mapToChannelEntity(false) },
+            channelLocalDataSource.updateAllChannels(
+                all.map { channelDto ->
+                    channelDto.mapToChannelEntity(subscribed.any { channelDto.id == it.id })
+                }
             )
-
-            channelLocalDataSource.refreshChannelsByCategory(
-                true,
-                subscribed.map { channelDto -> channelDto.mapToChannelEntity(true) },
-            )
-
             all.map { it.mapToChannel() }
         }
     }
 
-    override fun getSubscribedChannels(cached: Boolean): Single<List<Channel>> {
-        if (cached) return getCachedSubscribedChannels()
-
+    override fun getSubscribedChannels(): Single<List<Channel>> {
         return channelRemoteDataSource.getSubscribedChannels()
             .map {
-                channelLocalDataSource.refreshChannelsByCategory(
-                    true,
-                    it.map { channelDto -> channelDto.mapToChannelEntity(true) }
+                channelLocalDataSource.updateSubscribedChannels(
+                    it.map { channelDto -> channelDto.mapToChannelEntity(isSubscribed = true) }
                 )
                 it.map { channelDto -> channelDto.mapToChannel() }
             }
@@ -92,12 +80,12 @@ class ChannelRepositoryImpl @Inject constructor(
         return channelRemoteDataSource.subscribeToChannels(Json.encodeToString(subscription))
     }
 
-    private fun getCachedAllChannels(): Single<List<Channel>> {
+    override fun getCachedAllChannels(): Single<List<Channel>> {
         return channelLocalDataSource.getAllChannels()
             .map { it.map { channelEntity -> channelEntity.mapToChannel() } }
     }
 
-    private fun getCachedSubscribedChannels(): Single<List<Channel>> {
+    override fun getCachedSubscribedChannels(): Single<List<Channel>> {
         return channelLocalDataSource.getSubscribedChannels()
             .map { it.map { channelEntity -> channelEntity.mapToChannel() } }
     }

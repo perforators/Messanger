@@ -7,5 +7,9 @@ class LoadSubscribedChannelsUseCase @Inject constructor(
     private val repository: ChannelRepository
 ) : LoadChannelsUseCase {
 
-    override operator fun invoke(cached: Boolean) = repository.getSubscribedChannels(cached)
+    override operator fun invoke(cached: Boolean) = if (cached) {
+        repository.getCachedSubscribedChannels()
+    } else {
+        repository.getSubscribedChannels()
+    }
 }

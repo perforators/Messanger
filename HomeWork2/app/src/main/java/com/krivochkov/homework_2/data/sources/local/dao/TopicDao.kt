@@ -17,7 +17,7 @@ interface TopicDao {
     fun deleteTopicsByChannelId(channelId: Long)
 
     @Transaction
-    fun refreshTopics(channelId: Long, newTopics: List<TopicEntity>) {
+    fun updateTopics(channelId: Long, newTopics: List<TopicEntity>) {
         deleteTopicsByChannelId(channelId)
         insertTopics(newTopics)
     }

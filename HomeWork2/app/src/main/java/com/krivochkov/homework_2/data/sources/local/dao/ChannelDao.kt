@@ -16,12 +16,21 @@ interface ChannelDao {
     @Query("SELECT * FROM channels WHERE isSubscribed = 1")
     fun getSubscribedChannels(): Single<List<ChannelEntity>>
 
-    @Query("DELETE FROM channels WHERE isSubscribed = :subscribed")
-    fun deleteChannelsByCategory(subscribed: Boolean)
+    @Query("DELETE FROM channels")
+    fun deleteAllChannels()
+
+    @Query("DELETE FROM channels WHERE isSubscribed = 1")
+    fun deleteSubscribedChannels()
 
     @Transaction
-    fun refreshChannels(subscribed: Boolean, newChannels: List<ChannelEntity>) {
-        deleteChannelsByCategory(subscribed)
+    fun updateAllChannels(newChannels: List<ChannelEntity>) {
+        deleteAllChannels()
+        insertChannels(newChannels)
+    }
+
+    @Transaction
+    fun updateSubscribedChannels(newChannels: List<ChannelEntity>) {
+        deleteSubscribedChannels()
         insertChannels(newChannels)
     }
 }
