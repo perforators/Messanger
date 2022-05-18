@@ -15,6 +15,12 @@ interface ZulipApi {
     @GET("users/me/subscriptions")
     fun getSubscribedChannels(): Single<SubscribedChannelsResponse>
 
+    @GET("get_stream_id")
+    fun getChannelId(@Query("stream") channelName: String): Single<ChannelIdResponse>
+
+    @POST("users/me/subscriptions")
+    fun subscribeToChannels(@Query("subscriptions") subscriptions: String): Completable
+
     @GET("users/me/{stream_id}/topics")
     fun getTopicsInChannel(@Path("stream_id") channelId: Long): Single<TopicsResponse>
 

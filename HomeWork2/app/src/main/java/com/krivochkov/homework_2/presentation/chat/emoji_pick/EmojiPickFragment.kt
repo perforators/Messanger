@@ -13,6 +13,7 @@ import com.krivochkov.homework_2.databinding.FragmentEmojiPickBinding
 import com.krivochkov.homework_2.domain.models.Emoji
 import com.krivochkov.homework_2.utils.dpToPx
 
+
 class EmojiPickFragment : BottomSheetDialogFragment() {
 
     private var _binding: FragmentEmojiPickBinding? = null

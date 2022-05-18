@@ -7,7 +7,7 @@ interface GetMessagesUseCase {
 
     operator fun invoke(
         channelName: String,
-        topicName: String,
+        topicName: String = "",
         lastMessageId: Long = 0,
         numBefore: Int = 1000,
         cached: Boolean = false

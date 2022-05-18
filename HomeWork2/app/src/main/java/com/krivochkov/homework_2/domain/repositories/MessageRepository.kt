@@ -15,7 +15,7 @@ interface MessageRepository {
 
     fun getSingleMessage(messageId: Long): Single<Message>
 
-    fun getCachedMessages(channelName: String, topicName: String): Single<List<Message>>
+    fun getCachedMessages(channelName: String, topicName: String = ""): Single<List<Message>>
 
     fun sendMessage(channelName: String, topicName: String, content: String): Completable
 

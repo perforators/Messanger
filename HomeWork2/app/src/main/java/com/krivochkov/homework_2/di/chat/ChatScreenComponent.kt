@@ -3,7 +3,7 @@ package com.krivochkov.homework_2.di.chat
 import com.krivochkov.homework_2.di.chat.annotations.ChatScreenScope
 import com.krivochkov.homework_2.di.chat.modules.ChatDomainModule
 import com.krivochkov.homework_2.di.chat.modules.ChatElmModule
-import com.krivochkov.homework_2.presentation.chat.ChatFragment
+import com.krivochkov.homework_2.presentation.chat.BaseChatFragment
 import dagger.Component
 
 @ChatScreenScope
@@ -13,7 +13,7 @@ import dagger.Component
 )
 interface ChatScreenComponent {
 
-    fun inject(fragment: ChatFragment)
+    fun inject(fragment: BaseChatFragment)
 
     @Component.Factory
     interface Factory {

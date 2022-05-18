@@ -8,10 +8,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.krivochkov.homework_2.R
 import com.krivochkov.homework_2.databinding.UserItemBinding
 import com.krivochkov.homework_2.domain.models.User
-import com.krivochkov.homework_2.presentation.profile.ProfileFragment
+import com.krivochkov.homework_2.presentation.profile.utils.ACTIVE_STATUS
+import com.krivochkov.homework_2.presentation.profile.utils.IDLE_STATUS
+import com.krivochkov.homework_2.presentation.profile.utils.OFFLINE_STATUS
 import com.krivochkov.homework_2.utils.loadImage
 
-class PeopleAdapter : RecyclerView.Adapter<PeopleAdapter.UserViewHolder>() {
+class PeopleAdapter(
+    private val onUserClick: (User) -> Unit = {  }
+) : RecyclerView.Adapter<PeopleAdapter.UserViewHolder>() {
 
     private val differ: AsyncListDiffer<User> = AsyncListDiffer(this, DiffCallback())
 
@@ -22,24 +26,27 @@ class PeopleAdapter : RecyclerView.Adapter<PeopleAdapter.UserViewHolder>() {
         override fun areContentsTheSame(oldItem: User, newItem: User) = oldItem == newItem
     }
 
-    class UserViewHolder(private val binding: UserItemBinding)
-        : RecyclerView.ViewHolder(binding.root) {
+    class UserViewHolder(
+        private val binding: UserItemBinding,
+        private val onUserClick: (User) -> Unit = {  }
+    ) : RecyclerView.ViewHolder(binding.root) {
 
         fun bind(user: User) {
             binding.apply {
-                if (user.avatarUrl == null)
+                userItem.setOnClickListener {
+                    onUserClick(user)
+                }
+                if (user.avatarUrl == null) {
                     avatar.setImageResource(R.mipmap.ic_launcher)
-                else
+                } else {
                     avatar.loadImage(user.avatarUrl)
+                }
                 fullName.text = user.fullName
                 email.text = user.email
                 when (user.status) {
-                    ProfileFragment.ACTIVE_STATUS ->
-                        onlineStatus.setImageResource(R.drawable.is_online_picture)
-                    ProfileFragment.IDLE_STATUS ->
-                        onlineStatus.setImageResource(R.drawable.is_idle_picture)
-                    ProfileFragment.OFFLINE_STATUS ->
-                        onlineStatus.setImageResource(R.drawable.is_offline_picture)
+                    ACTIVE_STATUS -> onlineStatus.setImageResource(R.drawable.is_online_picture)
+                    IDLE_STATUS -> onlineStatus.setImageResource(R.drawable.is_idle_picture)
+                    OFFLINE_STATUS -> onlineStatus.setImageResource(R.drawable.is_offline_picture)
                     else -> onlineStatus.setImageResource(R.drawable.is_offline_picture)
                 }
             }
@@ -59,7 +66,8 @@ class PeopleAdapter : RecyclerView.Adapter<PeopleAdapter.UserViewHolder>() {
                 LayoutInflater.from(parent.context),
                 parent,
                 false
-            )
+            ),
+            onUserClick = onUserClick
         )
     }
 

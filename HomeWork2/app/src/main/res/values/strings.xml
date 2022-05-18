@@ -1,9 +1,18 @@
 <resources>
     <string name="app_name">HomeWork-2</string>
-    <string name="title_message">Messages</string>
+    <string name="dialog_channel_exists_title">Канал уже существует</string>
+    <string name="dialog_channel_exists_positive_button">Да</string>
+    <string name="dialog_channel_exists_negative_button">Нет</string>
+    <string name="dialog_channel_exists_message">
+        Канал с таким именем уже существует. Хотите на него подписаться?
+    </string>
+    <string name="title_channel_chat">Channel chat</string>
+    <string name="title_topic_chat">Topic chat</string>
     <string name="title_channels">Channels</string>
     <string name="title_people">People</string>
-    <string name="title_profile">Profile</string>
+    <string name="title_topic_pick">People</string>
+    <string name="title_my_profile">My Profile</string>
+    <string name="title_create_channel">Create Channel</string>
     <string name="tab_all">All channels</string>
     <string name="tab_subscribed">Subscribed</string>
     <string name="avatar">Avatar</string>
@@ -12,18 +21,44 @@
     <string name="hint_search_view_users">Users…</string>
     <string name="count_messages">%s mes</string>
     <string name="status">in a meeting</string>
+    <string name="new_topic">Новый топик</string>
+    <string name="topic_picker">Topic Picker</string>
+    <string name="profile_title_toolbar">Profile</string>
     <string name="online_status">online</string>
     <string name="offline_status">offline</string>
     <string name="log_out">Log out</string>
     <string name="topic_text">Topic: %s</string>
     <string name="error_button_text">ПОВТОРИТЬ</string>
-    <string name="failed_load_actual_topics">Не удалось загрузить актуальные топики</string>
+    <string name="error_validation_channel_name">Имя канала не может быть пустым</string>
+    <string name="error_validation_topic_name">Имя топика не может быть пустым</string>
+    <string name="failed_load_actual_topics">
+        Не удалось загрузить актуальные топики. Проверьте интернет соединение!
+    </string>
     <string name="failed_load_cached_channels">Не удалось загрузить кэшированные каналы</string>
+    <string name="failed_search_actual_channels">
+        Не удалось найти актуальные каналы. Проверьте интернет соединение!
+    </string>
+    <string name="failed_load_cached_topics">Не удалось загрузить кэшированные каналы</string>
     <string name="failed_load_cached_messages">Не удалось загрузить кэшированные сообщения</string>
-    <string name="failed_load_next_page">Не удалось загрузить новую страницу сообщений</string>
+    <string name="failed_load_next_page">
+        Не удалось загрузить новую страницу сообщений. Проверьте интернет соединение!
+    </string>
     <string name="failed_send_message">Не удалось отправить сообщение</string>
     <string name="failed_add_reaction">Не удалось добавить реакцию</string>
     <string name="failed_remove_reaction">Не удалось удалить реакцию</string>
     <string name="failed_refresh_message">Не удалось обновить сообщение</string>
-    <string name="error_text">Произошла ошибка при загрузке данных. Проверьте подключение к сети.</string>
+    <string name="topic_name_hint">…</string>
+    <string name="error_text">
+        Произошла ошибка при загрузке данных. Проверьте подключение к сети!
+    </string>
+    <string name="channel_name">Название канала</string>
+    <string name="channel_description">Описание канала</string>
+    <string name="create_channel">Создать канал</string>
+    <string name="creating_channel">Создание канала</string>
+    <string name="failed_create_channel">Упс… произошла ошибка. Не удалось создать канал</string>
+    <string name="failed_subscribe_to_channel">
+        Упс… произошла ошибка. Не удалось подписаться на канал
+    </string>
+    <string name="successful_creation_channel">Канал успешно создан</string>
+    <string name="successful_subscription_to_channel">Подписка на канал успешко оформлена</string>
 </resources>

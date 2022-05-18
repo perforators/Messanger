@@ -4,17 +4,18 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.RecyclerView
+import com.krivochkov.homework_2.databinding.*
 import com.krivochkov.homework_2.presentation.DiffCallback
 import com.krivochkov.homework_2.presentation.Item
-import com.krivochkov.homework_2.databinding.DateSeparatorItemBinding
-import com.krivochkov.homework_2.databinding.LoadingItemBinding
-import com.krivochkov.homework_2.databinding.MessageItemBinding
 import com.krivochkov.homework_2.domain.models.Emoji
+import com.krivochkov.homework_2.domain.models.Topic
 import com.krivochkov.homework_2.presentation.BaseViewHolder
 import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.items.LoadingItem
 import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.view_holders.LoadingViewHolder
+import com.krivochkov.homework_2.presentation.chat.adapters.chat_adapter.items.BeginningTopicItem
 import com.krivochkov.homework_2.presentation.chat.adapters.chat_adapter.items.DateSeparatorItem
 import com.krivochkov.homework_2.presentation.chat.adapters.chat_adapter.items.MessageItem
+import com.krivochkov.homework_2.presentation.chat.adapters.chat_adapter.view_holders.BeginningTopicViewHolder
 import com.krivochkov.homework_2.presentation.chat.adapters.chat_adapter.view_holders.DateSeparatorViewHolder
 import com.krivochkov.homework_2.presentation.chat.adapters.chat_adapter.view_holders.MessageViewHolder
 import java.lang.IllegalStateException
@@ -32,6 +33,7 @@ class ChatAdapter(
     private var onAddMyReaction: (messageId: Long, emoji: Emoji) -> Unit = { _, _ -> }
     private var onRemoveMyReaction: (messageId: Long, emoji: Emoji) -> Unit = { _, _ -> }
     private var onChoosingReaction: (messageId: Long) -> Unit = {  }
+    private var onTopicClick: (topic: Topic) -> Unit = {  }
 
     private fun submitList(items: List<Item>, onCommitted: (() -> Unit)? = null) {
         differ.submitList(items, onCommitted)
@@ -47,6 +49,10 @@ class ChatAdapter(
 
     fun setOnChoosingReactionListener(listener: (messageId: Long) -> Unit) {
         onChoosingReaction = listener
+    }
+
+    fun setOnTopicClickListener(listener: (topic: Topic) -> Unit) {
+        onTopicClick = listener
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
@@ -75,6 +81,14 @@ class ChatAdapter(
                     false
                 )
             )
+            BeginningTopicItem.TYPE -> BeginningTopicViewHolder(
+                BeginningTopicItemBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                ),
+                onTopicClick
+            )
             else -> throw IllegalStateException("Unknown viewType")
         }
     }
@@ -84,6 +98,8 @@ class ChatAdapter(
             is MessageViewHolder -> holder.bind(differ.currentList[position] as MessageItem)
             is DateSeparatorViewHolder -> holder
                 .bind(differ.currentList[position] as DateSeparatorItem)
+            is BeginningTopicViewHolder -> holder
+                .bind(differ.currentList[position] as BeginningTopicItem)
         }
         paginationAdapterHelper.onBind(position)
     }

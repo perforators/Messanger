@@ -9,7 +9,10 @@ interface MessageDao {
 
     @Query("SELECT * FROM messages WHERE channelName = :channelName " +
             "AND topicName = :topicName ORDER BY date")
-    fun getMessages(channelName: String, topicName: String): Single<List<MessageEntity>>
+    fun getMessagesFromTopic(channelName: String, topicName: String): Single<List<MessageEntity>>
+
+    @Query("SELECT * FROM messages WHERE channelName = :channelName ORDER BY date")
+    fun getMessagesFromChannel(channelName: String): Single<List<MessageEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertMessages(messages: List<MessageEntity>)

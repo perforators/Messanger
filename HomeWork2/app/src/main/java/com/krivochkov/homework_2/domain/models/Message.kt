@@ -7,6 +7,7 @@ data class Message(
     val isMyMessage: Boolean,
     val text: String,
     val date: Long,
+    val topic: String,
     val reactions: List<Reaction>,
     val groupedReactions: List<GroupedReaction>
 )

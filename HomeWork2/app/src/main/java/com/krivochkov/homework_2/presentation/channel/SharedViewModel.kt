@@ -13,12 +13,28 @@ class SharedViewModel : ViewModel() {
     val selectedTopic: LiveData<SingleEvent<Pair<Channel, Topic>>>
         get() = _selectedTopic
 
+    private val _selectedChannel: MutableLiveData<SingleEvent<Channel>> = MutableLiveData()
+    val selectedChannel: LiveData<SingleEvent<Channel>>
+        get() = _selectedChannel
+
+    private val _showCreateChannelScreenEvent: MutableLiveData<SingleEvent<Any>> = MutableLiveData()
+    val showCreateChannelScreenEvent: LiveData<SingleEvent<Any>>
+        get() = _showCreateChannelScreenEvent
+
     private val _searchQuery: MutableLiveData<SingleEvent<String>> = MutableLiveData()
     val searchQuery: LiveData<SingleEvent<String>>
         get() = _searchQuery
 
     fun selectTopic(channel: Channel, topic: Topic) {
         _selectedTopic.value = SingleEvent(channel to topic)
+    }
+
+    fun selectChannel(channel: Channel) {
+        _selectedChannel.value = SingleEvent(channel)
+    }
+
+    fun showCreateChannelScreen() {
+        _showCreateChannelScreenEvent.value = SingleEvent(Any())
     }
 
     fun sendSearchQuery(query: String) {

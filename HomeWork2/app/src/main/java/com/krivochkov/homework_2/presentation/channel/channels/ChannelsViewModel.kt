@@ -6,7 +6,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.krivochkov.homework_2.presentation.SearchQueryFilter
 import com.krivochkov.homework_2.presentation.SingleEvent
-import com.krivochkov.homework_2.presentation.channel.elm.ChannelStoreFactory
+import com.krivochkov.homework_2.presentation.channel.channels.elm.ChannelStoreFactory
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.rxkotlin.subscribeBy
 

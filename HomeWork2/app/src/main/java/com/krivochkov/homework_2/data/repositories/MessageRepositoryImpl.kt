@@ -31,10 +31,8 @@ class MessageRepositoryImpl @Inject constructor(
         lastMessageId: Long,
         numBefore: Int
     ): Single<List<Message>> {
-        val narrows = mutableListOf(
-            NarrowDto(NarrowDto.OPERATOR_CHANNEL, channelName),
-            NarrowDto(NarrowDto.OPERATOR_TOPIC, topicName)
-        )
+        val narrows = mutableListOf(NarrowDto(NarrowDto.OPERATOR_CHANNEL, channelName))
+        if (topicName.isNotEmpty()) narrows.add(NarrowDto(NarrowDto.OPERATOR_TOPIC, topicName))
 
         val anchor = if (lastMessageId <= 0) DEFAULT_ANCHOR else lastMessageId - 1
 
@@ -53,7 +51,7 @@ class MessageRepositoryImpl @Inject constructor(
                             messageDto.mapToMessage(myUser.id)
                         }
                     }
-                    .doOnSuccess { cacheMessages(channelName, topicName, it) }
+                    .doOnSuccess { cacheMessages(channelName, it) }
             }
     }
 
@@ -87,12 +85,24 @@ class MessageRepositoryImpl @Inject constructor(
     }
 
     override fun getCachedMessages(channelName: String, topicName: String): Single<List<Message>> {
-        return messageLocalDataSource.getMessages(channelName, topicName)
-            .map { it.map { messageEntity -> messageEntity.mapToMessage() } }
+        return if (topicName.isNotEmpty()) {
+            messageLocalDataSource.getMessagesFromTopic(channelName, topicName)
+        } else {
+            messageLocalDataSource.getMessagesFromChannel(channelName)
+        }.map { it.map { messageEntity -> messageEntity.mapToMessage() } }
     }
 
-    private fun cacheMessages(channelName: String, topicName: String, messages: List<Message>) {
-        messageLocalDataSource.getMessages(channelName, topicName)
+    private fun cacheMessages(channelName: String, messages: List<Message>) {
+        val groups = messages.groupBy { it.topic }
+        groups.forEach { cacheMessagesByTopic(channelName, it.key, it.value) }
+    }
+
+    private fun cacheMessagesByTopic(
+        channelName: String,
+        topicName: String,
+        messages: List<Message>
+    ) {
+        messageLocalDataSource.getMessagesFromTopic(channelName, topicName)
             .map { cachedMessages ->
                 val newMessages = messages.map { it.mapToMessageEntity(channelName, topicName) }
                 messageLocalDataSource.refreshMessages(
@@ -102,7 +112,7 @@ class MessageRepositoryImpl @Inject constructor(
                 )
             }
             .subscribeOn(Schedulers.io())
-            .subscribeBy(onError = { Log.d(TAG, it.printStackTrace().toString()) } )
+            .subscribeBy(onError = { Log.d(TAG, it.printStackTrace().toString()) })
     }
 
     private fun getUpdatedListMessages(
@@ -121,7 +131,10 @@ class MessageRepositoryImpl @Inject constructor(
         }
 
         return if (resultMessages.size > MAX_COUNT_CACHED_MESSAGES)
-            resultMessages.subList(resultMessages.size - MAX_COUNT_CACHED_MESSAGES, resultMessages.size)
+            resultMessages.subList(
+                resultMessages.size - MAX_COUNT_CACHED_MESSAGES,
+                resultMessages.size
+            )
         else
             resultMessages
     }

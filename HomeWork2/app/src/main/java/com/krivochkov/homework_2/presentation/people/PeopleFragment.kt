@@ -2,17 +2,18 @@ package com.krivochkov.homework_2.presentation.people
 
 import android.content.Context
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.krivochkov.homework_2.R
 import com.krivochkov.homework_2.appComponent
 import com.krivochkov.homework_2.databinding.FragmentPeopleBinding
 import com.krivochkov.homework_2.di.people.DaggerPeopleScreenComponent
+import com.krivochkov.homework_2.domain.models.User
 import com.krivochkov.homework_2.presentation.people.adapter.PeopleAdapter
 import com.krivochkov.homework_2.presentation.people.elm.PeopleEffect
 import com.krivochkov.homework_2.presentation.people.elm.PeopleEvent
@@ -20,13 +21,12 @@ import com.krivochkov.homework_2.presentation.people.elm.PeopleState
 import vivid.money.elmslie.android.base.ElmFragment
 import javax.inject.Inject
 
-class PeopleFragment : ElmFragment<PeopleEvent, PeopleEffect, PeopleState>() {
+class PeopleFragment : ElmFragment<PeopleEvent, PeopleEffect, PeopleState>(R.layout.fragment_people) {
 
     @Inject
     internal lateinit var peopleViewModelFactory: PeopleViewModelFactory
 
-    private var _binding: FragmentPeopleBinding? = null
-    private val binding get() = _binding!!
+    private val binding: FragmentPeopleBinding by viewBinding()
 
     private lateinit var adapter: PeopleAdapter
 
@@ -59,19 +59,10 @@ class PeopleFragment : ElmFragment<PeopleEvent, PeopleEffect, PeopleState>() {
         }
     }
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentPeopleBinding.bind(
-            inflater.inflate(R.layout.fragment_people, container, false)
-        )
-        return binding.root
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
+    override fun handleEffect(effect: PeopleEffect) {
+        when (effect) {
+            is PeopleEffect.ShowUserDetailScreen -> navigateToUserDetailScreen(effect.user)
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -92,7 +83,9 @@ class PeopleFragment : ElmFragment<PeopleEvent, PeopleEffect, PeopleState>() {
     }
 
     private fun initRecycler() {
-        adapter = PeopleAdapter()
+        adapter = PeopleAdapter { user ->
+            store.accept(PeopleEvent.Ui.OnUserClick(user))
+        }
         binding.peopleRecycler.adapter = adapter
         binding.peopleRecycler.layoutManager = LinearLayoutManager(requireContext())
     }
@@ -112,5 +105,11 @@ class PeopleFragment : ElmFragment<PeopleEvent, PeopleEffect, PeopleState>() {
         binding.search.searchView.addTextChangedListener { text ->
             viewModel.addQueryToQueue(text?.toString().orEmpty())
         }
+    }
+
+    private fun navigateToUserDetailScreen(user: User) {
+        findNavController().navigate(
+            PeopleFragmentDirections.actionNavigationPeopleToOtherProfileFragment(user)
+        )
     }
 }

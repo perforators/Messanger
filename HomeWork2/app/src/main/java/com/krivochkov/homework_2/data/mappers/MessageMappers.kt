@@ -19,6 +19,7 @@ fun MessageDto.mapToMessage(myUserId: Long): Message {
         isMyMessage = myUserId == senderId,
         text = Html.fromHtml(content, Html.FROM_HTML_MODE_COMPACT).toString().trim(),
         date = timestamp,
+        topic = topic,
         reactions = reactions,
         groupedReactions = groupReaction(reactions, myUserId)
     )
@@ -31,6 +32,7 @@ fun MessageEntity.mapToMessage() = Message(
     isMyMessage = isMyMessage,
     text = text,
     date = date,
+    topic = topicName,
     reactions = reactions,
     groupedReactions = groupedReactions
 )

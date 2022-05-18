@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/button_box_layout"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal">
+
+    <ImageButton
+        android:id="@+id/send_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_send_button"
+        android:minWidth="48dp"
+        android:minHeight="48dp"
+        android:padding="@dimen/middle_padding"
+        android:scaleType="centerCrop"
+        android:visibility="gone"
+        app:srcCompat="@drawable/send_picture"
+        tools:ignore="ContentDescription,SpeakableTextPresentCheck" />
+
+    <ImageButton
+        android:id="@+id/add_file_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/add_file_btn_picture"
+        android:minWidth="48dp"
+        android:minHeight="48dp"
+        android:padding="@dimen/middle_padding"
+        android:scaleType="centerCrop"
+        tools:ignore="ContentDescription,SpeakableTextPresentCheck,ImageContrastCheck" />
+
+</LinearLayout>

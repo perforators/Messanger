@@ -11,33 +11,88 @@
         android:label="@string/title_channels"
         tools:layout="@layout/fragment_channel" >
         <action
-            android:id="@+id/action_navigation_channels_to_messagesFragment"
-            app:destination="@id/navigation_messages" />
+            android:id="@+id/action_navigation_channels_to_createChannelFragment"
+            app:destination="@id/navigation_create_channel" />
+        <action
+            android:id="@+id/action_navigation_channels_to_navigation_channel_chat"
+            app:destination="@id/navigation_channel_chat" />
+        <action
+            android:id="@+id/action_navigation_channels_to_navigation_topic_chat"
+            app:destination="@id/navigation_topic_chat" />
     </fragment>
 
     <fragment
-        android:id="@+id/navigation_profile"
-        android:name="com.krivochkov.homework_2.presentation.profile.ProfileFragment"
-        android:label="@string/title_profile"
-        tools:layout="@layout/fragment_profile" />
+        android:id="@+id/navigation_my_profile"
+        android:name="com.krivochkov.homework_2.presentation.profile.my_profile.MyProfileFragment"
+        android:label="@string/title_my_profile"
+        tools:layout="@layout/fragment_my_profile" />
 
     <fragment
         android:id="@+id/navigation_people"
         android:name="com.krivochkov.homework_2.presentation.people.PeopleFragment"
         android:label="@string/title_people"
-        tools:layout="@layout/fragment_people" />
+        tools:layout="@layout/fragment_people" >
+        <action
+            android:id="@+id/action_navigation_people_to_otherProfileFragment"
+            app:destination="@id/otherProfileFragment" />
+    </fragment>
 
     <fragment
-        android:id="@+id/navigation_messages"
-        android:name="com.krivochkov.homework_2.presentation.chat.ChatFragment"
-        android:label="@string/title_message"
-        tools:layout="@layout/fragment_chat">
+        android:id="@+id/navigation_create_channel"
+        android:name="com.krivochkov.homework_2.presentation.channel.create_channel.CreateChannelFragment"
+        android:label="@string/title_create_channel"
+        tools:layout="@layout/fragment_create_channel" >
+        <action
+            android:id="@+id/action_navigation_create_channel_to_navigation_channels"
+            app:destination="@id/navigation_channels"
+            app:popUpTo="@id/navigation_channels"
+            app:popUpToInclusive="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_channel_chat"
+        android:name="com.krivochkov.homework_2.presentation.chat.channel_chat.ChannelChatFragment"
+        android:label="@string/title_channel_chat" >
+        <argument
+            android:name="channel"
+            app:argType="com.krivochkov.homework_2.domain.models.Channel" />
+        <action
+            android:id="@+id/action_navigation_channel_chat_to_navigation_topic_chat"
+            app:destination="@id/navigation_topic_chat" />
+        <action
+            android:id="@+id/action_navigation_channel_chat_to_topicPickFragment"
+            app:destination="@id/navigation_topic_pick" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_topic_chat"
+        android:name="com.krivochkov.homework_2.presentation.chat.topic_chat.TopicChatFragment"
+        android:label="@string/title_topic_chat" >
         <argument
             android:name="channel"
             app:argType="com.krivochkov.homework_2.domain.models.Channel" />
         <argument
             android:name="topic"
             app:argType="com.krivochkov.homework_2.domain.models.Topic" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_topic_pick"
+        android:name="com.krivochkov.homework_2.presentation.chat.topic_pick.TopicPickFragment"
+        android:label="@string/title_topic_pick" >
+        <argument
+            android:name="channelId"
+            app:argType="long"
+            android:defaultValue="-1L" />
+    </fragment>
+    <fragment
+        android:id="@+id/otherProfileFragment"
+        android:name="com.krivochkov.homework_2.presentation.profile.other_profile.OtherProfileFragment"
+        android:label="fragment_other_profile"
+        tools:layout="@layout/fragment_other_profile" >
+        <argument
+            android:name="user"
+            app:argType="com.krivochkov.homework_2.domain.models.User" />
     </fragment>
 
 </navigation>

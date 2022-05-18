@@ -2,6 +2,7 @@ package com.krivochkov.homework_2.data.sources.remote.data_sources
 
 import com.krivochkov.homework_2.data.sources.remote.dto.ChannelDto
 import com.krivochkov.homework_2.data.sources.remote.dto.TopicDto
+import io.reactivex.Completable
 import io.reactivex.Single
 
 interface ChannelRemoteDataSource {
@@ -11,4 +12,8 @@ interface ChannelRemoteDataSource {
     fun getSubscribedChannels(): Single<List<ChannelDto>>
 
     fun getTopicsInChannel(channelId: Long): Single<List<TopicDto>>
+
+    fun getChannelId(channelName: String): Single<Long>
+
+    fun subscribeToChannels(subscriptions: String): Completable
 }

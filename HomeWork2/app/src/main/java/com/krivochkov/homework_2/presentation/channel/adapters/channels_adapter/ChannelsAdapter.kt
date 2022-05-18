@@ -9,13 +9,16 @@ import com.krivochkov.homework_2.presentation.Item
 import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.items.ChannelItem
 import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.items.TopicItem
 import com.krivochkov.homework_2.databinding.ChannelItemBinding
+import com.krivochkov.homework_2.databinding.CreateChannelItemBinding
 import com.krivochkov.homework_2.databinding.LoadingItemBinding
 import com.krivochkov.homework_2.databinding.TopicItemBinding
 import com.krivochkov.homework_2.domain.models.Channel
 import com.krivochkov.homework_2.domain.models.Topic
 import com.krivochkov.homework_2.presentation.BaseViewHolder
+import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.items.CreateChannelItem
 import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.items.LoadingItem
 import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.view_holders.ChannelViewHolder
+import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.view_holders.CreateChannelViewHolder
 import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.view_holders.LoadingViewHolder
 import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.view_holders.TopicViewHolder
 import java.lang.IllegalStateException
@@ -27,18 +30,16 @@ class ChannelsAdapter : RecyclerView.Adapter<BaseViewHolder>() {
     private var onExpandedChannel: (channelId: Long) -> Unit = {  }
     private var onCollapsedChannel: (channelId: Long) -> Unit = {  }
     private var onTopicClick: (channel: Channel, topic: Topic) -> Unit = { _, _ -> }
+    private var onChannelClick: (channel: Channel) -> Unit = {  }
+    private var onCreatingChannelItemClick: () -> Unit = {  }
 
-    fun submitChannels(channels: List<ChannelItem>, onCommitted: (() -> Unit)? = null) {
+    fun submitItems(items: List<Item>, onCommitted: (() -> Unit)? = null) {
         val resultItems = mutableListOf<Item>()
-        channels.forEach { channelItem ->
-            resultItems.add(channelItem)
-            if (channelItem.isExpanded) resultItems.addAll(channelItem.childItems)
+        items.forEach { item ->
+            resultItems.add(item)
+            if (item is ChannelItem && item.isExpanded) resultItems.addAll(item.childItems)
         }
-        submitItems(resultItems, onCommitted)
-    }
-
-    private fun submitItems(items: List<Item>, onCommitted: (() -> Unit)? = null) {
-        differ.submitList(items, onCommitted)
+        differ.submitList(resultItems, onCommitted)
     }
 
     private fun findChannelItemById(channelId: Long): ChannelItem? {
@@ -59,6 +60,14 @@ class ChannelsAdapter : RecyclerView.Adapter<BaseViewHolder>() {
         onTopicClick = listener
     }
 
+    fun setOnCreatingChannelItemClickListener(listener: () -> Unit) {
+        onCreatingChannelItemClick = listener
+    }
+
+    fun setOnChannelClickListener(listener: (channel: Channel) -> Unit) {
+        onChannelClick = listener
+    }
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         return when (viewType) {
             ChannelItem.TYPE -> ChannelViewHolder(
@@ -67,6 +76,7 @@ class ChannelsAdapter : RecyclerView.Adapter<BaseViewHolder>() {
                     parent,
                     false
                 ),
+                onChannelClick = { onChannelClick(it.channel) },
                 onExpanded = { onExpandedChannel(it.channel.id) },
                 onCollapsed = { onCollapsedChannel(it.channel.id) }
             )
@@ -88,6 +98,14 @@ class ChannelsAdapter : RecyclerView.Adapter<BaseViewHolder>() {
                     false
                 )
             )
+            CreateChannelItem.TYPE -> CreateChannelViewHolder(
+                CreateChannelItemBinding.inflate(
+                    LayoutInflater.from(parent.context),
+                    parent,
+                    false
+                ),
+                onCreatingChannelItemClick
+            )
             else -> throw IllegalStateException("Unknown viewType")
         }
     }
@@ -96,6 +114,7 @@ class ChannelsAdapter : RecyclerView.Adapter<BaseViewHolder>() {
         when (holder) {
             is ChannelViewHolder -> holder.bind(differ.currentList[position] as ChannelItem)
             is TopicViewHolder -> holder.bind(differ.currentList[position] as TopicItem)
+            is CreateChannelViewHolder-> holder.bind()
         }
     }
 

@@ -8,8 +8,9 @@ import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.
 
 class ChannelViewHolder(
     private val binding: ChannelItemBinding,
+    private val onChannelClick: (channelItem: ChannelItem) -> Unit,
     private val onExpanded: (channelItem: ChannelItem) -> Unit,
-    private val onCollapsed: (channelItem: ChannelItem) -> Unit,
+    private val onCollapsed: (channelItem: ChannelItem) -> Unit
 ) : BaseViewHolder(binding.root) {
 
     private val context = binding.root.context
@@ -18,7 +19,10 @@ class ChannelViewHolder(
         binding.channelName.text = channelItem.channel.name
         if (channelItem.isExpanded) showUpArrow() else showDownArrow()
 
-        binding.channelItem.setOnClickListener {
+        binding.channelName.setOnClickListener {
+            onChannelClick(channelItem)
+        }
+        binding.arrow.setOnClickListener {
             when (!channelItem.isExpanded) {
                 true -> {
                     onExpanded(channelItem)

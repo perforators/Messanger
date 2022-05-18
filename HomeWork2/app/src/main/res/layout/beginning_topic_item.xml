@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/beginning_topic_item"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="@dimen/big_margin"
+    android:layout_marginBottom="@dimen/big_margin">
+
+    <TextView
+        android:id="@+id/topic_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/grey"
+        android:paddingStart="@dimen/big_padding"
+        android:paddingEnd="@dimen/big_padding"
+        android:paddingTop="@dimen/small_padding"
+        android:paddingBottom="@dimen/small_padding"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        tools:ignore="TextContrastCheck" />
+
+</FrameLayout>

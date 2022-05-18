@@ -28,6 +28,9 @@ class PeopleReducer : ScreenDslReducer<PeopleEvent, PeopleEvent.Ui, PeopleEvent.
                     Any()
                 }
             }
+            is PeopleEvent.Ui.OnUserClick -> {
+                effects { +PeopleEffect.ShowUserDetailScreen(event.user) }
+            }
             is PeopleEvent.Ui.SearchPeople -> {
                 state { copy(isLoading = true, error = null, lastQuery = event.query) }
                 commands { +PeopleCommand.SearchPeople(event.query) }

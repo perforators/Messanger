@@ -15,6 +15,7 @@ sealed class PeopleEvent {
     sealed class Ui : PeopleEvent() {
         object Init : Ui()
         data class SearchPeople(val query: String) : Ui()
+        data class OnUserClick(val user: User) : Ui()
         object SearchPeopleByLastQuery : Ui()
     }
 
@@ -24,7 +25,9 @@ sealed class PeopleEvent {
     }
 }
 
-sealed class PeopleEffect
+sealed class PeopleEffect {
+    data class ShowUserDetailScreen(val user: User) : PeopleEffect()
+}
 
 sealed class PeopleCommand {
     data class SearchPeople(val query: String = "") : PeopleCommand()

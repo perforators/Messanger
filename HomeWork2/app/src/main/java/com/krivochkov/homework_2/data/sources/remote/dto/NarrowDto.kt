@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class NarrowDto(
     @SerialName("operator") val operator: String,
-    @SerialName("operand") val operand: String,
+    @SerialName("operand") val operand: String
 ) {
 
     companion object {

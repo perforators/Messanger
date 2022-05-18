@@ -74,6 +74,7 @@ dependencies {
 
     // Room
     implementation "androidx.room:room-runtime:$roomVersion"
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     kapt "androidx.room:room-compiler:$roomVersion"
     implementation "androidx.room:room-rxjava2:$roomVersion"
 
@@ -86,7 +87,10 @@ dependencies {
     implementation "com.google.dagger:dagger:$daggerVersion"
     kapt "com.google.dagger:dagger-compiler:$daggerVersion"
 
+    //Tests
     testImplementation "junit:junit:$junitVersion"
     androidTestImplementation "androidx.test.ext:junit:$junitExtVersion"
     androidTestImplementation "com.kaspersky.android-components:kaspresso:$kaspressoVersion"
+
+    implementation "com.github.kirich1409:viewbindingpropertydelegate:$viewBindingDelegateVersion"
 }

@@ -37,7 +37,7 @@ class ChatActor(
         is ChatCommand.SendMessage ->
             sendMessageUseCase(command.channelName, command.topicName, command.message, command.attachedFiles)
                 .mapEvents(
-                    successEvent = ChatEvent.Internal.MessageSent(command.channelName, command.topicName),
+                    successEvent = ChatEvent.Internal.MessageSent,
                     failureEventMapper = { error -> ChatEvent.Internal.ErrorSendingMessage(error) }
                 )
         is ChatCommand.AddReaction -> addReactionUseCase(command.messageId, command.emojiName)

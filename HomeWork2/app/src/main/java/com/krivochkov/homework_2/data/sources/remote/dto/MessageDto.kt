@@ -11,5 +11,6 @@ data class MessageDto(
     @SerialName("sender_full_name") val senderName: String,
     @SerialName("sender_id") val senderId: Long,
     @SerialName("timestamp") val timestamp: Long,
-    @SerialName("reactions") val reactions: List<ReactionDto>
+    @SerialName("reactions") val reactions: List<ReactionDto>,
+    @SerialName("subject") val topic: String
 )

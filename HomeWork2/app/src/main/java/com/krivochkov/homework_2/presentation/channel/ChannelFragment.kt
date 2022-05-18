@@ -1,13 +1,12 @@
 package com.krivochkov.homework_2.presentation.channel
 
 import android.os.Bundle
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
 import androidx.core.widget.addTextChangedListener
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
+import by.kirich1409.viewbindingdelegate.viewBinding
 import com.google.android.material.tabs.TabLayoutMediator
 import com.krivochkov.homework_2.R
 import com.krivochkov.homework_2.databinding.FragmentChannelBinding
@@ -15,36 +14,32 @@ import com.krivochkov.homework_2.domain.models.Channel
 import com.krivochkov.homework_2.domain.models.Topic
 import com.krivochkov.homework_2.presentation.channel.adapters.pager_adapter.PagerStateAdapter
 
-class ChannelFragment : Fragment() {
+class ChannelFragment : Fragment(R.layout.fragment_channel) {
 
-    private var _binding: FragmentChannelBinding? = null
-    private val binding get() = _binding!!
+    private val binding: FragmentChannelBinding by viewBinding()
 
     private val sharedViewModel: SharedViewModel by activityViewModels()
-
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
-        _binding = FragmentChannelBinding.bind(
-            inflater.inflate(R.layout.fragment_channel, container, false)
-        )
-        return binding.root
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        _binding = null
-    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initTabLayout()
 
-        sharedViewModel.selectedTopic.observe(this) {
+        sharedViewModel.selectedTopic.observe(viewLifecycleOwner) {
             it.getContentIfNotHandled()?.let { result ->
                 val (channel, topic) = result
-                navigateToMessageFragment(channel, topic)
+                navigateToTopicChatFragment(channel, topic)
+            }
+        }
+
+        sharedViewModel.selectedChannel.observe(viewLifecycleOwner) {
+            it.getContentIfNotHandled()?.let { channel ->
+                navigateToChannelChatFragment(channel)
+            }
+        }
+
+        sharedViewModel.showCreateChannelScreenEvent.observe(viewLifecycleOwner) {
+            it.getContentIfNotHandled()?.let {
+                navigateToCreateChannelFragment()
             }
         }
     }
@@ -76,9 +71,21 @@ class ChannelFragment : Fragment() {
         }
     }
 
-    private fun navigateToMessageFragment(channel: Channel, topic: Topic) {
+    private fun navigateToTopicChatFragment(channel: Channel, topic: Topic) {
         findNavController().navigate(
-            ChannelFragmentDirections.actionNavigationChannelsToMessagesFragment(channel, topic)
+            ChannelFragmentDirections.actionNavigationChannelsToNavigationTopicChat(channel, topic)
+        )
+    }
+
+    private fun navigateToChannelChatFragment(channel: Channel) {
+        findNavController().navigate(
+            ChannelFragmentDirections.actionNavigationChannelsToNavigationChannelChat(channel)
+        )
+    }
+
+    private fun navigateToCreateChannelFragment() {
+        findNavController().navigate(
+            ChannelFragmentDirections.actionNavigationChannelsToCreateChannelFragment()
         )
     }
 }

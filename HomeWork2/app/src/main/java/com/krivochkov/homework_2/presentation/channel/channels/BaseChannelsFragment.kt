@@ -3,6 +3,7 @@ package com.krivochkov.homework_2.presentation.channel.channels
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.annotation.LayoutRes
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -11,13 +12,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.krivochkov.homework_2.R
 import com.krivochkov.homework_2.presentation.channel.SharedViewModel
 import com.krivochkov.homework_2.presentation.channel.adapters.channels_adapter.ChannelsAdapter
-import com.krivochkov.homework_2.presentation.channel.elm.ChannelEffect
-import com.krivochkov.homework_2.presentation.channel.elm.ChannelEvent
-import com.krivochkov.homework_2.presentation.channel.elm.ChannelState
+import com.krivochkov.homework_2.presentation.channel.channels.elm.ChannelEffect
+import com.krivochkov.homework_2.presentation.channel.channels.elm.ChannelEvent
+import com.krivochkov.homework_2.presentation.channel.channels.elm.ChannelState
 import com.krivochkov.homework_2.presentation.custom_views.ErrorView
 import vivid.money.elmslie.android.base.ElmFragment
 
-abstract class BaseChannelsFragment : ElmFragment<ChannelEvent, ChannelEffect, ChannelState>() {
+abstract class BaseChannelsFragment(@LayoutRes contentLayoutId: Int) :
+    ElmFragment<ChannelEvent, ChannelEffect, ChannelState>(contentLayoutId) {
 
     private val sharedViewModel: SharedViewModel by activityViewModels()
     protected val channelsViewModel: ChannelsViewModel by viewModels { channelsViewModelFactory }
@@ -59,10 +61,17 @@ abstract class BaseChannelsFragment : ElmFragment<ChannelEvent, ChannelEffect, C
         when (effect) {
             is ChannelEffect.ShowTopicContent ->
                 sharedViewModel.selectTopic(effect.channel, effect.topic)
-            is ChannelEffect.ShowErrorLoadingTopics ->
+            is ChannelEffect.ShowCreateChannelScreen ->
+                sharedViewModel.showCreateChannelScreen()
+            is ChannelEffect.ShowErrorLoadingCachedTopics ->
+                showToast(requireContext().getString(R.string.failed_load_cached_topics))
+            is ChannelEffect.ShowErrorLoadingActualTopics ->
                 showToast(requireContext().getString(R.string.failed_load_actual_topics))
             is ChannelEffect.ShowErrorLoadingCachedChannels ->
                 showToast(requireContext().getString(R.string.failed_load_cached_channels))
+            is ChannelEffect.ShowErrorSearchingActualChannels ->
+                showToast(requireContext().getString(R.string.failed_search_actual_channels))
+            is ChannelEffect.ShowChannelContent -> sharedViewModel.selectChannel(effect.channel)
         }
     }
 
@@ -78,6 +87,14 @@ abstract class BaseChannelsFragment : ElmFragment<ChannelEvent, ChannelEffect, C
 
             setOnTopicClickListener { channel, topic ->
                 store.accept(ChannelEvent.Ui.TopicClick(channel, topic))
+            }
+
+            setOnCreatingChannelItemClickListener {
+                store.accept(ChannelEvent.Ui.CreatingChannelItemClick)
+            }
+
+            setOnChannelClickListener { channel ->
+                store.accept(ChannelEvent.Ui.ChannelClick(channel))
             }
         }
         recyclerView.adapter = adapter

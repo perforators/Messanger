@@ -33,7 +33,9 @@ class ChatReducer : ScreenDslReducer<ChatEvent, ChatEvent.Ui, ChatEvent.Internal
                     }
 
                     if (indexOfOccurrence == -1) {
-                        state.items.toMutableList().apply { addAll(this.lastIndex + 1, event.messages) }
+                        state.items.toMutableList().apply {
+                            addAll(this.lastIndex + 1, event.messages)
+                        }
                     } else {
                         val updatedMessages = state.items.subList(0, indexOfOccurrence).toMutableList()
                         updatedMessages.apply { addAll(indexOfOccurrence, event.messages) }
@@ -63,7 +65,7 @@ class ChatReducer : ScreenDslReducer<ChatEvent, ChatEvent.Ui, ChatEvent.Internal
             }
             is ChatEvent.Internal.MessageSent -> {
                 commands {
-                    +ChatCommand.LoadPage(event.channelName, event.topicName, 0, state.pageSize)
+                    +ChatCommand.LoadPage(state.channelName, state.topicName, 0, state.pageSize)
                 }
             }
             is ChatEvent.Internal.ReactionUpdated -> {
@@ -98,12 +100,12 @@ class ChatReducer : ScreenDslReducer<ChatEvent, ChatEvent.Ui, ChatEvent.Internal
     override fun Result.ui(event: ChatEvent.Ui): Any {
         return when (event) {
             is ChatEvent.Ui.Init -> {
-                if (state.isInitialized.not() ||
-                    state.channelName != event.channelName || state.topicName != event.topicName) {
+                if (state.isInitialized.not()) {
                     state {
                         copy(
                             channelName = event.channelName,
                             topicName = event.topicName,
+                            topicForSendingMessages = event.topicName,
                             isLoading = true,
                             isInitialized = true,
                             items = emptyList(),
@@ -119,6 +121,15 @@ class ChatReducer : ScreenDslReducer<ChatEvent, ChatEvent.Ui, ChatEvent.Internal
                 } else {
                     Any()
                 }
+            }
+            is ChatEvent.Ui.ChangeTopicsForSendingMessages -> {
+                state { copy(topicForSendingMessages = event.topic.name) }
+            }
+            is ChatEvent.Ui.ShowTopicChatContent -> {
+                effects { +ChatEffect.ShowTopicChatContent(event.topic) }
+            }
+            is ChatEvent.Ui.ShowTopicPicker -> {
+                effects { +ChatEffect.ShowTopicPicker(event.channelId) }
             }
             is ChatEvent.Ui.BackButtonClick -> {
                 effects { +ChatEffect.NavigateUp }
@@ -163,7 +174,7 @@ class ChatReducer : ScreenDslReducer<ChatEvent, ChatEvent.Ui, ChatEvent.Internal
                 state { copy(attachedFiles = emptyList()) }
                 commands {
                     +ChatCommand.SendMessage(
-                        state.channelName, state.topicName, event.message, attachedFiles
+                        state.channelName, state.topicForSendingMessages, event.message, attachedFiles
                     )
                 }
             }

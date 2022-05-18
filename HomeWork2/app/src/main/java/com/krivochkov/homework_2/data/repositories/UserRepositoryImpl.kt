@@ -10,7 +10,7 @@ import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
-    private val userRemoteDataSource: UserRemoteDataSource
+    private val userRemoteDataSource: UserRemoteDataSource,
 ) : UserRepository {
 
     override fun getUsers(): Single<List<User>> {
@@ -28,7 +28,9 @@ class UserRepositoryImpl @Inject constructor(
 
     override fun getMyUser(): Single<User> {
         return userRemoteDataSource.getOwnUser()
-            .flatMap { userDto -> getUserStatus(userDto.email).map { userDto.mapToUser(it) } }
+            .flatMap { userDto ->
+                getUserStatus(userDto.email).map { userDto.mapToUser(it) }
+            }
     }
 
     private fun getUserStatus(userEmail: String): Single<String> {
